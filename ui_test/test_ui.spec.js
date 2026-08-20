@@ -34,6 +34,8 @@ test('full v3.1 browser flow renders canonical output', async ({ page }) => {
   await expect(page.locator('#layers')).toContainText('L1');
   await expect(page.locator('#layers')).toContainText('L6');
   await expect(page.locator('#checks')).toContainText('canonical vocabulary');
+  const l5Check = page.locator('#checks .check', { hasText: 'L5 canonical=true' });
+  await expect(l5Check).toHaveClass(/pass/);
   await expect(page.locator('#checks')).toContainText('deterministic request');
   await expect(page.locator('#summary')).toContainText('input hash');
 });
