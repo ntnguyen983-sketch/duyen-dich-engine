@@ -1,0 +1,15 @@
+test_decision_log_keeps_governance (test_v31_spec.TestV31CanonicalSpec.test_decision_log_keeps_governance) ... ok
+test_exact_s07_enum (test_v31_spec.TestV31CanonicalSpec.test_exact_s07_enum) ... ok
+test_legacy_is_not_canonical (test_v31_spec.TestV31CanonicalSpec.test_legacy_is_not_canonical) ... ok
+test_profile_hash_matches_registry (test_v31_spec.TestV31CanonicalSpec.test_profile_hash_matches_registry) ... ok
+test_required_test_vectors_are_documented (test_v31_spec.TestV31CanonicalSpec.test_required_test_vectors_are_documented) ... ok
+test_runtime_profiles_have_guards (test_v31_spec.TestV31CanonicalSpec.test_runtime_profiles_have_guards) ... ok
+test_s07_profile_has_rules_and_vectors (test_v31_spec.TestV31CanonicalSpec.test_s07_profile_has_rules_and_vectors) ... ok
+test_schema_is_strict_about_labels_and_confidence (test_v31_spec.TestV31CanonicalSpec.test_schema_is_strict_about_labels_and_confidence) ... ok
+test_spec_contains_complete_runtime (test_v31_spec.TestV31CanonicalSpec.test_spec_contains_complete_runtime) ... ok
+test_spec_keeps_60_tick_and_h1_research (test_v31_spec.TestV31CanonicalSpec.test_spec_keeps_60_tick_and_h1_research) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.007s
+
+OK

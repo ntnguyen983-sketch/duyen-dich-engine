@@ -1,0 +1,402 @@
+{
+  "registry_version": "3.1.0",
+  "registry_status": "RELEASE_CANDIDATE",
+  "source_refs": [
+    {
+      "document_id": "1nGmMp7Gg5PVc9QeYpmTr7HKIVpGXcBNqDQ52vrO3LX8",
+      "source_version": "2.9.3-FULL",
+      "role": "runtime_implementation"
+    },
+    {
+      "document_id": "1LgvaWOndVxnBpi7p-6OPARZqJZ47TgmhB-Ii-b1losc",
+      "source_version": "2.8.6",
+      "role": "field_model"
+    },
+    {
+      "document_id": "112YN7bwAHHebKLa5Amd_fFtVkQ5079Z-AZQk3XzVHBM",
+      "source_version": "2.8.7",
+      "role": "bec_unified_logic"
+    },
+    {
+      "document_id": "180a8LwwV1OH3H2claoO89xih8h55lUY9tdbNgp0vTY0",
+      "source_version": "2.9.1-NEW2",
+      "role": "s07_profile"
+    }
+  ],
+  "profiles": {
+    "MATRIX-2.9.3-FULL": {
+      "status": "CORE_PROFILE",
+      "precision": 6,
+      "matrices": {
+        "M_POL": {
+          "shape": [
+            10,
+            10
+          ],
+          "values": [
+            [
+              1.0,
+              0.8,
+              1.5,
+              1.2,
+              -2.0,
+              -1.5,
+              -1.0,
+              -0.8,
+              0.5,
+              0.3
+            ],
+            [
+              0.8,
+              0.5,
+              1.2,
+              1.0,
+              -1.5,
+              -1.2,
+              -0.8,
+              -0.6,
+              0.3,
+              0.2
+            ],
+            [
+              0.3,
+              0.2,
+              1.0,
+              0.8,
+              1.5,
+              1.2,
+              -2.0,
+              -1.5,
+              -1.0,
+              -0.8
+            ],
+            [
+              -1.0,
+              -0.8,
+              0.8,
+              0.3,
+              1.2,
+              1.0,
+              -1.5,
+              -1.2,
+              -0.8,
+              -0.6
+            ],
+            [
+              -0.8,
+              -0.6,
+              0.5,
+              0.3,
+              1.0,
+              0.8,
+              1.5,
+              1.2,
+              -2.0,
+              -1.5
+            ],
+            [
+              -2.0,
+              -1.5,
+              0.3,
+              0.2,
+              0.8,
+              0.5,
+              1.2,
+              1.0,
+              -1.5,
+              -1.2
+            ],
+            [
+              -2.0,
+              -1.2,
+              -1.0,
+              -0.8,
+              0.5,
+              0.3,
+              1.0,
+              0.8,
+              1.5,
+              1.2
+            ],
+            [
+              -1.0,
+              -0.8,
+              -0.8,
+              -0.6,
+              0.3,
+              0.2,
+              0.8,
+              0.5,
+              1.2,
+              1.0
+            ],
+            [
+              1.5,
+              1.2,
+              -2.0,
+              -1.5,
+              -1.0,
+              -0.8,
+              0.5,
+              0.3,
+              1.0,
+              0.8
+            ],
+            [
+              1.2,
+              1.0,
+              -1.5,
+              -1.2,
+              -0.8,
+              -0.6,
+              0.3,
+              0.2,
+              0.8,
+              0.5
+            ]
+          ]
+        },
+        "M_SIE": {
+          "shape": [
+            3,
+            3
+          ],
+          "values": [
+            [
+              1.0,
+              0.45,
+              -0.3
+            ],
+            [
+              0.35,
+              1.0,
+              0.6
+            ],
+            [
+              -0.25,
+              0.5,
+              1.0
+            ]
+          ]
+        },
+        "M_FLUX": {
+          "shape": [
+            5,
+            5
+          ],
+          "values": [
+            [
+              0.1,
+              0.85,
+              -0.6,
+              -0.75,
+              0.4
+            ],
+            [
+              -0.5,
+              0.1,
+              0.85,
+              -0.6,
+              -0.8
+            ],
+            [
+              -0.7,
+              -0.4,
+              0.1,
+              0.85,
+              -0.5
+            ],
+            [
+              -0.8,
+              -0.75,
+              -0.35,
+              0.1,
+              0.85
+            ],
+            [
+              0.85,
+              -0.7,
+              -0.65,
+              -0.4,
+              0.1
+            ]
+          ]
+        }
+      },
+      "hash_policy": "sha256(canonical_json(matrices))",
+      "no_runtime_reconstruction": true
+    },
+    "TOPOLOGY-MCHI-2.9.3": {
+      "status": "CORE_PROFILE",
+      "branch_index": {
+        "Tý": 0,
+        "Sửu": 1,
+        "Dần": 2,
+        "Mão": 3,
+        "Thìn": 4,
+        "Tỵ": 5,
+        "Ngọ": 6,
+        "Mùi": 7,
+        "Thân": 8,
+        "Dậu": 9,
+        "Tuất": 10,
+        "Hợi": 11
+      },
+      "relations": {
+        "LUC_HOP": 1.5,
+        "LUC_XUNG": -2.0,
+        "TUONG_HINH": -1.5,
+        "TAM_HOP": 1.5,
+        "TUONG_HAI": -1.0,
+        "TY_HOA": 1.0,
+        "ROOT_TRANSFORM_PAIR": 1.0,
+        "ADJACENT": 0.5
+      },
+      "precedence": [
+        "LUC_HOP",
+        "TAM_HOP",
+        "LUC_XUNG",
+        "TUONG_HINH",
+        "TUONG_HAI",
+        "TY_HOA",
+        "ROOT_TRANSFORM_PAIR",
+        "ADJACENT"
+      ],
+      "node_count": 12
+    },
+    "DWL-0.1-REV-A-FNORM": {
+      "status": "CORE_PROFILE",
+      "alpha": 0.15,
+      "beta": 0.2,
+      "epsilon": 1e-06,
+      "precision": 6,
+      "weight_formula": "B_ij*(1+alpha*P_ij+beta*A_ij/(A_max+epsilon))*F_norm",
+      "force_norm_formula": "norm(F_field_raw)/(4*N_edges+epsilon)",
+      "guards": {
+        "a_max_lte_epsilon": "QUARANTINE",
+        "n_edges_eq_zero": "NO_EDGES",
+        "denominator_near_zero": "DIVISION_BY_ZERO_RISK",
+        "persistence_denominator_missing": "QUARANTINE",
+        "confidence_input_scan": "G7_FIREWALL_DIRECTION"
+      }
+    },
+    "DD-DELAY-2.9.2-TF1": {
+      "status": "CORE_PROFILE",
+      "formula": "clamp(round((w_resist/v_final)*(1+mu_topology)+simulation_ticks/v_i),0,12)",
+      "tick_min": 0,
+      "tick_max": 12,
+      "v_final_min": 20,
+      "v_final_max": 50,
+      "precision": 6
+    },
+    "DD-DELAY-REV-A": {
+      "status": "COMPATIBILITY_PROFILE",
+      "formula": "clamp(round(sum_i((1+mu_topology_i)/v_i)),0,12)",
+      "not_composable_with": [
+        "DD-DELAY-2.9.2-TF1"
+      ]
+    },
+    "DPKE-1": {
+      "status": "CORE_PROFILE",
+      "alpha": 0.15,
+      "beta": 0.2,
+      "v_final_domain": [
+        20,
+        50
+      ],
+      "velocity_formula": "clamp(v_final/50+alpha*f_net-beta*w_resist,0.1,2.0)",
+      "precision": 6,
+      "clamp_audit_required": true
+    },
+    "BEC-OBS-1": {
+      "status": "CALIBRATION_REQUIRED",
+      "lambda": 0.35,
+      "gamma": 0.08,
+      "formula": "sigmoid(lambda*(acc_prev*exp(-gamma)+f_net_out))",
+      "sigmoid_input_clamp": [
+        -60,
+        60
+      ],
+      "reporting_precision": 4,
+      "write_back": false
+    },
+    "S07-HIST-2.9.1-NEW2": {
+      "status": "CALIBRATION_REQUIRED",
+      "codes": [
+        "SAT",
+        "TA",
+        "NHIEU",
+        "HY",
+        "DUONG",
+        "AN"
+      ],
+      "domain": {
+        "S": [
+          0,
+          1
+        ],
+        "D": [
+          -1,
+          1
+        ],
+        "I": [
+          0,
+          1
+        ],
+        "F": [
+          0,
+          1
+        ]
+      },
+      "rules": [
+        {
+          "code": "DUONG",
+          "predicate": "I>=0.70 and D>0.2 and F>=0.5"
+        },
+        {
+          "code": "HY",
+          "predicate": "I>=0.60 and D>0.5 and S>=0.5"
+        },
+        {
+          "code": "AN",
+          "predicate": "S*I<0.30 and F<=0.4"
+        },
+        {
+          "code": "NHIEU",
+          "predicate": "abs(D)<=0.2 and F>0.6 and I>=0.3 and I<=0.6"
+        },
+        {
+          "code": "TA",
+          "predicate": "D<-0.3 and F>=0.7 and S<0.30"
+        },
+        {
+          "code": "SAT",
+          "predicate": "I<0.30 and D<-0.5 and F>=0.6"
+        }
+      ],
+      "overlap_policy": "MAPPING_AMBIGUOUS",
+      "zero_match_policy": "MAPPING_UNRESOLVED",
+      "evaluator": "whitelist_ast_only",
+      "required_calibration_artifacts": [
+        "profile_sha256",
+        "boundary_vectors",
+        "review_decision_id"
+      ],
+      "rule_config_sha256": "sha256:58f6612344f8bda0169be66070f08d76d4eadb3b5613e224956498b87c437ecf"
+    },
+    "RGS-PROCRUSTES-REV-A": {
+      "status": "CALIBRATION_REQUIRED",
+      "error_formula": "mean(sum((P*R+t-Q)^2,axis=1))",
+      "fit_formula": "clamp(1-error/E_threshold,0,1)",
+      "reflection_correction": true,
+      "missing_profile_behavior": "RIGID_NORMALIZATION_REQUIRED"
+    },
+    "BEC-H1-DRAIN-RESERVE": {
+      "status": "RESEARCH",
+      "formula_drain": "D0*exp(gamma*OmegaForce)*(1+eta*FD_drag)",
+      "formula_reserve": "max(0,R_prev-D*delta_t)",
+      "circuit_breaker": "R<=Threshold_stop",
+      "write_back": false
+    }
+  }
+}

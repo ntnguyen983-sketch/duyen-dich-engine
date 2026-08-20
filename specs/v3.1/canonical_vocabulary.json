@@ -2,25 +2,103 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "spec_id": "DD-V31-CANONICAL-VOCABULARY",
   "version": "3.1.0",
-  "status": "CORE",
+  "status": "CORE_ENUM_COMPATIBILITY_ALIASES",
   "source": {
     "authority": "duyen-dich-canonical-governance",
-    "source_version": "v3.0_dd-governance",
-    "source_hash": "PENDING_REPOSITORY_HASH",
-    "provenance": "Canonical rules: six-state S07 set; legacy labels excluded from Kernel."
+    "source_version": "v3.0.0 + v2.9.1-NEW2",
+    "source_hash": "sha256:80773d8037925afdde5a4cb95e238207cd94b1d8ba443565de1c83661b03668e",
+    "provenance": "Six-state S07 set is canonical; legacy labels remain outside Kernel and require explicit decoder profile.",
+    "runtime_profiles_sha256": "sha256:80773d8037925afdde5a4cb95e238207cd94b1d8ba443565de1c83661b03668e"
   },
   "s07_states": [
-    {"order": 1, "vi": "SÁT", "code": "SAT"},
-    {"order": 2, "vi": "TÀ", "code": "TA"},
-    {"order": 3, "vi": "NHIỄU", "code": "NHIEU"},
-    {"order": 4, "vi": "HỶ", "code": "HY"},
-    {"order": 5, "vi": "DƯỠNG", "code": "DUONG"},
-    {"order": 6, "vi": "ẨN", "code": "AN"}
+    {
+      "order": 1,
+      "vi": "SÁT",
+      "code": "SAT",
+      "classification": "CORE"
+    },
+    {
+      "order": 2,
+      "vi": "TÀ",
+      "code": "TA",
+      "classification": "CORE"
+    },
+    {
+      "order": 3,
+      "vi": "NHIỄU",
+      "code": "NHIEU",
+      "classification": "CORE"
+    },
+    {
+      "order": 4,
+      "vi": "HỶ",
+      "code": "HY",
+      "classification": "CORE"
+    },
+    {
+      "order": 5,
+      "vi": "DƯỠNG",
+      "code": "DUONG",
+      "classification": "CORE"
+    },
+    {
+      "order": 6,
+      "vi": "ẨN",
+      "code": "AN",
+      "classification": "CORE"
+    }
   ],
+  "non_semantic_states": [
+    "MAPPING_UNRESOLVED",
+    "MAPPING_AMBIGUOUS",
+    "THRESHOLD_PROFILE_REQUIRED",
+    "RUNTIME_UNVERIFIED",
+    "QUARANTINE"
+  ],
+  "legacy_aliases": {
+    "TỤ": {
+      "status": "LEGACY_ONLY",
+      "requires_profile": true
+    },
+    "HỢP": {
+      "status": "LEGACY_ONLY",
+      "requires_profile": true
+    },
+    "TÁN": {
+      "status": "LEGACY_ONLY",
+      "requires_profile": true
+    },
+    "LY": {
+      "status": "LEGACY_ONLY",
+      "requires_profile": true
+    },
+    "HIỆN": {
+      "status": "LEGACY_ONLY",
+      "requires_profile": true
+    },
+    "ÂN": {
+      "status": "LEGACY_ONLY",
+      "requires_profile": true
+    }
+  },
   "kernel_constraints": {
-    "allowed_codes": ["SAT", "TA", "NHIEU", "HY", "DUONG", "AN"],
+    "allowed_codes": [
+      "SAT",
+      "TA",
+      "NHIEU",
+      "HY",
+      "DUONG",
+      "AN"
+    ],
     "legacy_codes_allowed": false,
-    "unknown_code_behavior": "SCHEMA_INVALID",
-    "missing_mapping_behavior": "MAPPING_UNRESOLVED"
+    "unknown_code_behavior": "SCHEMA_REJECTED",
+    "missing_mapping_behavior": "MAPPING_UNRESOLVED",
+    "overlap_behavior": "MAPPING_AMBIGUOUS"
+  },
+  "serialization_rules": {
+    "unicode_display": "NFC",
+    "ascii_code": true,
+    "legacy_decoder_write_back": false,
+    "canonical_json_encoding": "UTF-8"
   }
 }

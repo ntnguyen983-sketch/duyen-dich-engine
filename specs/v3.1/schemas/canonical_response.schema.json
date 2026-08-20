@@ -4,80 +4,441 @@
   "title": "Duyên Dịch v3.1 Canonical Response",
   "type": "object",
   "additionalProperties": false,
-  "required": ["contract_version", "execution", "raw_measurements", "semantic_state", "uncertainty", "provenance", "gate_results"],
+  "required": [
+    "contract_version",
+    "execution",
+    "identity",
+    "dynamic_state",
+    "raw_measurements",
+    "semantic_state",
+    "uncertainty",
+    "provenance",
+    "gate_results",
+    "output_a",
+    "output_b"
+  ],
   "properties": {
-    "contract_version": {"const": "3.1.0"},
+    "contract_version": {
+      "const": "3.1.0"
+    },
     "execution": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["decision_id", "tick", "input_hash", "runtime_status"],
+      "required": [
+        "execution_id",
+        "snapshot_id",
+        "tick",
+        "input_hash",
+        "runtime_status",
+        "runtime_profile_id",
+        "topology_profile_id",
+        "mapping_profile_id"
+      ],
       "properties": {
-        "decision_id": {"type": "string", "minLength": 1},
-        "tick": {"type": "integer", "minimum": 0},
-        "input_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
-        "runtime_status": {"enum": ["PASSED", "RUNTIME_UNVERIFIED", "RUNTIME_ERROR"]}
+        "execution_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "snapshot_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tick": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "input_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "runtime_status": {
+          "enum": [
+            "PASSED",
+            "RUNTIME_UNVERIFIED",
+            "RUNTIME_ERROR",
+            "QUARANTINE"
+          ]
+        },
+        "runtime_profile_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "topology_profile_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mapping_profile_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "forward_only": {
+          "const": true
+        },
+        "core_lock_mode": {
+          "enum": [
+            "INITIALIZATION_EVENT_ONLY",
+            "LOCKED"
+          ]
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root_bits",
+        "moving_lines",
+        "root_code",
+        "transformed_code",
+        "identity_hash"
+      ],
+      "properties": {
+        "root_bits": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            },
+            {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            },
+            {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            },
+            {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            },
+            {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            },
+            {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ]
+            }
+          ],
+          "items": false
+        },
+        "moving_lines": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 6
+          },
+          "uniqueItems": true
+        },
+        "root_code": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 63
+        },
+        "transformed_code": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 63
+        },
+        "identity_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "dynamic_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "force",
+        "persistence",
+        "accumulation",
+        "phase",
+        "velocity",
+        "delay",
+        "spacetime"
+      ],
+      "properties": {
+        "force": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "persistence": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "accumulation": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "phase": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "velocity": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "delay": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 12
+        },
+        "spacetime": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
       }
     },
     "raw_measurements": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["khi_vector", "runtime_trace"],
+      "required": [
+        "khi_vector",
+        "runtime_trace"
+      ],
       "properties": {
         "khi_vector": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["S", "D", "I", "F", "T"],
+          "required": [
+            "S",
+            "D",
+            "I",
+            "F",
+            "T"
+          ],
           "properties": {
-            "S": {"type": "number", "minimum": 0, "maximum": 1},
-            "D": {"type": "number", "minimum": -1, "maximum": 1},
-            "I": {"type": "number", "minimum": 0, "maximum": 1},
-            "F": {"type": "number", "minimum": 0, "maximum": 1},
-            "T": {"type": "number", "minimum": 0, "maximum": 1}
+            "S": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "D": {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            "I": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "F": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "T": {
+              "type": "number",
+              "minimum": 0
+            }
           }
         },
-        "field_state": {"type": ["object", "null"]},
-        "f_net_out": {"type": ["number", "null"]},
-        "runtime_trace": {"type": "array", "items": {"type": "object"}}
+        "field_state": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "f_net_out": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "runtime_trace": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "error_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
     "semantic_state": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "primary_label", "mapping_profile"],
+      "required": [
+        "status",
+        "primary_label",
+        "mapping_profile"
+      ],
       "properties": {
-        "status": {"enum": ["RESOLVED", "MAPPING_UNRESOLVED"]},
-        "primary_label": {"enum": ["SAT", "TA", "NHIEU", "HY", "DUONG", "AN", "MAPPING_UNRESOLVED"]},
+        "status": {
+          "enum": [
+            "RESOLVED",
+            "MAPPING_UNRESOLVED",
+            "MAPPING_AMBIGUOUS",
+            "THRESHOLD_PROFILE_REQUIRED"
+          ]
+        },
+        "primary_label": {
+          "enum": [
+            "SAT",
+            "TA",
+            "NHIEU",
+            "HY",
+            "DUONG",
+            "AN",
+            "MAPPING_UNRESOLVED",
+            "MAPPING_AMBIGUOUS"
+          ]
+        },
         "mapping_profile": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["profile_id", "version", "sha256", "status"],
+          "required": [
+            "profile_id",
+            "version",
+            "sha256",
+            "status"
+          ],
           "properties": {
-            "profile_id": {"type": "string"},
-            "version": {"type": "string"},
-            "sha256": {"type": "string"},
-            "status": {"enum": ["APPROVED", "RESEARCH", "UNRESOLVED", "INVALID"]}
+            "profile_id": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "status": {
+              "enum": [
+                "APPROVED",
+                "CALIBRATION_REQUIRED",
+                "RESEARCH",
+                "UNRESOLVED",
+                "INVALID"
+              ]
+            }
           }
         },
-        "mapping_provenance": {"type": "array", "items": {"type": "object"}}
+        "matched_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mapping_provenance": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
       }
     },
     "uncertainty": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["measurement", "model", "semantic", "confidence"],
+      "required": [
+        "measurement",
+        "model",
+        "semantic",
+        "confidence"
+      ],
       "properties": {
-        "measurement": {"type": "number", "minimum": 0},
-        "model": {"type": "number", "minimum": 0},
-        "semantic": {"type": "number", "minimum": 0},
+        "measurement": {
+          "type": "number",
+          "minimum": 0
+        },
+        "model": {
+          "type": "number",
+          "minimum": 0
+        },
+        "semantic": {
+          "type": "number",
+          "minimum": 0
+        },
         "confidence": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["score", "method", "inputs", "f_net_out_excluded"],
+          "required": [
+            "score",
+            "method",
+            "inputs",
+            "f_net_out_excluded",
+            "audit_status",
+            "scanned_paths",
+            "f_net_out_found"
+          ],
           "properties": {
-            "score": {"type": "number", "minimum": 0, "maximum": 1},
-            "method": {"type": "string", "minLength": 1},
-            "inputs": {"type": "array", "items": {"type": "string"}},
-            "f_net_out_excluded": {"const": true}
+            "score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "method": {
+              "type": "string",
+              "minLength": 1
+            },
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "f_net_out_excluded": {
+              "const": true
+            },
+            "audit_status": {
+              "enum": [
+                "PASSED",
+                "REJECTED"
+              ]
+            },
+            "scanned_paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            },
+            "f_net_out_found": {
+              "const": false
+            }
           }
         }
       }
@@ -85,25 +446,123 @@
     "provenance": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["source_version", "source_hashes", "engine_commit", "review_records"],
+      "required": [
+        "source_refs",
+        "source_versions",
+        "source_hashes",
+        "engine_commit",
+        "review_records",
+        "content_fingerprint"
+      ],
       "properties": {
-        "source_version": {"type": "string"},
-        "source_hashes": {"type": "object", "additionalProperties": {"type": "string"}},
-        "engine_commit": {"type": "string"},
-        "review_records": {"type": "array", "items": {"type": "string"}}
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "source_versions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "source_hashes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "engine_commit": {
+          "type": "string",
+          "minLength": 7
+        },
+        "review_records": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "content_fingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
       }
     },
     "gate_results": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["GATE-1-THEORY-FIELD", "GATE-2-RUNTIME", "GATE-3-INTERPRETATION", "GATE-4-DATA", "GATE-5-OPERATIONS"],
+      "required": [
+        "G1_SCHEMA",
+        "G2_IDENTITY",
+        "G3_CORE_LOCK",
+        "G4_RESEARCH_CALIBRATION",
+        "G5_CANONICAL_HASH",
+        "G6_MATRIX_LOGIC_CONSISTENCY",
+        "G7_FIREWALL_DIRECTION"
+      ],
       "properties": {
-        "GATE-1-THEORY-FIELD": {"enum": ["PASSED", "PLACEHOLDER_THEORY"]},
-        "GATE-2-RUNTIME": {"enum": ["PASSED", "RUNTIME_UNVERIFIED", "RUNTIME_ERROR"]},
-        "GATE-3-INTERPRETATION": {"enum": ["PASSED", "MAPPING_UNRESOLVED"]},
-        "GATE-4-DATA": {"enum": ["PASSED", "SCHEMA_INVALID"]},
-        "GATE-5-OPERATIONS": {"enum": ["PASSED", "UI_CONTRACT_VIOLATION"]}
+        "G1_SCHEMA": {
+          "enum": [
+            "PASSED",
+            "SCHEMA_REJECTED"
+          ]
+        },
+        "G2_IDENTITY": {
+          "enum": [
+            "PASSED",
+            "CORE_IDENTITY_MISMATCH",
+            "QUARANTINE"
+          ]
+        },
+        "G3_CORE_LOCK": {
+          "enum": [
+            "PASSED",
+            "CORE_IDENTITY_MISMATCH",
+            "HALT"
+          ]
+        },
+        "G4_RESEARCH_CALIBRATION": {
+          "enum": [
+            "PASSED",
+            "CALIBRATION_REQUIRED",
+            "RUNTIME_UNVERIFIED",
+            "QUARANTINE"
+          ]
+        },
+        "G5_CANONICAL_HASH": {
+          "enum": [
+            "PASSED",
+            "PROFILE_HASH_MISMATCH",
+            "HASH_MISMATCH",
+            "PROVENANCE_INCOMPLETE"
+          ]
+        },
+        "G6_MATRIX_LOGIC_CONSISTENCY": {
+          "enum": [
+            "PASSED",
+            "NO_EDGES",
+            "DIVISION_BY_ZERO_RISK",
+            "RUNTIME_ERROR"
+          ]
+        },
+        "G7_FIREWALL_DIRECTION": {
+          "enum": [
+            "PASSED",
+            "SEMANTIC_LEAKAGE",
+            "UI_CONTRACT_VIOLATION",
+            "HALT"
+          ]
+        }
       }
+    },
+    "output_a": {
+      "type": "object"
+    },
+    "output_b": {
+      "type": "object"
     }
   }
 }

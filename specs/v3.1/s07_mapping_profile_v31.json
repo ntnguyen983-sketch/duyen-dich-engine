@@ -1,35 +1,228 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "profile_id": "S07_CANONICAL_V31_UNRESOLVED",
+  "profile_id": "S07-HIST-2.9.1-NEW2",
   "version": "3.1.0",
-  "status": "RESEARCH",
-  "mapping_status": "MAPPING_UNRESOLVED",
+  "status": "CALIBRATION_REQUIRED",
+  "mapping_status": "PROFILE_PRESENT_CALIBRATION_REQUIRED",
   "source": {
-    "source_version": "v3.1",
-    "source_hash": "PENDING_APPROVED_PROFILE_HASH",
-    "provenance": "No approved S07 profile with domain, calibration and test vectors was found in the selected repositories."
+    "source_document_id": "180a8LwwV1OH3H2claoO89xih8h55lUY9tdbNgp0vTY0",
+    "source_version": "v2.9.1-NEW2",
+    "source_hash": "sha256:58f6612344f8bda0169be66070f08d76d4eadb3b5613e224956498b87c437ecf",
+    "provenance": "Predicates and domain transcribed from the v2.9.1 NEW2 source document; activation still requires independent calibration decision and boundary review."
   },
   "input_space": {
     "name": "KhiVector5D",
-    "components": ["S", "D", "I", "F", "T"],
-    "domain": "PENDING_SOURCE_PROFILE"
+    "components": [
+      "S",
+      "D",
+      "I",
+      "F",
+      "T"
+    ],
+    "domain": {
+      "S": [
+        0,
+        1
+      ],
+      "D": [
+        -1,
+        1
+      ],
+      "I": [
+        0,
+        1
+      ],
+      "F": [
+        0,
+        1
+      ],
+      "T": {
+        "type": "runtime_tick_mod_12",
+        "minimum": 0,
+        "maximum": 11
+      }
+    }
   },
-  "rules": [],
-  "output_space": ["SAT", "TA", "NHIEU", "HY", "DUONG", "AN"],
+  "evaluator": "whitelist_ast_only",
+  "rules": [
+    {
+      "rule_id": "S07-R-DUONG",
+      "code": "DUONG",
+      "predicate": "I >= 0.70 AND D > 0.20 AND F >= 0.50"
+    },
+    {
+      "rule_id": "S07-R-HY",
+      "code": "HY",
+      "predicate": "I >= 0.60 AND D > 0.50 AND S >= 0.50"
+    },
+    {
+      "rule_id": "S07-R-AN",
+      "code": "AN",
+      "predicate": "S * I < 0.30 AND F <= 0.40"
+    },
+    {
+      "rule_id": "S07-R-NHIEU",
+      "code": "NHIEU",
+      "predicate": "ABS(D) <= 0.20 AND F > 0.60 AND I >= 0.30 AND I <= 0.60"
+    },
+    {
+      "rule_id": "S07-R-TA",
+      "code": "TA",
+      "predicate": "D < -0.30 AND F >= 0.70 AND S < 0.30"
+    },
+    {
+      "rule_id": "S07-R-SAT",
+      "code": "SAT",
+      "predicate": "I < 0.30 AND D < -0.50 AND F >= 0.60"
+    }
+  ],
+  "output_space": [
+    "SAT",
+    "TA",
+    "NHIEU",
+    "HY",
+    "DUONG",
+    "AN"
+  ],
+  "overlap_policy": "MAPPING_AMBIGUOUS",
+  "zero_match_policy": "MAPPING_UNRESOLVED",
   "unresolved_behavior": {
     "missing_profile": "MAPPING_UNRESOLVED",
     "invalid_hash": "MAPPING_UNRESOLVED",
     "out_of_domain": "MAPPING_UNRESOLVED",
-    "no_rule_match": "MAPPING_UNRESOLVED"
+    "no_rule_match": "MAPPING_UNRESOLVED",
+    "multiple_rule_match": "MAPPING_AMBIGUOUS"
   },
+  "boundary_vectors": [
+    {
+      "id": "S07-B-DUONG-LOW",
+      "input": {
+        "S": 0.5,
+        "D": 0.200001,
+        "I": 0.7,
+        "F": 0.5,
+        "T": 0
+      },
+      "expected_matches": [
+        "DUONG"
+      ]
+    },
+    {
+      "id": "S07-B-HY-LOW",
+      "input": {
+        "S": 0.5,
+        "D": 0.500001,
+        "I": 0.6,
+        "F": 0.4,
+        "T": 0
+      },
+      "expected_matches": [
+        "HY"
+      ]
+    },
+    {
+      "id": "S07-B-AN-HIGH",
+      "input": {
+        "S": 0.5,
+        "D": 0.0,
+        "I": 0.599999,
+        "F": 0.4,
+        "T": 0
+      },
+      "expected_matches": [
+        "AN"
+      ]
+    },
+    {
+      "id": "S07-B-NHIEU-CENTER",
+      "input": {
+        "S": 0.5,
+        "D": 0.0,
+        "I": 0.45,
+        "F": 0.61,
+        "T": 0
+      },
+      "expected_matches": [
+        "NHIEU"
+      ]
+    },
+    {
+      "id": "S07-B-TA-LOW",
+      "input": {
+        "S": 0.299999,
+        "D": -0.300001,
+        "I": 0.5,
+        "F": 0.7,
+        "T": 0
+      },
+      "expected_matches": [
+        "TA"
+      ]
+    },
+    {
+      "id": "S07-B-SAT-LOW",
+      "input": {
+        "S": 0.5,
+        "D": -0.500001,
+        "I": 0.299999,
+        "F": 0.6,
+        "T": 0
+      },
+      "expected_matches": [
+        "SAT"
+      ]
+    },
+    {
+      "id": "S07-B-OVERLAP-DUONG-HY",
+      "input": {
+        "S": 0.6,
+        "D": 0.55,
+        "I": 0.7,
+        "F": 0.52,
+        "T": 1
+      },
+      "expected_matches": [
+        "DUONG",
+        "HY"
+      ],
+      "expected_status": "MAPPING_AMBIGUOUS"
+    },
+    {
+      "id": "S07-B-NO-MATCH",
+      "input": {
+        "S": 0.5,
+        "D": 0.25,
+        "I": 0.65,
+        "F": 0.45,
+        "T": 0
+      },
+      "expected_matches": [],
+      "expected_status": "MAPPING_UNRESOLVED"
+    },
+    {
+      "id": "S07-B-OUT-OF-DOMAIN",
+      "input": {
+        "S": 1.2,
+        "D": 0.0,
+        "I": 0.5,
+        "F": 0.5,
+        "T": 0
+      },
+      "expected_matches": [],
+      "expected_status": "MAPPING_UNRESOLVED"
+    }
+  ],
   "approval_requirements": [
     "profile_id",
     "version",
-    "sha256",
+    "source_hash",
+    "rule_config_sha256",
     "domain",
     "parameter_calibration_status",
-    "ordered_rules_or_model",
-    "test_vectors",
+    "boundary_vectors",
     "review_decision_id"
-  ]
+  ],
+  "parameter_calibration_status": "REQUIRED",
+  "review_decision_id": "PENDING-GEMINI-R2-MANUS-FINAL",
+  "rule_config_sha256": "sha256:58f6612344f8bda0169be66070f08d76d4eadb3b5613e224956498b87c437ecf"
 }
