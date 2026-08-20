@@ -40,3 +40,29 @@ python3 -m unittest discover -s runtime/v31 -p 'test_*.py' -v
 ```
 
 GitHub Actions tự chạy runtime regression trên push và pull request.
+
+## Web test end-to-end
+
+Ứng dụng Flask tại `app.py` là adapter duy nhất nối HTTP với `runtime.v31`; không có engine thứ hai trong API. Vercel nạp `api/index.py`, route `/` phục vụ `ui_test/index.html`, còn `POST /api/v31` trả strict canonical JSON theo schema v3.1.
+
+Chạy local:
+
+```bash
+pip install -r requirements.txt
+python3 app.py
+```
+
+Mở `http://127.0.0.1:8000/`. Health check là `GET /api/health`; readiness check là `GET /api/v31`.
+
+Kiểm định đầy đủ:
+
+```bash
+python3 -m unittest discover -s specs/v3.1/tests -p 'test_*.py' -v
+PYTHONPATH=runtime/v31 python3 -m unittest discover -s runtime/v31 -p 'test_*.py' -v
+python3 -m unittest -v test_api.py
+npm install
+npx playwright install chromium
+npm run test:e2e
+```
+
+Workflow `.github/workflows/v31-full.yml` chạy toàn bộ các bước trên cho mỗi push và pull request. Các file `specs/v3.1/`, `runtime/`, artifacts, schemas, compatibility decoder và baseline cũ được giữ nguyên; các operator chưa có profile nguồn vẫn được ghi rõ `PROVISIONAL`/`RESEARCH`, không được trình bày như CORE.

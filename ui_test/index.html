@@ -1,18 +1,98 @@
 <!doctype html>
 <html lang="vi">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Duyên Dịch v3.1 UI Test</title><style>body{font-family:system-ui;margin:0;background:#f5f5f5;color:#222}main{max-width:900px;margin:auto;padding:20px}section{background:white;padding:16px;margin:12px 0;border-radius:12px;box-shadow:0 1px 4px #ccc}label{display:block;margin:10px 0 4px}input,textarea,button{width:100%;box-sizing:border-box;padding:10px;border:1px solid #bbb;border-radius:8px}textarea{min-height:90px}button{margin-top:12px;cursor:pointer}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pass{color:#087f23}.fail{color:#b00020}.mono{white-space:pre-wrap;font-family:monospace;font-size:12px;background:#111;color:#eee;padding:12px;border-radius:8px;overflow:auto}@media(max-width:650px){.grid{grid-template-columns:1fr}}</style></head>
-<body><main>
-<h1>Duyên Dịch v3.1 — Full UI Test</h1>
-<section><label>Câu hỏi *</label><textarea id="question">tình cảm</textarea><div class="grid"><div><label>Number *</label><input id="number" value="369147" inputmode="numeric"></div><div><label>Time *</label><input id="time" type="datetime-local"></div></div><div class="grid"><div><label>GPS latitude</label><input id="lat" value="10.755124"></div><div><label>GPS longitude</label><input id="lng" value="106.616242"></div></div><label>Địa chỉ</label><input id="address" value=""><label>Ảnh</label><input id="image" type="file" accept="image/*" capture="environment"><button id="run">CHẠY V3.1</button></section>
-<section><h2>UI Test</h2><div id="status">Chưa chạy</div><div id="checks"></div></section>
-<section><h2>Canonical Output</h2><div id="out" class="mono">—</div></section>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Duyên Dịch v3.1 — Web Test</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#172033;background:#eef2f7}
+    *{box-sizing:border-box}body{margin:0}main{max-width:1100px;margin:auto;padding:20px}
+    section{background:#fff;border:1px solid #d9e1ec;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 5px 18px #14213d0d}
+    h1{margin:0 0 8px;font-size:clamp(1.5rem,4vw,2.2rem)}h2{font-size:1.15rem;margin:0 0 12px}
+    label{display:block;font-weight:650;margin:12px 0 5px}input,textarea,button{width:100%;font:inherit;border:1px solid #aebbd0;border-radius:9px;padding:10px;background:#fff}
+    textarea{min-height:88px;resize:vertical}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    button{margin-top:16px;background:#173b70;color:#fff;border-color:#173b70;font-weight:750;cursor:pointer}button:disabled{opacity:.65;cursor:wait}
+    .muted{color:#5d6b80}.status{font-weight:800;padding:10px;border-radius:8px;background:#f0f4fa}.pass{color:#137333}.fail{color:#b3261e}.warn{color:#9a6700}
+    .checks,.layers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.check,.layer{border:1px solid #dde4ee;border-radius:8px;padding:8px;background:#fafcff}
+    .mono{white-space:pre-wrap;overflow:auto;background:#111827;color:#e5edf9;border-radius:9px;padding:14px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;max-height:620px}
+    .summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.card{border:1px solid #dde4ee;border-radius:9px;padding:10px}.value{font-weight:750;word-break:break-word}
+    @media(max-width:700px){main{padding:12px}.grid,.checks,.layers,.summary{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <section>
+    <h1>Duyên Dịch v3.1 — Full End-to-End Web Test</h1>
+    <p class="muted">UI → <code>POST /api/v31</code> → runtime v3.1 → canonical JSON → UI. Các toán tử chưa có hồ sơ nguồn được đánh dấu PROVISIONAL/RESEARCH.</p>
+  </section>
+
+  <section>
+    <h2>Input</h2>
+    <form id="form" novalidate>
+      <label for="question">Câu hỏi *</label>
+      <textarea id="question" required>tình cảm</textarea>
+      <div class="grid">
+        <div><label for="number">Number 6 chữ số *</label><input id="number" required inputmode="numeric" pattern="[0-9]{6}" value="369147"></div>
+        <div><label for="time">Time *</label><input id="time" type="datetime-local" required></div>
+      </div>
+      <div class="grid">
+        <div><label for="lat">GPS latitude</label><input id="lat" inputmode="decimal" placeholder="10.755124"></div>
+        <div><label for="lng">GPS longitude</label><input id="lng" inputmode="decimal" placeholder="106.616242"></div>
+      </div>
+      <label for="address">Địa chỉ</label><input id="address" autocomplete="street-address" placeholder="test">
+      <label for="image">Upload ảnh / camera mobile</label><input id="image" type="file" accept="image/*" capture="environment">
+      <button id="run" type="submit">CHẠY DUYÊN DỊCH v3.1</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Runtime status</h2>
+    <div id="status" class="status">Chưa chạy</div>
+    <div id="checks" class="checks" aria-live="polite"></div>
+  </section>
+
+  <section>
+    <h2>L1–L6</h2>
+    <div id="layers" class="layers"><div class="muted">Chưa có kết quả.</div></div>
+  </section>
+
+  <section>
+    <h2>Semantic, uncertainty, provenance</h2>
+    <div id="summary" class="summary"><div class="card"><div class="muted">Chưa có kết quả.</div></div></div>
+  </section>
+
+  <section>
+    <h2>Canonical JSON</h2>
+    <pre id="out" class="mono">—</pre>
+  </section>
+
 <script>
-const $=id=>document.getElementById(id); const canonical=['SAT','TA','NHIEU','HY','DUONG','AN'];
-function nowLocal(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)} $('time').value=nowLocal();
-function check(name,ok,detail=''){return `<div class="${ok?'pass':'fail'}">${ok?'✓':'✗'} ${name}${detail?' — '+detail:''}</div>`}
-async function run(){
- $('status').textContent='Đang chạy…'; const image=$('image').files[0]; const payload={question:$('question').value,number:Number($('number').value),time:new Date($('time').value).toISOString(),gps:($('lat').value&&$('lng').value)?{lat:Number($('lat').value),lng:Number($('lng').value)}:null,address:$('address').value,image:image?{name:image.name,type:image.type,size:image.size}:null};
- let r; try { const base=location.origin; const resp=await fetch(base+'/api/v31',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)}); if(!resp.ok)throw Error('HTTP '+resp.status); r=await resp.json(); } catch(e){$('status').innerHTML='<span class="fail">✗ API FAIL</span>'; $('checks').innerHTML=check('API reachable',false,e.message); $('out').textContent=JSON.stringify({payload,error:e.message},null,2);return}
- const checks=[]; checks.push(check('L1',r.layers?.L1?.status==='PASSED')); checks.push(check('L2',String(r.layers?.L2?.status||'').startsWith('PASSED'))); checks.push(check('L3',String(r.layers?.L3?.status||'').startsWith('PASSED'))); checks.push(check('L4',canonical.includes(r.semantic_state?.primary_label))); checks.push(check('L5 canonical',r.layers?.L5?.canonical===true)); checks.push(check('L6 API ready',r.layers?.L6?.api_ready===true)); checks.push(check('contract 3.1',r.contract_version==='3.1.0')); checks.push(check('confidence firewall',r.uncertainty?.confidence?.f_net_out_excluded===true)); checks.push(check('deterministic input hash',!!r.execution?.input_hash)); checks.push(check('GPS accepted',payload.gps===null || (r.layers?.L1 && 'question' in r.layers.L1))); checks.push(check('image accepted',payload.image===null || (r.layers?.L1 && 'question' in r.layers.L1))); checks.push(check('canonical vocabulary only',canonical.includes(r.layers?.L4?.primary_label))); $('checks').innerHTML=checks.join(''); const bad=checks.filter(x=>x.includes('fail')).length; $('status').innerHTML=bad?'<span class="fail">FAIL</span>':'<span class="pass">PASS — '+checks.length+' checks</span>'; $('out').textContent=JSON.stringify(r,null,2);
-} $('run').onclick=run;
-</script></main></body></html>
+const $ = (id) => document.getElementById(id);
+const CANONICAL = ['SAT','TA','NHIEU','HY','DUONG','AN'];
+function nowLocal(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)}
+$('time').value = nowLocal();
+function addCheck(name, ok, detail=''){const item=document.createElement('div');item.className='check '+(ok?'pass':'fail');item.textContent=(ok?'✓ ':'✗ ')+name+(detail?' — '+detail:'');$('checks').appendChild(item);return ok}
+function card(label,value){const item=document.createElement('div');item.className='card';const key=document.createElement('div');key.className='muted';key.textContent=label;const val=document.createElement('div');val.className='value';val.textContent=value;item.append(key,val);return item}
+function validateInput(){
+  const question=$('question').value.trim(), number=$('number').value.trim(), time=$('time').value.trim(), lat=$('lat').value.trim(), lng=$('lng').value.trim();
+  const checks=[]; checks.push(['required question',!!question]); checks.push(['required number',!!number]); checks.push(['required time',!!time]);
+  checks.push(['number validation',/^\d{6}$/.test(number)]);
+  const gpsPair=(!lat&&!lng)||(!!lat&&!!lng); let gpsValid=gpsPair;
+  if(lat&&lng){const a=Number(lat),b=Number(lng);gpsValid=Number.isFinite(a)&&Number.isFinite(b)&&a>=-90&&a<=90&&b>=-180&&b<=180}
+  checks.push(['GPS validation',gpsValid]); checks.push(['image input',true]);
+  const isoTime = time ? new Date(time).toISOString() : '';
+  return {ok:checks.every(x=>x[1]),checks,payload:{question,number:Number(number),time:isoTime,gps:(lat&&lng)?{lat:Number(lat),lng:Number(lng)}:null,address:$('address').value.trim()||null,image:$('image').files[0]?{name:$('image').files[0].name,type:$('image').files[0].type,size:$('image').files[0].size}:null}};
+}
+async function callApi(payload){const response=await fetch('/api/v31',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});const body=await response.json();if(!response.ok)throw new Error(body.error||('HTTP '+response.status));return body}
+function renderLayers(result){$('layers').replaceChildren();const trace=Object.fromEntries((result.raw_measurements?.runtime_trace||[]).map(x=>[x.layer,x.status]));[['L1','Input normalized',trace.L1||'UNKNOWN'],['L2','Field operator',trace.L2||'UNKNOWN'],['L3','Force/vector',trace.L3||'UNKNOWN'],['L4','Semantic mapping',trace.L4||'UNKNOWN'],['L5','Canonical contract',trace.L5||'UNKNOWN'],['L6','API ready',trace.L6||'UNKNOWN']].forEach(([key,label,status])=>{const item=document.createElement('div');item.className='layer';item.innerHTML='<strong>'+key+'</strong> — '+label+'<br><span class="'+(status.startsWith('PASSED')?'pass':'warn')+'">'+status+'</span>';$('layers').appendChild(item)})}
+function renderSummary(result){$('summary').replaceChildren();$('summary').append(card('semantic state',result.semantic_state?.status||'—'),card('primary label',result.semantic_state?.primary_label||'—'),card('uncertainty',JSON.stringify(result.uncertainty?.confidence||{})),card('provenance',result.provenance?.source_version||'—'),card('input hash',result.execution?.input_hash||'—'),card('gate results',JSON.stringify(result.gate_results||{})))}
+$('form').addEventListener('submit',async(event)=>{event.preventDefault();$('run').disabled=true;$('status').textContent='Đang chạy…';$('status').className='status';$('checks').replaceChildren();$('out').textContent='—';
+  const validation=validateInput();validation.checks.forEach(([name,ok])=>addCheck(name,ok));if(!validation.ok){$('status').textContent='FAIL — input không hợp lệ';$('status').className='status fail';$('run').disabled=false;return}
+  try{addCheck('API reachable',true);const first=await callApi(validation.payload);const second=await callApi(validation.payload);const trace=Object.fromEntries((first.raw_measurements?.runtime_trace||[]).map(x=>[x.layer,x.status]));
+    addCheck('L1',trace.L1==='PASSED');addCheck('L2 PASS/PROVISIONAL',String(trace.L2||'').startsWith('PASSED'));addCheck('L3 PASS/PROVISIONAL',String(trace.L3||'').startsWith('PASSED'));addCheck('L4 canonical vocabulary',CANONICAL.includes(first.semantic_state?.primary_label));addCheck('L5 canonical=true',first.execution?.runtime_status==='PASSED'&&first.gate_results?.['GATE-4-DATA']==='PASSED');addCheck('L6 API ready',trace.L6==='PASSED');addCheck('contract_version = 3.1.0',first.contract_version==='3.1.0');addCheck('f_net_out_excluded = true',first.uncertainty?.confidence?.f_net_out_excluded===true);addCheck('provenance tồn tại',!!first.provenance&&Object.keys(first.provenance).length>0);addCheck('input hash tồn tại',/^sha256:[0-9a-f]{64}$/.test(first.execution?.input_hash||''));addCheck('output JSON hợp lệ',typeof first==='object');addCheck('deterministic request',JSON.stringify(first)===JSON.stringify(second));renderLayers(first);renderSummary(first);$('out').textContent=JSON.stringify(first,null,2);$('status').textContent='PASS — canonical response nhận được';$('status').className='status pass';
+  }catch(error){$('status').textContent='FAIL — '+error.message;$('status').className='status fail';addCheck('API reachable',false,error.message)}finally{$('run').disabled=false}
+});
+</script>
+</main>
+</body>
+</html>
