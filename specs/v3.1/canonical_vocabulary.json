@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "spec_id": "DD-V31-CANONICAL-VOCABULARY",
+  "version": "3.1.0",
+  "status": "CORE",
+  "source": {
+    "authority": "duyen-dich-canonical-governance",
+    "source_version": "v3.0_dd-governance",
+    "source_hash": "PENDING_REPOSITORY_HASH",
+    "provenance": "Canonical rules: six-state S07 set; legacy labels excluded from Kernel."
+  },
+  "s07_states": [
+    {"order": 1, "vi": "SÁT", "code": "SAT"},
+    {"order": 2, "vi": "TÀ", "code": "TA"},
+    {"order": 3, "vi": "NHIỄU", "code": "NHIEU"},
+    {"order": 4, "vi": "HỶ", "code": "HY"},
+    {"order": 5, "vi": "DƯỠNG", "code": "DUONG"},
+    {"order": 6, "vi": "ẨN", "code": "AN"}
+  ],
+  "kernel_constraints": {
+    "allowed_codes": ["SAT", "TA", "NHIEU", "HY", "DUONG", "AN"],
+    "legacy_codes_allowed": false,
+    "unknown_code_behavior": "SCHEMA_INVALID",
+    "missing_mapping_behavior": "MAPPING_UNRESOLVED"
+  }
+}

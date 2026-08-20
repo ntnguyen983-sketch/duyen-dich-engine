@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://duyen-dich.local/schema/v3.1/canonical-response.json",
+  "title": "Duyên Dịch v3.1 Canonical Response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "execution", "raw_measurements", "semantic_state", "uncertainty", "provenance", "gate_results"],
+  "properties": {
+    "contract_version": {"const": "3.1.0"},
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision_id", "tick", "input_hash", "runtime_status"],
+      "properties": {
+        "decision_id": {"type": "string", "minLength": 1},
+        "tick": {"type": "integer", "minimum": 0},
+        "input_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "runtime_status": {"enum": ["PASSED", "RUNTIME_UNVERIFIED", "RUNTIME_ERROR"]}
+      }
+    },
+    "raw_measurements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["khi_vector", "runtime_trace"],
+      "properties": {
+        "khi_vector": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["S", "D", "I", "F", "T"],
+          "properties": {
+            "S": {"type": "number", "minimum": 0, "maximum": 1},
+            "D": {"type": "number", "minimum": -1, "maximum": 1},
+            "I": {"type": "number", "minimum": 0, "maximum": 1},
+            "F": {"type": "number", "minimum": 0, "maximum": 1},
+            "T": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        },
+        "field_state": {"type": ["object", "null"]},
+        "f_net_out": {"type": ["number", "null"]},
+        "runtime_trace": {"type": "array", "items": {"type": "object"}}
+      }
+    },
+    "semantic_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "primary_label", "mapping_profile"],
+      "properties": {
+        "status": {"enum": ["RESOLVED", "MAPPING_UNRESOLVED"]},
+        "primary_label": {"enum": ["SAT", "TA", "NHIEU", "HY", "DUONG", "AN", "MAPPING_UNRESOLVED"]},
+        "mapping_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["profile_id", "version", "sha256", "status"],
+          "properties": {
+            "profile_id": {"type": "string"},
+            "version": {"type": "string"},
+            "sha256": {"type": "string"},
+            "status": {"enum": ["APPROVED", "RESEARCH", "UNRESOLVED", "INVALID"]}
+          }
+        },
+        "mapping_provenance": {"type": "array", "items": {"type": "object"}}
+      }
+    },
+    "uncertainty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["measurement", "model", "semantic", "confidence"],
+      "properties": {
+        "measurement": {"type": "number", "minimum": 0},
+        "model": {"type": "number", "minimum": 0},
+        "semantic": {"type": "number", "minimum": 0},
+        "confidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["score", "method", "inputs", "f_net_out_excluded"],
+          "properties": {
+            "score": {"type": "number", "minimum": 0, "maximum": 1},
+            "method": {"type": "string", "minLength": 1},
+            "inputs": {"type": "array", "items": {"type": "string"}},
+            "f_net_out_excluded": {"const": true}
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_version", "source_hashes", "engine_commit", "review_records"],
+      "properties": {
+        "source_version": {"type": "string"},
+        "source_hashes": {"type": "object", "additionalProperties": {"type": "string"}},
+        "engine_commit": {"type": "string"},
+        "review_records": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "gate_results": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["GATE-1-THEORY-FIELD", "GATE-2-RUNTIME", "GATE-3-INTERPRETATION", "GATE-4-DATA", "GATE-5-OPERATIONS"],
+      "properties": {
+        "GATE-1-THEORY-FIELD": {"enum": ["PASSED", "PLACEHOLDER_THEORY"]},
+        "GATE-2-RUNTIME": {"enum": ["PASSED", "RUNTIME_UNVERIFIED", "RUNTIME_ERROR"]},
+        "GATE-3-INTERPRETATION": {"enum": ["PASSED", "MAPPING_UNRESOLVED"]},
+        "GATE-4-DATA": {"enum": ["PASSED", "SCHEMA_INVALID"]},
+        "GATE-5-OPERATIONS": {"enum": ["PASSED", "UI_CONTRACT_VIOLATION"]}
+      }
+    }
+  }
+}

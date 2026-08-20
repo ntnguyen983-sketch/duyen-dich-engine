@@ -1,0 +1,253 @@
+{
+  "timestamp_utc": "2026-08-20T08:52:15.896102+00:00",
+  "model": "gemini-3.6-flash",
+  "round": 2,
+  "input_files": [
+    "CANONICALIZATION_BRIEF.md",
+    "gemini_round1.json"
+  ],
+  "response": {
+    "accepted_decisions": [
+      {
+        "decision_id": "ACC-01",
+        "topic": "Canonical S07 Vocabulary",
+        "classification": "CORE",
+        "reason": "Xác nhận đúng 6 mã canonical (SAT, TA, NHIEU, HY, DUONG, AN) theo quy định của governance v3.0_dd, không chứa nhãn legacy trong Kernel."
+      },
+      {
+        "topic": "Compute-Interpretation Firewall",
+        "decision_id": "ACC-02",
+        "classification": "CORE",
+        "reason": "Phân tách triệt để giữa L3 (chỉ xuất raw_measurements/field_state) và L4 (chịu trách nhiệm dịch sang ngữ nghĩa S07)."
+      },
+      {
+        "topic": "Gate System Architecture",
+        "decision_id": "ACC-03",
+        "classification": "CORE",
+        "reason": "Thiết lập mô hình 5 Gates (GATE-1 đến GATE-5) với cơ chế trả mã lỗi rõ ràng khi không đạt điều kiện tối thiểu."
+      },
+      {
+        "topic": "Confidence Score Separation",
+        "decision_id": "ACC-04",
+        "classification": "CORE",
+        "reason": "Cấm sử dụng trực tiếp f_net_out làm confidence_score, bắt buộc confidence phải là chỉ số tổng hợp có provenance."
+      }
+    ],
+    "rejected_or_downgraded": [
+      {
+        "item": "Profile S07_CANONICAL_V31_DEFAULT",
+        "action": "DOWNGRADED_TO_RESEARCH",
+        "error": "Vòng 1 tự ý tạo Profile mapping mặc định với các ngưỡng (I >= 0.75, D > 0, S >= 0.7...) mà không có provenance, calibration hay bằng chứng từ tài liệu gốc. Vi phạm quy tắc không tự map Vectơ Khí 5D sang S07."
+      },
+      {
+        "item": "Công thức ngưng tụ BEC: rho_condensate = min(1.0, max(0.0, I * F / (1 + epsilon)))",
+        "action": "REJECTED",
+        "error": "Tự bịa công thức BEC toán học không có trong bất kỳ tài liệu gốc nào (v2.8). Vi phạm cấm dùng công thức BEC suy đoán."
+      },
+      {
+        "item": "safe_epsilon = 1e-7 được phân loại là CORE",
+        "action": "DOWNGRADED_TO_CALIBRATION",
+        "error": "Nâng epsilon cụ thể thành CORE invariant khi chưa có đăng ký canonical. Epsilon chỉ là hằng số an toàn kỹ thuật (safety parameter), không phải bản chất vật lý CORE."
+      },
+      {
+        "item": "Đưa các nhãn Legacy (TỤ, HỢP, TÁN, LY, HIỆN) vào từ vựng Canonical Vocabulary dưới dạng L5_COMPATIBILITY",
+        "action": "REJECTED",
+        "error": "Ô nhiễm từ vựng canonical. Các nhãn legacy không được xuất hiện trong danh sách từ vựng canonical, chỉ tồn tại trong Compatibility Decoder bên ngoài Kernel."
+      },
+      {
+        "item": "Xác nhận L3 Matrix/Delay Runtime là CORE",
+        "action": "DOWNGRADED_TO_RESEARCH",
+        "error": "Tài liệu runtime v2.9.2 chưa được truy xuất và xác minh bằng chứng. Không thể khóa L3 là CORE hoàn chỉnh khi các toán tử delay và ma trận chưa có tài liệu gốc."
+      }
+    ],
+    "mapping_audit": {
+      "status": "MAPPING_UNRESOLVED",
+      "details": "Vòng 1 đề xuất profile S07_CANONICAL_V31_DEFAULT nhưng thiếu hoàn toàn provenance, hash đăng ký, miền hiệu lực và calibration. Theo quy tắc brief section 2 & 7, khi thiếu profile hợp lệ có bằng chứng, L4 bắt buộc trả về MAPPING_UNRESOLVED.",
+      "rules_evidence_check": [
+        {
+          "rule_id": "RULE-HY-01",
+          "condition": "I >= 0.75 AND D > 0",
+          "has_evidence": false,
+          "verdict": "UNVERIFIED_SPECULATION"
+        },
+        {
+          "rule_id": "RULE-SAT-01",
+          "condition": "S >= 0.7 AND F > 0.5",
+          "has_evidence": false,
+          "verdict": "UNVERIFIED_SPECULATION"
+        }
+      ]
+    },
+    "layer_audit": {
+      "layer_dependency_check": "FAIL",
+      "violations": [
+        {
+          "layer": "L3_RUNTIME",
+          "issue": "L3 Runtime gọi trực tiếp hàm compute_bec_field_unproven chứa logic L2 chưa kiểm định. L3 phải độc lập với các mô hình lý thuyết L2 chưa đạt GATE-2."
+        },
+        {
+          "layer": "L5_COMPATIBILITY",
+          "issue": "Khai báo tầng L5_COMPATIBILITY trong Canonical Vocabulary Table gây rò rỉ khái niệm legacy vào tầng Canonical Data Contract."
+        }
+      ],
+      "correct_flow": "L1 (Theoretical Reference) -> L2 (Field Model) -> L3 (Deterministic Runtime Engine) -> Firewall -> L4 (Semantic Mapping) -> L5 (Canonical Data Contract) -> L6 (Operations/UI)"
+    },
+    "runtime_audit": {
+      "determinism": "PASSED (Khái niệm)",
+      "division_safety": "PARTIAL (Cần tham số safe_denominator nhưng không được gán cứng valeur 1e-7 thành invariant CORE)",
+      "bec_model": "REJECTED (Công thức suy đoán I*F/(1+epsilon) bị loại bỏ hoàn toàn)",
+      "uncertainty_handling": "NEEDS_REVISION (Vòng 1 gán cứng variance 0.05 không có căn cứ thực nghiệm)",
+      "pseudocode_status": "NON_CANONICAL_PROPOSAL"
+    },
+    "vocabulary_audit": {
+      "canonical_codes": [
+        "SAT",
+        "TA",
+        "NHIEU",
+        "HY",
+        "DUONG",
+        "AN"
+      ],
+      "unicode_mapping": {
+        "SAT": "SÁT",
+        "TA": "TÀ",
+        "NHIEU": "NHIỄU",
+        "HY": "HỶ",
+        "DUONG": "DƯỠNG",
+        "AN": "ẨN"
+      },
+      "legacy_codes_found_in_canonical_list": [
+        "TU_LEGACY",
+        "HOP_LEGACY",
+        "TAN_LEGACY",
+        "LY_LEGACY",
+        "HIEN_LEGACY"
+      ],
+      "verdict": "REJECT_LEGACY_IN_CANONICAL_LIST. Nhãn legacy phải bị xóa hoàn toàn khỏi danh mục từ vựng canonical."
+    },
+    "data_contract_audit": {
+      "required_fields_present": true,
+      "enum_strictness": "PASSED (Chỉ nhận 6 mã S07 + MAPPING_UNRESOLVED)",
+      "f_net_out_usage": "VALIDATED (Không dùng f_net_out làm confidence_score)",
+      "provenance_fields": "PASSED (Đã bổ sung decision_id, source_version, source_hashes)",
+      "schema_issues": "Cần đảm bảo primary_label không chứa bất kỳ mã legacy nào ngay cả ở cấp API Schema."
+    },
+    "test_audit": {
+      "valid_tests": [
+        "TV-01-ENUM-VALIDATION",
+        "TV-02-LEGACY-REJECTION",
+        "TV-03-UNICODE-CONSISTENCY",
+        "TV-04-MISSING-PROFILE",
+        "TV-07-60-TICKS-REPLAY-DETERMINISM"
+      ],
+      "invalid_assumptions_in_tests": [
+        {
+          "test_name": "TV-05-DPKE-ZERO-DIVISION",
+          "flaw": "Coi safe_epsilon=1e-7 là hằng số cố định CORE."
+        },
+        {
+          "test_name": "TV-06-BEC-BOUNDARY-CHECK",
+          "flaw": "Giả định công thức BEC suy đoán I*F/(1+epsilon) là chuẩn."
+        }
+      ],
+      "additional_tests_proposed": [
+        {
+          "name": "TV-08-FIREWALL-NON-SEMANTIC-L3",
+          "input": "L3 Output payload",
+          "expected": "Không chứa bất kỳ trường ngữ nghĩa S07 nào (HY, TA, SAT...)"
+        },
+        {
+          "name": "TV-09-UNRESOLVED-PROFILE-HASH-MISMATCH",
+          "input": "Vector 5D + Profile có hash không trùng khớp với đăng ký",
+          "expected": "GATE-3 FAILURE -> MAPPING_UNRESOLVED"
+        }
+      ]
+    },
+    "final_canonical_recommendation": [
+      "Khóa 6 mã S07 Canonical Enum: SAT, TA, NHIEU, HY, DUONG, AN.",
+      "Khóa Firewall tuyệt đối giữa L3 (Data/Signal) và L4 (Pattern/Inference).",
+      "Khóa cơ chế mặc định L4 phát nhãn MAPPING_UNRESOLVED khi thiếu Profile có Provenance.",
+      "Khóa cấu trúc Data Contract L5 và hệ thống 5 Gates kiểm định.",
+      "Khóa nguyên tắc Runtime Determinism S_{t+1} = K(S_t, I_t)."
+    ],
+    "research_and_placeholder_register": [
+      {
+        "item": "SL-DIF/BEC Coupled Field Model (L2)",
+        "status": "RESEARCH",
+        "reason": "Thiếu tài liệu v2.8 và công thức ngưng tụ chính xác."
+      },
+      {
+        "item": "Deterministic Matrix/Delay Runtime Spec (L3)",
+        "status": "RESEARCH",
+        "reason": "Chưa có văn bản quy định chi tiết toán tử delay v2.9.2."
+      },
+      {
+        "item": "S07 Mapping Profile Rules & Thresholds",
+        "status": "RESEARCH",
+        "reason": "Chưa có dữ liệu calibration thực chứng cho các ngưỡng 5D KhiVector."
+      },
+      {
+        "item": "SDE/Bellman MDP Operators (L1)",
+        "status": "PLACEHOLDER",
+        "reason": "Thiếu phụ lục toán học v2.5."
+      },
+      {
+        "item": "safe_epsilon & Parameter Calibration Table",
+        "status": "CALIBRATION_PARAMETER",
+        "reason": "Tham số kỹ thuật cần tối ưu qua thực nghiệm, không phải invariant CORE."
+      }
+    ],
+    "unresolved_questions": [
+      {
+        "question_id": "UQ-01",
+        "topic": "S07 Profile Provenance",
+        "description": "Tài liệu gốc nào định nghĩa bảng ánh xạ từ Vectơ Khí 5D (S, D, I, F, T) sang 6 trạng thái S07? Cần cung cấp hash và file gốc.",
+        "action_required": "Cần người dùng hoặc repository bổ sung file profile chuẩn."
+      },
+      {
+        "question_id": "UQ-02",
+        "topic": "v2.9.2 Matrix/Delay Spec",
+        "description": "Phương trình ma trận và độ trễ (delay) chính xác trong L3 Runtime được quy định ở đâu?",
+        "action_required": "Yêu cầu truy xuất tài liệu v2.9.2 trước khi khóa CORE cho L3."
+      }
+    ],
+    "decision_log": [
+      {
+        "item": "S07 Canonical Codes (SAT, TA, NHIEU, HY, DUONG, AN)",
+        "action": "KEEP",
+        "reason": "Khớp 100% với Canonicalization Brief section 3."
+      },
+      {
+        "item": "Compute-Interpretation Firewall",
+        "action": "KEEP",
+        "reason": "Tuân thủ nghiêm ngặt nguyên tắc kiến trúc v3.1."
+      },
+      {
+        "item": "Profile S07_CANONICAL_V31_DEFAULT",
+        "action": "REJECT",
+        "reason": "Vòng 1 tự bịa profile không có bằng chứng provenance."
+      },
+      {
+        "item": "BEC Formula (I*F/(1+eps))",
+        "action": "REJECT",
+        "reason": "Công thức suy đoán vi phạm cấm tự tạo toán học BEC."
+      },
+      {
+        "item": "Epsilon 1e-7 as CORE Invariant",
+        "action": "MODIFY",
+        "reason": "Hạ cấp xuống Calibration/Safety Parameter."
+      },
+      {
+        "item": "L3 Runtime Status",
+        "action": "MODIFY",
+        "reason": "Hạ từ CORE xuống RESEARCH cho đến khi có spec v2.9.2."
+      },
+      {
+        "item": "Legacy Labels in Canonical Vocabulary",
+        "action": "REJECT",
+        "reason": "Xóa khỏi danh sách từ vựng canonical để tránh ô nhiễm Kernel."
+      }
+    ]
+  },
+  "raw_response": "{\n  \"accepted_decisions\": [\n    {\n      \"decision_id\": \"ACC-01\",\n      \"topic\": \"Canonical S07 Vocabulary\",\n      \"classification\": \"CORE\",\n      \"reason\": \"Xác nhận đúng 6 mã canonical (SAT, TA, NHIEU, HY, DUONG, AN) theo quy định của governance v3.0_dd, không chứa nhãn legacy trong Kernel.\"\n    },\n    {\n      \"topic\": \"Compute-Interpretation Firewall\",\n      \"decision_id\": \"ACC-02\",\n      \"classification\": \"CORE\",\n      \"reason\": \"Phân tách triệt để giữa L3 (chỉ xuất raw_measurements/field_state) và L4 (chịu trách nhiệm dịch sang ngữ nghĩa S07).\"\n    },\n    {\n      \"topic\": \"Gate System Architecture\",\n      \"decision_id\": \"ACC-03\",\n      \"classification\": \"CORE\",\n      \"reason\": \"Thiết lập mô hình 5 Gates (GATE-1 đến GATE-5) với cơ chế trả mã lỗi rõ ràng khi không đạt điều kiện tối thiểu.\"\n    },\n    {\n      \"topic\": \"Confidence Score Separation\",\n      \"decision_id\": \"ACC-04\",\n      \"classification\": \"CORE\",\n      \"reason\": \"Cấm sử dụng trực tiếp f_net_out làm confidence_score, bắt buộc confidence phải là chỉ số tổng hợp có provenance.\"\n    }\n  ],\n  \"rejected_or_downgraded\": [\n    {\n      \"item\": \"Profile S07_CANONICAL_V31_DEFAULT\",\n      \"action\": \"DOWNGRADED_TO_RESEARCH\",\n      \"error\": \"Vòng 1 tự ý tạo Profile mapping mặc định với các ngưỡng (I >= 0.75, D > 0, S >= 0.7...) mà không có provenance, calibration hay bằng chứng từ tài liệu gốc. Vi phạm quy tắc không tự map Vectơ Khí 5D sang S07.\"\n    },\n    {\n      \"item\": \"Công thức ngưng tụ BEC: rho_condensate = min(1.0, max(0.0, I * F / (1 + epsilon)))\",\n      \"action\": \"REJECTED\",\n      \"error\": \"Tự bịa công thức BEC toán học không có trong bất kỳ tài liệu gốc nào (v2.8). Vi phạm cấm dùng công thức BEC suy đoán.\"\n    },\n    {\n      \"item\": \"safe_epsilon = 1e-7 được phân loại là CORE\",\n      \"action\": \"DOWNGRADED_TO_CALIBRATION\",\n      \"error\": \"Nâng epsilon cụ thể thành CORE invariant khi chưa có đăng ký canonical. Epsilon chỉ là hằng số an toàn kỹ thuật (safety parameter), không phải bản chất vật lý CORE.\"\n    },\n    {\n      \"item\": \"Đưa các nhãn Legacy (TỤ, HỢP, TÁN, LY, HIỆN) vào từ vựng Canonical Vocabulary dưới dạng L5_COMPATIBILITY\",\n      \"action\": \"REJECTED\",\n      \"error\": \"Ô nhiễm từ vựng canonical. Các nhãn legacy không được xuất hiện trong danh sách từ vựng canonical, chỉ tồn tại trong Compatibility Decoder bên ngoài Kernel.\"\n    },\n    {\n      \"item\": \"Xác nhận L3 Matrix/Delay Runtime là CORE\",\n      \"action\": \"DOWNGRADED_TO_RESEARCH\",\n      \"error\": \"Tài liệu runtime v2.9.2 chưa được truy xuất và xác minh bằng chứng. Không thể khóa L3 là CORE hoàn chỉnh khi các toán tử delay và ma trận chưa có tài liệu gốc.\"\n    }\n  ],\n  \"mapping_audit\": {\n    \"status\": \"MAPPING_UNRESOLVED\",\n    \"details\": \"Vòng 1 đề xuất profile S07_CANONICAL_V31_DEFAULT nhưng thiếu hoàn toàn provenance, hash đăng ký, miền hiệu lực và calibration. Theo quy tắc brief section 2 & 7, khi thiếu profile hợp lệ có bằng chứng, L4 bắt buộc trả về MAPPING_UNRESOLVED.\",\n    \"rules_evidence_check\": [\n      {\n        \"rule_id\": \"RULE-HY-01\",\n        \"condition\": \"I >= 0.75 AND D > 0\",\n        \"has_evidence\": false,\n        \"verdict\": \"UNVERIFIED_SPECULATION\"\n      },\n      {\n        \"rule_id\": \"RULE-SAT-01\",\n        \"condition\": \"S >= 0.7 AND F > 0.5\",\n        \"has_evidence\": false,\n        \"verdict\": \"UNVERIFIED_SPECULATION\"\n      }\n    ]\n  },\n  \"layer_audit\": {\n    \"layer_dependency_check\": \"FAIL\",\n    \"violations\": [\n      {\n        \"layer\": \"L3_RUNTIME\",\n        \"issue\": \"L3 Runtime gọi trực tiếp hàm compute_bec_field_unproven chứa logic L2 chưa kiểm định. L3 phải độc lập với các mô hình lý thuyết L2 chưa đạt GATE-2.\"\n      },\n      {\n        \"layer\": \"L5_COMPATIBILITY\",\n        \"issue\": \"Khai báo tầng L5_COMPATIBILITY trong Canonical Vocabulary Table gây rò rỉ khái niệm legacy vào tầng Canonical Data Contract.\"\n      }\n    ],\n    \"correct_flow\": \"L1 (Theoretical Reference) -> L2 (Field Model) -> L3 (Deterministic Runtime Engine) -> Firewall -> L4 (Semantic Mapping) -> L5 (Canonical Data Contract) -> L6 (Operations/UI)\"\n  },\n  \"runtime_audit\": {\n    \"determinism\": \"PASSED (Khái niệm)\",\n    \"division_safety\": \"PARTIAL (Cần tham số safe_denominator nhưng không được gán cứng valeur 1e-7 thành invariant CORE)\",\n    \"bec_model\": \"REJECTED (Công thức suy đoán I*F/(1+epsilon) bị loại bỏ hoàn toàn)\",\n    \"uncertainty_handling\": \"NEEDS_REVISION (Vòng 1 gán cứng variance 0.05 không có căn cứ thực nghiệm)\",\n    \"pseudocode_status\": \"NON_CANONICAL_PROPOSAL\"\n  },\n  \"vocabulary_audit\": {\n    \"canonical_codes\": [\n      \"SAT\",\n      \"TA\",\n      \"NHIEU\",\n      \"HY\",\n      \"DUONG\",\n      \"AN\"\n    ],\n    \"unicode_mapping\": {\n      \"SAT\": \"SÁT\",\n      \"TA\": \"TÀ\",\n      \"NHIEU\": \"NHIỄU\",\n      \"HY\": \"HỶ\",\n      \"DUONG\": \"DƯỠNG\",\n      \"AN\": \"ẨN\"\n    },\n    \"legacy_codes_found_in_canonical_list\": [\n      \"TU_LEGACY\",\n      \"HOP_LEGACY\",\n      \"TAN_LEGACY\",\n      \"LY_LEGACY\",\n      \"HIEN_LEGACY\"\n    ],\n    \"verdict\": \"REJECT_LEGACY_IN_CANONICAL_LIST. Nhãn legacy phải bị xóa hoàn toàn khỏi danh mục từ vựng canonical.\"\n  },\n  \"data_contract_audit\": {\n    \"required_fields_present\": true,\n    \"enum_strictness\": \"PASSED (Chỉ nhận 6 mã S07 + MAPPING_UNRESOLVED)\",\n    \"f_net_out_usage\": \"VALIDATED (Không dùng f_net_out làm confidence_score)\",\n    \"provenance_fields\": \"PASSED (Đã bổ sung decision_id, source_version, source_hashes)\",\n    \"schema_issues\": \"Cần đảm bảo primary_label không chứa bất kỳ mã legacy nào ngay cả ở cấp API Schema.\"\n  },\n  \"test_audit\": {\n    \"valid_tests\": [\n      \"TV-01-ENUM-VALIDATION\",\n      \"TV-02-LEGACY-REJECTION\",\n      \"TV-03-UNICODE-CONSISTENCY\",\n      \"TV-04-MISSING-PROFILE\",\n      \"TV-07-60-TICKS-REPLAY-DETERMINISM\"\n    ],\n    \"invalid_assumptions_in_tests\": [\n      {\n        \"test_name\": \"TV-05-DPKE-ZERO-DIVISION\",\n        \"flaw\": \"Coi safe_epsilon=1e-7 là hằng số cố định CORE.\"\n      },\n      {\n        \"test_name\": \"TV-06-BEC-BOUNDARY-CHECK\",\n        \"flaw\": \"Giả định công thức BEC suy đoán I*F/(1+epsilon) là chuẩn.\"\n      }\n    ],\n    \"additional_tests_proposed\": [\n      {\n        \"name\": \"TV-08-FIREWALL-NON-SEMANTIC-L3\",\n        \"input\": \"L3 Output payload\",\n        \"expected\": \"Không chứa bất kỳ trường ngữ nghĩa S07 nào (HY, TA, SAT...)\"\n      },\n      {\n        \"name\": \"TV-09-UNRESOLVED-PROFILE-HASH-MISMATCH\",\n        \"input\": \"Vector 5D + Profile có hash không trùng khớp với đăng ký\",\n        \"expected\": \"GATE-3 FAILURE -> MAPPING_UNRESOLVED\"\n      }\n    ]\n  },\n  \"final_canonical_recommendation\": [\n    \"Khóa 6 mã S07 Canonical Enum: SAT, TA, NHIEU, HY, DUONG, AN.\",\n    \"Khóa Firewall tuyệt đối giữa L3 (Data/Signal) và L4 (Pattern/Inference).\",\n    \"Khóa cơ chế mặc định L4 phát nhãn MAPPING_UNRESOLVED khi thiếu Profile có Provenance.\",\n    \"Khóa cấu trúc Data Contract L5 và hệ thống 5 Gates kiểm định.\",\n    \"Khóa nguyên tắc Runtime Determinism S_{t+1} = K(S_t, I_t).\"\n  ],\n  \"research_and_placeholder_register\": [\n    {\n      \"item\": \"SL-DIF/BEC Coupled Field Model (L2)\",\n      \"status\": \"RESEARCH\",\n      \"reason\": \"Thiếu tài liệu v2.8 và công thức ngưng tụ chính xác.\"\n    },\n    {\n      \"item\": \"Deterministic Matrix/Delay Runtime Spec (L3)\",\n      \"status\": \"RESEARCH\",\n      \"reason\": \"Chưa có văn bản quy định chi tiết toán tử delay v2.9.2.\"\n    },\n    {\n      \"item\": \"S07 Mapping Profile Rules & Thresholds\",\n      \"status\": \"RESEARCH\",\n      \"reason\": \"Chưa có dữ liệu calibration thực chứng cho các ngưỡng 5D KhiVector.\"\n    },\n    {\n      \"item\": \"SDE/Bellman MDP Operators (L1)\",\n      \"status\": \"PLACEHOLDER\",\n      \"reason\": \"Thiếu phụ lục toán học v2.5.\"\n    },\n    {\n      \"item\": \"safe_epsilon & Parameter Calibration Table\",\n      \"status\": \"CALIBRATION_PARAMETER\",\n      \"reason\": \"Tham số kỹ thuật cần tối ưu qua thực nghiệm, không phải invariant CORE.\"\n    }\n  ],\n  \"unresolved_questions\": [\n    {\n      \"question_id\": \"UQ-01\",\n      \"topic\": \"S07 Profile Provenance\",\n      \"description\": \"Tài liệu gốc nào định nghĩa bảng ánh xạ từ Vectơ Khí 5D (S, D, I, F, T) sang 6 trạng thái S07? Cần cung cấp hash và file gốc.\",\n      \"action_required\": \"Cần người dùng hoặc repository bổ sung file profile chuẩn.\"\n    },\n    {\n      \"question_id\": \"UQ-02\",\n      \"topic\": \"v2.9.2 Matrix/Delay Spec\",\n      \"description\": \"Phương trình ma trận và độ trễ (delay) chính xác trong L3 Runtime được quy định ở đâu?\",\n      \"action_required\": \"Yêu cầu truy xuất tài liệu v2.9.2 trước khi khóa CORE cho L3.\"\n    }\n  ],\n  \"decision_log\": [\n    {\n      \"item\": \"S07 Canonical Codes (SAT, TA, NHIEU, HY, DUONG, AN)\",\n      \"action\": \"KEEP\",\n      \"reason\": \"Khớp 100% với Canonicalization Brief section 3.\"\n    },\n    {\n      \"item\": \"Compute-Interpretation Firewall\",\n      \"action\": \"KEEP\",\n      \"reason\": \"Tuân thủ nghiêm ngặt nguyên tắc kiến trúc v3.1.\"\n    },\n    {\n      \"item\": \"Profile S07_CANONICAL_V31_DEFAULT\",\n      \"action\": \"REJECT\",\n      \"reason\": \"Vòng 1 tự bịa profile không có bằng chứng provenance.\"\n    },\n    {\n      \"item\": \"BEC Formula (I*F/(1+eps))\",\n      \"action\": \"REJECT\",\n      \"reason\": \"Công thức suy đoán vi phạm cấm tự tạo toán học BEC.\"\n    },\n    {\n      \"item\": \"Epsilon 1e-7 as CORE Invariant\",\n      \"action\": \"MODIFY\",\n      \"reason\": \"Hạ cấp xuống Calibration/Safety Parameter.\"\n    },\n    {\n      \"item\": \"L3 Runtime Status\",\n      \"action\": \"MODIFY\",\n      \"reason\": \"Hạ từ CORE xuống RESEARCH cho đến khi có spec v2.9.2.\"\n    },\n    {\n      \"item\": \"Legacy Labels in Canonical Vocabulary\",\n      \"action\": \"REJECT\",\n      \"reason\": \"Xóa khỏi danh sách từ vựng canonical để tránh ô nhiễm Kernel.\"\n    }\n  ]\n}"
+}

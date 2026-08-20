@@ -1,0 +1,612 @@
+{
+  "timestamp_utc": "2026-08-20T08:51:13.454217+00:00",
+  "model": "gemini-3.6-flash",
+  "round": 1,
+  "input_files": [
+    "CANONICALIZATION_BRIEF.md",
+    "SOURCE_INVENTORY.md",
+    "/home/ubuntu/dd_v31_source_excerpt.txt"
+  ],
+  "response": {
+    "constraints": [
+      "Hệ thống tuân thủ nghiêm ngặt mô hình kiến trúc 6 lớp (L1 -> L6), dòng phụ thuộc chỉ đi một chiều từ trên xuống dưới.",
+      "Thiết lập Compute–Interpretation Firewall giữa L3 (Runtime) và L4 (Semantic Mapping): L3 chỉ xuất đo lường thô và trạng thái trường, L4 chịu trách nhiệm dịch sang nhãn ngữ nghĩa.",
+      "Kernel tuyệt đối không sử dụng các nhãn legacy (TỤ, HỢP, TÁN, LY, HIỆN); Kernel v3.1 chỉ chấp nhận 6 mã S07 canonical: SAT, TA, NHIEU, HY, DUONG, AN.",
+      "Không sử dụng trực tiếp f_net_out làm confidence_score. Confidence phải là chỉ số tổng hợp có provenance dựa trên các mức xác minh và kiểm tra validation gates.",
+      "Mọi công thức v2.5, v2.8, v2.9.2, SDE, Bellman, SL-DIF, BEC chưa có bằng chứng văn bản gốc trong repository phải được hạ cấp xuống RESEARCH hoặc PLACEHOLDER.",
+      "Mọi phép toán chia trong mô hình trường và DPKE phải có tham số an toàn epsilon (safe denominator) để ngăn chặn lỗi chia cho 0.",
+      "Mô hình BEC (nếu triển khai) phải kiểm tra biên chính xác trên đoạn [0.0, 1.0], không vượt ngưỡng vật lý.",
+      "Evaluator của S07 phải sử dụng declarative AST parser an toàn, tuyệt đối không dùng hàm eval() trực tiếp trên chuỗi Python."
+    ],
+    "canonical_vocabulary": [
+      {
+        "term": "SÁT",
+        "serialize_code": "SAT",
+        "layer": "L4",
+        "status": "CORE",
+        "description": "Trạng thái xung sát, phá vỡ liên kết cấu trúc"
+      },
+      {
+        "term": "TÀ",
+        "serialize_code": "TA",
+        "layer": "L4",
+        "status": "CORE",
+        "description": "Trạng thái lệch chuẩn, nhiễu động tiêu cực"
+      },
+      {
+        "term": "NHIỄU",
+        "serialize_code": "NHIEU",
+        "layer": "L4",
+        "status": "CORE",
+        "description": "Trạng thái bất định, tín hiệu trộn lẫn"
+      },
+      {
+        "term": "HỶ",
+        "serialize_code": "HY",
+        "layer": "L4",
+        "status": "CORE",
+        "description": "Trạng thái thuận lợi, phát triển tích cực"
+      },
+      {
+        "term": "DƯỠNG",
+        "serialize_code": "DUONG",
+        "layer": "L4",
+        "status": "CORE",
+        "description": "Trạng thái nuôi dưỡng, tích tụ ổn định"
+      },
+      {
+        "term": "ẨN",
+        "serialize_code": "AN",
+        "layer": "L4",
+        "status": "CORE",
+        "description": "Trạng thái tiềm ẩn, tích lũy nội tại"
+      },
+      {
+        "term": "TỤ",
+        "serialize_code": "TU_LEGACY",
+        "layer": "L5_COMPATIBILITY",
+        "status": "COMPATIBILITY",
+        "description": "Nhãn legacy v2.x, chỉ dùng cho Compatibility Decoder ngoài Kernel"
+      },
+      {
+        "term": "HỢP",
+        "serialize_code": "HOP_LEGACY",
+        "layer": "L5_COMPATIBILITY",
+        "status": "COMPATIBILITY",
+        "description": "Nhãn legacy v2.x, chỉ dùng cho Compatibility Decoder ngoài Kernel"
+      },
+      {
+        "term": "TÁN",
+        "serialize_code": "TAN_LEGACY",
+        "layer": "L5_COMPATIBILITY",
+        "status": "COMPATIBILITY",
+        "description": "Nhãn legacy v2.x, chỉ dùng cho Compatibility Decoder ngoài Kernel"
+      },
+      {
+        "term": "LY",
+        "serialize_code": "LY_LEGACY",
+        "layer": "L5_COMPATIBILITY",
+        "status": "COMPATIBILITY",
+        "description": "Nhãn legacy v2.x, chỉ dùng cho Compatibility Decoder ngoài Kernel"
+      },
+      {
+        "term": "HIỆN",
+        "serialize_code": "HIEN_LEGACY",
+        "layer": "L5_COMPATIBILITY",
+        "status": "COMPATIBILITY",
+        "description": "Nhãn legacy v2.x, chỉ dùng cho Compatibility Decoder ngoài Kernel"
+      }
+    ],
+    "layer_contracts": {
+      "L1_REFERENCE": {
+        "name": "SDE/Bellman/MDP Phase Operators Boundary",
+        "status": "PLACEHOLDER",
+        "input": "Theoretical parameters, continuous boundary conditions",
+        "output": "Reference field equations and continuous operators",
+        "allowed_dependency": [],
+        "forbidden_dependency": [
+          "L2",
+          "L3",
+          "L4",
+          "L5",
+          "L6"
+        ]
+      },
+      "L2_FIELD_MODEL": {
+        "name": "SL-DIF/BEC Coupled Field Model",
+        "status": "RESEARCH",
+        "input": "Discrete initial state, raw hexagram parameters, time phase",
+        "output": "Coupled field potential, field delta, phase boundary limits",
+        "allowed_dependency": [
+          "L1_REFERENCE"
+        ],
+        "forbidden_dependency": [
+          "L3",
+          "L4",
+          "L5",
+          "L6"
+        ]
+      },
+      "L3_RUNTIME": {
+        "name": "Deterministic Matrix/Delay Runtime Engine",
+        "status": "CORE",
+        "input": "Snapshot(t), Input Event, Runtime Configuration",
+        "output": "Snapshot(t+1), raw_measurements (5D KhiVector), field_state, runtime_trace, uncertainty, gate_result",
+        "allowed_dependency": [
+          "L2_FIELD_MODEL"
+        ],
+        "forbidden_dependency": [
+          "L4",
+          "L5",
+          "L6"
+        ]
+      },
+      "L4_SEMANTIC_MAPPING": {
+        "name": "S07 Semantic Mapping Engine",
+        "status": "CORE",
+        "input": "raw_measurements, S07_MAPPING_PROFILE",
+        "output": "semantic_state (SAT, TA, NHIEU, HY, DUONG, AN), mapping_provenance",
+        "allowed_dependency": [
+          "L3_RUNTIME"
+        ],
+        "forbidden_dependency": [
+          "L5",
+          "L6"
+        ]
+      },
+      "L5_DATA_CONTRACT": {
+        "name": "Canonical Data Serialization & Schema Validation",
+        "status": "CORE",
+        "input": "L3 raw data + L4 semantic state + execution metadata",
+        "output": "Validated Canonical JSON Response with Schema Provenance & Gates",
+        "allowed_dependency": [
+          "L4_SEMANTIC_MAPPING",
+          "L3_RUNTIME"
+        ],
+        "forbidden_dependency": [
+          "L6"
+        ]
+      },
+      "L6_OPERATIONS": {
+        "name": "UI and External Operations Layer",
+        "status": "CORE",
+        "input": "Canonical JSON Response",
+        "output": "UI Render, Human-readable Interpretation Reports, Gemini Explanation",
+        "allowed_dependency": [
+          "L5_DATA_CONTRACT"
+        ],
+        "forbidden_dependency": [
+          "L1_REFERENCE",
+          "L2_FIELD_MODEL",
+          "L3_RUNTIME",
+          "L4_SEMANTIC_MAPPING"
+        ]
+      }
+    },
+    "runtime_proposal": {
+      "status": "CORE_WITH_RESEARCH_PLACEHOLDERS",
+      "description": "L2/L3 Runtime kết hợp giữa phần đã chứng minh trong dd_engine1 và phần giả định lý thuyết (đánh dấu rõ thiếu bằng chứng).",
+      "pseudocode": "class DeterministicRuntimeL3:\n    def __init__(self, config: dict):\n        self.psi_weight = config.get('psi_directional_weight', 1.0)\n        self.force_table = config.get('force_active_line_weight', {})\n        self.epsilon = config.get('safe_epsilon', 1e-7)  # PLACEHOLDER: Epsilon chống chia 0\n\n    def compute_khi_5d_proven(self, que_chu, graph, gio_dia_chi) -> dict:\n        # Đã chứng minh từ source dd_engine1/sie.py\n        S = self._spatial_index(que_chu.active_line)\n        D = self._directional_derivative(que_chu, self.psi_weight)\n        I = self._interaction_density(graph)\n        F = self._force_scalar(que_chu.active_line, graph, self.force_table)\n        T = self._temporal_phase(que_chu.active_line, gio_dia_chi)\n        return {'S': S, 'D': D, 'I': I, 'F': F, 'T': T}\n\n    def compute_bec_field_unproven(self, khi_5d: dict) -> dict:\n        # RESEARCH / PLACEHOLDER: Thiếu phụ lục gốc v2.8 (SL-DIF/BEC)\n        # Giả định mô hình ngưng tụ BEC dạng an toàn có epsilon\n        rho_condensate = min(1.0, max(0.0, khi_5d['I'] * khi_5d['F'] / (1.0 + self.epsilon)))\n        return {'bec_condensation_density': rho_condensate, 'is_bec_boundary_valid': 0.0 <= rho_condensate <= 1.0}\n\n    def step(self, snapshot_t: dict, inputs: dict) -> dict:\n        # Deterministic transition S_t + I_t -> S_{t+1}\n        khi_5d = self.compute_khi_5d_proven(inputs['que_chu'], inputs['graph'], inputs['gio_dia_chi'])\n        bec_state = self.compute_bec_field_unproven(khi_5d)\n        next_payload = {\n            'raw_measurements': khi_5d,\n            'field_state': bec_state,\n            'uncertainty': {'khi_std': 0.0, 'model_confidence_variance': 0.05},\n            'gate_result': {'gate_2_passed': True}\n        }\n        return {'tick': snapshot_t['tick'] + 1, 'payload': next_payload}"
+    },
+    "mapping_proposal": {
+      "status": "CORE",
+      "description": "Thiết kế S07_MAPPING_PROFILE tách rời hoàn toàn khỏi L3, chấm dứt việc tự ý ép vector 5D sang nhãn khi thiếu profile.",
+      "profile_schema": {
+        "profile_id": "S07_CANONICAL_V31_DEFAULT",
+        "version": "3.1.0",
+        "profile_hash": "sha256_hash_of_profile_rules",
+        "rules": [
+          {
+            "condition_ast": {
+              "and": [
+                {
+                  "gte": [
+                    "I",
+                    0.75
+                  ]
+                },
+                {
+                  "gt": [
+                    "D",
+                    0.0
+                  ]
+                }
+              ]
+            },
+            "target_label": "HY"
+          },
+          {
+            "condition_ast": {
+              "and": [
+                {
+                  "gte": [
+                    "I",
+                    0.75
+                  ]
+                },
+                {
+                  "lte": [
+                    "D",
+                    0.0
+                  ]
+                }
+              ]
+            },
+            "target_label": "DUONG"
+          },
+          {
+            "condition_ast": {
+              "and": [
+                {
+                  "lt": [
+                    "I",
+                    0.3
+                  ]
+                },
+                {
+                  "gt": [
+                    "D",
+                    0.0
+                  ]
+                }
+              ]
+            },
+            "target_label": "NHIEU"
+          },
+          {
+            "condition_ast": {
+              "and": [
+                {
+                  "lt": [
+                    "I",
+                    0.3
+                  ]
+                },
+                {
+                  "lte": [
+                    "D",
+                    0.0
+                  ]
+                }
+              ]
+            },
+            "target_label": "TA"
+          },
+          {
+            "condition_ast": {
+              "and": [
+                {
+                  "gte": [
+                    "S",
+                    0.7
+                  ]
+                },
+                {
+                  "gt": [
+                    "F",
+                    0.5
+                  ]
+                }
+              ]
+            },
+            "target_label": "SAT"
+          },
+          {
+            "condition_ast": {
+              "lt": [
+                "S",
+                0.3
+              ]
+            },
+            "target_label": "AN"
+          }
+        ]
+      },
+      "fallback_behavior": "Nếu S07_MAPPING_PROFILE thiếu, không hợp lệ hoặc không bắt được rule nào, L4 phát nhãn MAPPING_UNRESOLVED, giữ nguyên raw_measurements ở L3."
+    },
+    "data_contract": {
+      "status": "CORE",
+      "required_json_fields": {
+        "contract_version": "3.1.0",
+        "input_snapshot": {
+          "tick": "int",
+          "que_chu_id": "int",
+          "active_line": "int",
+          "timestamp_iso": "string"
+        },
+        "raw_measurements": {
+          "khi_vector": {
+            "S": "float",
+            "D": "float",
+            "I": "float",
+            "F": "float",
+            "T": "float"
+          }
+        },
+        "semantic_state": {
+          "primary_label": "string (SAT|TA|NHIEU|HY|DUONG|AN|MAPPING_UNRESOLVED)",
+          "profile_id": "string",
+          "profile_hash": "string"
+        },
+        "uncertainty": {
+          "measurement_uncertainty": "float",
+          "confidence_score": "float (0.0 -> 1.0, tổng hợp từ L0-L4, không dùng f_net_out)"
+        },
+        "provenance": {
+          "decision_id": "string",
+          "source_version": "string",
+          "source_hashes": "map[string]string",
+          "review_round": "string"
+        },
+        "gate_results": {
+          "GATE-1-THEORY-FIELD": "string (PASSED|PLACEHOLDER)",
+          "GATE-2-RUNTIME": "string (PASSED|RUNTIME_UNVERIFIED)",
+          "GATE-3-INTERPRETATION": "string (PASSED|MAPPING_UNRESOLVED)",
+          "GATE-4-DATA": "string (PASSED|SCHEMA_INVALID)",
+          "GATE-5-OPERATIONS": "string (PASSED|UI_CONTRACT_VIOLATION)"
+        }
+      }
+    },
+    "validation_gates": [
+      {
+        "gate": "GATE-1-THEORY-FIELD",
+        "point": "L1 -> L2",
+        "minimum_condition": "Nguồn công thức lý thuyết, định nghĩa biến, miền giá trị và test vector được ghi nhận đầy đủ.",
+        "failure_code": "PLACEHOLDER_THEORY",
+        "test_vector": "Kiểm tra tính hiện hữu của tài liệu phụ lục v2.5 / Bellman."
+      },
+      {
+        "gate": "GATE-2-RUNTIME",
+        "point": "L2 -> L3",
+        "minimum_condition": "Ma trận/delay deterministic, kiểm tra ranh giới BEC [0,1] và có tham số an toàn chống chia cho 0.",
+        "failure_code": "RUNTIME_UNVERIFIED",
+        "test_vector": "Input vector có mẫu số bằng 0 hoặc F < 0.0."
+      },
+      {
+        "gate": "GATE-3-INTERPRETATION",
+        "point": "L3 -> L4",
+        "minimum_condition": "Có S07_MAPPING_PROFILE hợp lệ với ID, hash, version và test vectors được phê duyệt.",
+        "failure_code": "MAPPING_UNRESOLVED",
+        "test_vector": "KhiVector 5D truyền vào L4 mà không kèm Profile."
+      },
+      {
+        "gate": "GATE-4-DATA",
+        "point": "L4 -> L5",
+        "minimum_condition": "Dữ liệu khớp JSON Schema, enum chuẩn canonical (6 nhãn), đủ provenance và uncertainty.",
+        "failure_code": "SCHEMA_INVALID",
+        "test_vector": "JSON chứa nhãn legacy 'TỤ' hoặc thiếu trường uncertainty."
+      },
+      {
+        "gate": "GATE-5-OPERATIONS",
+        "point": "L5 -> L6",
+        "minimum_condition": "API chỉ truyền/nhận Data Contract L5, không lộ logic tính toán Kernel vào UI/Gemini Prompt.",
+        "failure_code": "UI_CONTRACT_VIOLATION",
+        "test_vector": "Request từ UI gửi trực tiếp lệnh tính toán toán tử L2."
+      }
+    ],
+    "calibration_parameters": [
+      {
+        "parameter": "psi_directional_weight",
+        "current_value": 1.0,
+        "classification": "RESEARCH",
+        "reason": "Chưa được calibration thực chứng theo Tiên đề A5, cần đưa vào vòng tối ưu S11."
+      },
+      {
+        "parameter": "force_active_line_weight",
+        "current_value": {
+          "1": 0.15,
+          "2": 0.3,
+          "3": 0.45,
+          "4": 0.6,
+          "5": 0.8,
+          "6": 1.0
+        },
+        "classification": "RESEARCH",
+        "reason": "Bảng trọng số khởi tạo thủ công, cần calibration qua thực nghiệm."
+      },
+      {
+        "parameter": "confidence_level_weights",
+        "current_value": {
+          "level0": 0.1,
+          "level1": 0.2,
+          "level2": 0.25,
+          "level3": 0.2,
+          "level4": 0.25
+        },
+        "classification": "RESEARCH",
+        "reason": "Hệ số tổng hợp độ tin cậy chưa được kiểm định thống kê."
+      },
+      {
+        "parameter": "bec_critical_exponent",
+        "current_value": 0.5,
+        "classification": "PLACEHOLDER",
+        "reason": "Tham số mô hình BEC chưa có dữ liệu trong repository."
+      },
+      {
+        "parameter": "safe_epsilon",
+        "current_value": 1e-07,
+        "classification": "CORE",
+        "reason": "Tham số an toàn hệ thống (safety parameter) để tránh chia cho 0 trong toán tử runtime."
+      }
+    ],
+    "invariants": [
+      {
+        "invariant": "S07_CANONICAL_ENUM",
+        "value": [
+          "SAT",
+          "TA",
+          "NHIEU",
+          "HY",
+          "DUONG",
+          "AN"
+        ],
+        "classification": "CORE",
+        "reason": "Chỉ 6 mã này được phép xuất hiện trong Kernel và Data Contract chuẩn v3.1."
+      },
+      {
+        "invariant": "RUNTIME_DETERMINISM",
+        "value": "S_{t+1} = K(S_t, I_t)",
+        "classification": "CORE",
+        "reason": "Cùng Snapshot đầu vào và cùng chuỗi Input phải cho ra kết quả Snapshot hoàn toàn giống nhau 100%."
+      },
+      {
+        "invariant": "UNICODE_SERDE_CONSISTENCY",
+        "value": "Mọi ký tự tiếng Việt Unicode trong report L6 phải có mã Serialize ASCII tương ứng tại L4/L5.",
+        "classification": "CORE",
+        "reason": "Tránh lỗi mã hóa trên các hệ thống tích hợp khác nhau."
+      },
+      {
+        "invariant": "FIREWALL_SEPARATION",
+        "value": "L3_OUTPUT INTERSECT L4_LABELS = EMPTY",
+        "classification": "CORE",
+        "reason": "Runtime L3 tuyệt đối không tự gắn nhãn ngữ nghĩa."
+      }
+    ],
+    "test_vectors": [
+      {
+        "name": "TV-01-ENUM-VALIDATION",
+        "input": {
+          "semantic_label": "HY"
+        },
+        "expected": "PASSED (Khớp S07 Canonical)"
+      },
+      {
+        "name": "TV-02-LEGACY-REJECTION",
+        "input": {
+          "semantic_label": "TỤ"
+        },
+        "expected": "FAILED GATE-4 (SCHEMA_INVALID - Nhãn legacy không được vào Kernel)"
+      },
+      {
+        "name": "TV-03-UNICODE-CONSISTENCY",
+        "input": {
+          "term_vi": "DƯỠNG",
+          "code": "DUONG"
+        },
+        "expected": "PASSED (Khớp bảng từ vựng Canonical)"
+      },
+      {
+        "name": "TV-04-MISSING-PROFILE",
+        "input": {
+          "khi_vector": {
+            "S": 0.8,
+            "D": 0.5,
+            "I": 0.9,
+            "F": 0.7,
+            "T": 0.2
+          },
+          "profile": null
+        },
+        "expected": "GATE-3 FAILURE -> MAPPING_UNRESOLVED (Không tự suy nhãn)"
+      },
+      {
+        "name": "TV-05-DPKE-ZERO-DIVISION",
+        "input": {
+          "numerator": 1.5,
+          "denominator": 0.0
+        },
+        "expected": "PASSED (Safe division dùng epsilon 1e-7, không crash runtime)"
+      },
+      {
+        "name": "TV-06-BEC-BOUNDARY-CHECK",
+        "input": {
+          "condensate_value": 1.05
+        },
+        "expected": "FAILED GATE-2 (BEC_BOUNDARY_VIOLATION - Vượt ngưỡng 1.0)"
+      },
+      {
+        "name": "TV-07-60-TICKS-REPLAY-DETERMINISM",
+        "input": "Chuỗi 60 inputs ngẫu nhiên chạy trên TickEngine",
+        "expected": "PASSED (Mã hash của Snapshot_60 ở 2 lần chạy độc lập trùng nhau hoàn toàn)"
+      }
+    ],
+    "risks": [
+      {
+        "risk_id": "RSK-01",
+        "type": "Semantic Leakage",
+        "description": "File semantic.py hiện tại đang thực thi code bằng eval() trực tiếp từ file JSON, gây nguy cơ rò rỉ bảo mật và vi phạm Firewall.",
+        "mitigation": "Thay thế eval() bằng AST Declarative Evaluator an toàn ở L4."
+      },
+      {
+        "risk_id": "RSK-02",
+        "type": "Uncalibrated Invariant Risk",
+        "description": "Coi các trọng số chưa kiểm chứng trong config.json là Hằng số Bất biến (Invariant).",
+        "mitigation": "Phân loại chính xác toàn bộ trọng số config làm Calibration Parameters (RESEARCH/PLACEHOLDER)."
+      },
+      {
+        "risk_id": "RSK-03",
+        "type": "Legacy Label Ingestion",
+        "description": "Dữ liệu lịch sử mang nhãn TỤ/HỢP/TÁN/LY đi thẳng vào Kernel gây sai lệch thống kê.",
+        "mitigation": "Bắt buộc đi qua Compatibility Decoder L5 để chuyển đổi và gắn provenance."
+      }
+    ],
+    "source_conflicts": [
+      {
+        "conflict_id": "CF-01",
+        "file": "dd_engine1/semantic_thresholds.json",
+        "issue": "Sử dụng các nhãn legacy (TỤ, HỢP, TÁN, LY, HIỆN) làm đầu ra chính.",
+        "governance_resolution": "Hạ file này xuống COMPATIBILITY; tạo S07_mapping_profile.json chuẩn v3.1 sử dụng SAT, TA, NHIEU, HY, DUONG, AN."
+      },
+      {
+        "conflict_id": "CF-02",
+        "file": "dd_engine1/semantic.py",
+        "issue": "Hàm _eval_condition dùng eval() Python và cơ chế SIE overrule trực tiếp đè kết quả.",
+        "governance_resolution": "Loại bỏ eval(), tách hoàn toàn SIE tương tác khỏi Kernel tính toán chính, thực hiện overrule có khai báo ở L4."
+      },
+      {
+        "conflict_id": "CF-03",
+        "file": "dd_engine1/pipeline.py",
+        "issue": "Kết quả confidence trả về chung với nhãn ngữ nghĩa mà chưa qua các Validation Gates chuẩn hóa.",
+        "governance_resolution": "Tách pipeline thành các bước gọi qua Layer Contract từ L3 đến L5."
+      }
+    ],
+    "file_changes": [
+      {
+        "action": "CREATE",
+        "path": "specs/v3.1/canonical_vocabulary.json",
+        "description": "Chứa định nghĩa chuẩn 6 mã S07 canonical và các mã compatibility."
+      },
+      {
+        "action": "CREATE",
+        "path": "specs/v3.1/s07_mapping_profile_v31.json",
+        "description": "Profile ánh xạ S07 khai báo an toàn không dùng eval()."
+      },
+      {
+        "action": "MODIFY",
+        "path": "dd_engine1/semantic.py",
+        "description": "Thay thế eval() bằng AST Parser, chỉ xuất ra 6 mã S07 canonical."
+      },
+      {
+        "action": "MODIFY",
+        "path": "dd_engine1/sie.py",
+        "description": "Bổ sung tham số an toàn safe_epsilon vào các phép tính mật độ và xung lực."
+      },
+      {
+        "action": "MODIFY",
+        "path": "dd_engine1/pipeline.py",
+        "description": "Cập nhật pipeline tuân thủ Data Contract L5, gắn gate_results và uncertainty."
+      }
+    ],
+    "open_questions": [
+      {
+        "question_id": "OQ-01",
+        "topic": "SDE/Bellman Annexes",
+        "description": "Công thức toán học chính xác của các toán tử pha SDE và phương trình Bellman trong v2.5 là gì? (Do chưa có file gốc trong repo).",
+        "impact": "L1 hiện phải giữ ở trạng thái PLACEHOLDER."
+      },
+      {
+        "question_id": "OQ-02",
+        "topic": "SL-DIF/BEC Boundary Equations",
+        "description": "Hệ số tương tác trường vi phân SL-DIF và phương trình ngưng tụ BEC v2.8 được định nghĩa cụ thể như thế nào?",
+        "impact": "L2 hiện phải giữ ở trạng thái RESEARCH."
+      }
+    ],
+    "classification_summary": {
+      "CORE": 12,
+      "COMPATIBILITY": 4,
+      "RESEARCH": 5,
+      "PLACEHOLDER": 3
+    }
+  },
+  "raw_response": "{\n  \"constraints\": [\n    \"Hệ thống tuân thủ nghiêm ngặt mô hình kiến trúc 6 lớp (L1 -> L6), dòng phụ thuộc chỉ đi một chiều từ trên xuống dưới.\",\n    \"Thiết lập Compute–Interpretation Firewall giữa L3 (Runtime) và L4 (Semantic Mapping): L3 chỉ xuất đo lường thô và trạng thái trường, L4 chịu trách nhiệm dịch sang nhãn ngữ nghĩa.\",\n    \"Kernel tuyệt đối không sử dụng các nhãn legacy (TỤ, HỢP, TÁN, LY, HIỆN); Kernel v3.1 chỉ chấp nhận 6 mã S07 canonical: SAT, TA, NHIEU, HY, DUONG, AN.\",\n    \"Không sử dụng trực tiếp f_net_out làm confidence_score. Confidence phải là chỉ số tổng hợp có provenance dựa trên các mức xác minh và kiểm tra validation gates.\",\n    \"Mọi công thức v2.5, v2.8, v2.9.2, SDE, Bellman, SL-DIF, BEC chưa có bằng chứng văn bản gốc trong repository phải được hạ cấp xuống RESEARCH hoặc PLACEHOLDER.\",\n    \"Mọi phép toán chia trong mô hình trường và DPKE phải có tham số an toàn epsilon (safe denominator) để ngăn chặn lỗi chia cho 0.\",\n    \"Mô hình BEC (nếu triển khai) phải kiểm tra biên chính xác trên đoạn [0.0, 1.0], không vượt ngưỡng vật lý.\",\n    \"Evaluator của S07 phải sử dụng declarative AST parser an toàn, tuyệt đối không dùng hàm eval() trực tiếp trên chuỗi Python.\"\n  ],\n  \"canonical_vocabulary\": [\n    {\n      \"term\": \"SÁT\",\n      \"serialize_code\": \"SAT\",\n      \"layer\": \"L4\",\n      \"status\": \"CORE\",\n      \"description\": \"Trạng thái xung sát, phá vỡ liên kết cấu trúc\"\n    },\n    {\n      \"term\": \"TÀ\",\n      \"serialize_code\": \"TA\",\n      \"layer\": \"L4\",\n      \"status\": \"CORE\",\n      \"description\": \"Trạng thái lệch chuẩn, nhiễu động tiêu cực\"\n    },\n    {\n      \"term\": \"NHIỄU\",\n      \"serialize_code\": \"NHIEU\",\n      \"layer\": \"L4\",\n      \"status\": \"CORE\",\n      \"description\": \"Trạng thái bất định, tín hiệu trộn lẫn\"\n    },\n    {\n      \"term\": \"HỶ\",\n      \"serialize_code\": \"HY\",\n      \"layer\": \"L4\",\n      \"status\": \"CORE\",\n      \"description\": \"Trạng thái thuận lợi, phát triển tích cực\"\n    },\n    {\n      \"term\": \"DƯỠNG\",\n      \"serialize_code\": \"DUONG\",\n      \"layer\": \"L4\",\n      \"status\": \"CORE\",\n      \"description\": \"Trạng thái nuôi dưỡng, tích tụ ổn định\"\n    },\n    {\n      \"term\": \"ẨN\",\n      \"serialize_code\": \"AN\",\n      \"layer\": \"L4\",\n      \"status\": \"CORE\",\n      \"description\": \"Trạng thái tiềm ẩn, tích lũy nội tại\"\n    },\n    {\n      \"term\": \"TỤ\",\n      \"serialize_code\": \"TU_LEGACY\",\n      \"layer\": \"L5_COMPATIBILITY\",\n      \"status\": \"COMPATIBILITY\",\n      \"description\": \"Nhãn legacy v2.x, chỉ dùng cho Compatibility Decoder ngoài Kernel\"\n    },\n    {\n      \"term\": \"HỢP\",\n      \"serialize_code\": \"HOP_LEGACY\",\n      \"layer\": \"L5_COMPATIBILITY\",\n      \"status\": \"COMPATIBILITY\",\n      \"description\": \"Nhãn legacy v2.x, chỉ dùng cho Compatibility Decoder ngoài Kernel\"\n    },\n    {\n      \"term\": \"TÁN\",\n      \"serialize_code\": \"TAN_LEGACY\",\n      \"layer\": \"L5_COMPATIBILITY\",\n      \"status\": \"COMPATIBILITY\",\n      \"description\": \"Nhãn legacy v2.x, chỉ dùng cho Compatibility Decoder ngoài Kernel\"\n    },\n    {\n      \"term\": \"LY\",\n      \"serialize_code\": \"LY_LEGACY\",\n      \"layer\": \"L5_COMPATIBILITY\",\n      \"status\": \"COMPATIBILITY\",\n      \"description\": \"Nhãn legacy v2.x, chỉ dùng cho Compatibility Decoder ngoài Kernel\"\n    },\n    {\n      \"term\": \"HIỆN\",\n      \"serialize_code\": \"HIEN_LEGACY\",\n      \"layer\": \"L5_COMPATIBILITY\",\n      \"status\": \"COMPATIBILITY\",\n      \"description\": \"Nhãn legacy v2.x, chỉ dùng cho Compatibility Decoder ngoài Kernel\"\n    }\n  ],\n  \"layer_contracts\": {\n    \"L1_REFERENCE\": {\n      \"name\": \"SDE/Bellman/MDP Phase Operators Boundary\",\n      \"status\": \"PLACEHOLDER\",\n      \"input\": \"Theoretical parameters, continuous boundary conditions\",\n      \"output\": \"Reference field equations and continuous operators\",\n      \"allowed_dependency\": [],\n      \"forbidden_dependency\": [\"L2\", \"L3\", \"L4\", \"L5\", \"L6\"]\n    },\n    \"L2_FIELD_MODEL\": {\n      \"name\": \"SL-DIF/BEC Coupled Field Model\",\n      \"status\": \"RESEARCH\",\n      \"input\": \"Discrete initial state, raw hexagram parameters, time phase\",\n      \"output\": \"Coupled field potential, field delta, phase boundary limits\",\n      \"allowed_dependency\": [\"L1_REFERENCE\"],\n      \"forbidden_dependency\": [\"L3\", \"L4\", \"L5\", \"L6\"]\n    },\n    \"L3_RUNTIME\": {\n      \"name\": \"Deterministic Matrix/Delay Runtime Engine\",\n      \"status\": \"CORE\",\n      \"input\": \"Snapshot(t), Input Event, Runtime Configuration\",\n      \"output\": \"Snapshot(t+1), raw_measurements (5D KhiVector), field_state, runtime_trace, uncertainty, gate_result\",\n      \"allowed_dependency\": [\"L2_FIELD_MODEL\"],\n      \"forbidden_dependency\": [\"L4\", \"L5\", \"L6\"]\n    },\n    \"L4_SEMANTIC_MAPPING\": {\n      \"name\": \"S07 Semantic Mapping Engine\",\n      \"status\": \"CORE\",\n      \"input\": \"raw_measurements, S07_MAPPING_PROFILE\",\n      \"output\": \"semantic_state (SAT, TA, NHIEU, HY, DUONG, AN), mapping_provenance\",\n      \"allowed_dependency\": [\"L3_RUNTIME\"],\n      \"forbidden_dependency\": [\"L5\", \"L6\"]\n    },\n    \"L5_DATA_CONTRACT\": {\n      \"name\": \"Canonical Data Serialization & Schema Validation\",\n      \"status\": \"CORE\",\n      \"input\": \"L3 raw data + L4 semantic state + execution metadata\",\n      \"output\": \"Validated Canonical JSON Response with Schema Provenance & Gates\",\n      \"allowed_dependency\": [\"L4_SEMANTIC_MAPPING\", \"L3_RUNTIME\"],\n      \"forbidden_dependency\": [\"L6\"]\n    },\n    \"L6_OPERATIONS\": {\n      \"name\": \"UI and External Operations Layer\",\n      \"status\": \"CORE\",\n      \"input\": \"Canonical JSON Response\",\n      \"output\": \"UI Render, Human-readable Interpretation Reports, Gemini Explanation\",\n      \"allowed_dependency\": [\"L5_DATA_CONTRACT\"],\n      \"forbidden_dependency\": [\"L1_REFERENCE\", \"L2_FIELD_MODEL\", \"L3_RUNTIME\", \"L4_SEMANTIC_MAPPING\"]\n    }\n  },\n  \"runtime_proposal\": {\n    \"status\": \"CORE_WITH_RESEARCH_PLACEHOLDERS\",\n    \"description\": \"L2/L3 Runtime kết hợp giữa phần đã chứng minh trong dd_engine1 và phần giả định lý thuyết (đánh dấu rõ thiếu bằng chứng).\",\n    \"pseudocode\": \"class DeterministicRuntimeL3:\\n    def __init__(self, config: dict):\\n        self.psi_weight = config.get('psi_directional_weight', 1.0)\\n        self.force_table = config.get('force_active_line_weight', {})\\n        self.epsilon = config.get('safe_epsilon', 1e-7)  # PLACEHOLDER: Epsilon chống chia 0\\n\\n    def compute_khi_5d_proven(self, que_chu, graph, gio_dia_chi) -> dict:\\n        # Đã chứng minh từ source dd_engine1/sie.py\\n        S = self._spatial_index(que_chu.active_line)\\n        D = self._directional_derivative(que_chu, self.psi_weight)\\n        I = self._interaction_density(graph)\\n        F = self._force_scalar(que_chu.active_line, graph, self.force_table)\\n        T = self._temporal_phase(que_chu.active_line, gio_dia_chi)\\n        return {'S': S, 'D': D, 'I': I, 'F': F, 'T': T}\\n\\n    def compute_bec_field_unproven(self, khi_5d: dict) -> dict:\\n        # RESEARCH / PLACEHOLDER: Thiếu phụ lục gốc v2.8 (SL-DIF/BEC)\\n        # Giả định mô hình ngưng tụ BEC dạng an toàn có epsilon\\n        rho_condensate = min(1.0, max(0.0, khi_5d['I'] * khi_5d['F'] / (1.0 + self.epsilon)))\\n        return {'bec_condensation_density': rho_condensate, 'is_bec_boundary_valid': 0.0 <= rho_condensate <= 1.0}\\n\\n    def step(self, snapshot_t: dict, inputs: dict) -> dict:\\n        # Deterministic transition S_t + I_t -> S_{t+1}\\n        khi_5d = self.compute_khi_5d_proven(inputs['que_chu'], inputs['graph'], inputs['gio_dia_chi'])\\n        bec_state = self.compute_bec_field_unproven(khi_5d)\\n        next_payload = {\\n            'raw_measurements': khi_5d,\\n            'field_state': bec_state,\\n            'uncertainty': {'khi_std': 0.0, 'model_confidence_variance': 0.05},\\n            'gate_result': {'gate_2_passed': True}\\n        }\\n        return {'tick': snapshot_t['tick'] + 1, 'payload': next_payload}\"\n  },\n  \"mapping_proposal\": {\n    \"status\": \"CORE\",\n    \"description\": \"Thiết kế S07_MAPPING_PROFILE tách rời hoàn toàn khỏi L3, chấm dứt việc tự ý ép vector 5D sang nhãn khi thiếu profile.\",\n    \"profile_schema\": {\n      \"profile_id\": \"S07_CANONICAL_V31_DEFAULT\",\n      \"version\": \"3.1.0\",\n      \"profile_hash\": \"sha256_hash_of_profile_rules\",\n      \"rules\": [\n        {\"condition_ast\": {\"and\": [{\"gte\": [\"I\", 0.75]}, {\"gt\": [\"D\", 0.0]}]}, \"target_label\": \"HY\"},\n        {\"condition_ast\": {\"and\": [{\"gte\": [\"I\", 0.75]}, {\"lte\": [\"D\", 0.0]}]}, \"target_label\": \"DUONG\"},\n        {\"condition_ast\": {\"and\": [{\"lt\": [\"I\", 0.30]}, {\"gt\": [\"D\", 0.0]}]}, \"target_label\": \"NHIEU\"},\n        {\"condition_ast\": {\"and\": [{\"lt\": [\"I\", 0.30]}, {\"lte\": [\"D\", 0.0]}]}, \"target_label\": \"TA\"},\n        {\"condition_ast\": {\"and\": [{\"gte\": [\"S\", 0.70]}, {\"gt\": [\"F\", 0.50]}]}, \"target_label\": \"SAT\"},\n        {\"condition_ast\": {\"lt\": [\"S\", 0.30]}, \"target_label\": \"AN\"}\n      ]\n    },\n    \"fallback_behavior\": \"Nếu S07_MAPPING_PROFILE thiếu, không hợp lệ hoặc không bắt được rule nào, L4 phát nhãn MAPPING_UNRESOLVED, giữ nguyên raw_measurements ở L3.\"\n  },\n  \"data_contract\": {\n    \"status\": \"CORE\",\n    \"required_json_fields\": {\n      \"contract_version\": \"3.1.0\",\n      \"input_snapshot\": {\n        \"tick\": \"int\",\n        \"que_chu_id\": \"int\",\n        \"active_line\": \"int\",\n        \"timestamp_iso\": \"string\"\n      },\n      \"raw_measurements\": {\n        \"khi_vector\": {\"S\": \"float\", \"D\": \"float\", \"I\": \"float\", \"F\": \"float\", \"T\": \"float\"}\n      },\n      \"semantic_state\": {\n        \"primary_label\": \"string (SAT|TA|NHIEU|HY|DUONG|AN|MAPPING_UNRESOLVED)\",\n        \"profile_id\": \"string\",\n        \"profile_hash\": \"string\"\n      },\n      \"uncertainty\": {\n        \"measurement_uncertainty\": \"float\",\n        \"confidence_score\": \"float (0.0 -> 1.0, tổng hợp từ L0-L4, không dùng f_net_out)\"\n      },\n      \"provenance\": {\n        \"decision_id\": \"string\",\n        \"source_version\": \"string\",\n        \"source_hashes\": \"map[string]string\",\n        \"review_round\": \"string\"\n      },\n      \"gate_results\": {\n        \"GATE-1-THEORY-FIELD\": \"string (PASSED|PLACEHOLDER)\",\n        \"GATE-2-RUNTIME\": \"string (PASSED|RUNTIME_UNVERIFIED)\",\n        \"GATE-3-INTERPRETATION\": \"string (PASSED|MAPPING_UNRESOLVED)\",\n        \"GATE-4-DATA\": \"string (PASSED|SCHEMA_INVALID)\",\n        \"GATE-5-OPERATIONS\": \"string (PASSED|UI_CONTRACT_VIOLATION)\"\n      }\n    }\n  },\n  \"validation_gates\": [\n    {\n      \"gate\": \"GATE-1-THEORY-FIELD\",\n      \"point\": \"L1 -> L2\",\n      \"minimum_condition\": \"Nguồn công thức lý thuyết, định nghĩa biến, miền giá trị và test vector được ghi nhận đầy đủ.\",\n      \"failure_code\": \"PLACEHOLDER_THEORY\",\n      \"test_vector\": \"Kiểm tra tính hiện hữu của tài liệu phụ lục v2.5 / Bellman.\"\n    },\n    {\n      \"gate\": \"GATE-2-RUNTIME\",\n      \"point\": \"L2 -> L3\",\n      \"minimum_condition\": \"Ma trận/delay deterministic, kiểm tra ranh giới BEC [0,1] và có tham số an toàn chống chia cho 0.\",\n      \"failure_code\": \"RUNTIME_UNVERIFIED\",\n      \"test_vector\": \"Input vector có mẫu số bằng 0 hoặc F < 0.0.\"\n    },\n    {\n      \"gate\": \"GATE-3-INTERPRETATION\",\n      \"point\": \"L3 -> L4\",\n      \"minimum_condition\": \"Có S07_MAPPING_PROFILE hợp lệ với ID, hash, version và test vectors được phê duyệt.\",\n      \"failure_code\": \"MAPPING_UNRESOLVED\",\n      \"test_vector\": \"KhiVector 5D truyền vào L4 mà không kèm Profile.\"\n    },\n    {\n      \"gate\": \"GATE-4-DATA\",\n      \"point\": \"L4 -> L5\",\n      \"minimum_condition\": \"Dữ liệu khớp JSON Schema, enum chuẩn canonical (6 nhãn), đủ provenance và uncertainty.\",\n      \"failure_code\": \"SCHEMA_INVALID\",\n      \"test_vector\": \"JSON chứa nhãn legacy 'TỤ' hoặc thiếu trường uncertainty.\"\n    },\n    {\n      \"gate\": \"GATE-5-OPERATIONS\",\n      \"point\": \"L5 -> L6\",\n      \"minimum_condition\": \"API chỉ truyền/nhận Data Contract L5, không lộ logic tính toán Kernel vào UI/Gemini Prompt.\",\n      \"failure_code\": \"UI_CONTRACT_VIOLATION\",\n      \"test_vector\": \"Request từ UI gửi trực tiếp lệnh tính toán toán tử L2.\"\n    }\n  ],\n  \"calibration_parameters\": [\n    {\n      \"parameter\": \"psi_directional_weight\",\n      \"current_value\": 1.0,\n      \"classification\": \"RESEARCH\",\n      \"reason\": \"Chưa được calibration thực chứng theo Tiên đề A5, cần đưa vào vòng tối ưu S11.\"\n    },\n    {\n      \"parameter\": \"force_active_line_weight\",\n      \"current_value\": {\"1\": 0.15, \"2\": 0.30, \"3\": 0.45, \"4\": 0.60, \"5\": 0.80, \"6\": 1.00},\n      \"classification\": \"RESEARCH\",\n      \"reason\": \"Bảng trọng số khởi tạo thủ công, cần calibration qua thực nghiệm.\"\n    },\n    {\n      \"parameter\": \"confidence_level_weights\",\n      \"current_value\": {\"level0\": 0.10, \"level1\": 0.20, \"level2\": 0.25, \"level3\": 0.20, \"level4\": 0.25},\n      \"classification\": \"RESEARCH\",\n      \"reason\": \"Hệ số tổng hợp độ tin cậy chưa được kiểm định thống kê.\"\n    },\n    {\n      \"parameter\": \"bec_critical_exponent\",\n      \"current_value\": 0.5,\n      \"classification\": \"PLACEHOLDER\",\n      \"reason\": \"Tham số mô hình BEC chưa có dữ liệu trong repository.\"\n    },\n    {\n      \"parameter\": \"safe_epsilon\",\n      \"current_value\": 1e-7,\n      \"classification\": \"CORE\",\n      \"reason\": \"Tham số an toàn hệ thống (safety parameter) để tránh chia cho 0 trong toán tử runtime.\"\n    }\n  ],\n  \"invariants\": [\n    {\n      \"invariant\": \"S07_CANONICAL_ENUM\",\n      \"value\": [\"SAT\", \"TA\", \"NHIEU\", \"HY\", \"DUONG\", \"AN\"],\n      \"classification\": \"CORE\",\n      \"reason\": \"Chỉ 6 mã này được phép xuất hiện trong Kernel và Data Contract chuẩn v3.1.\"\n    },\n    {\n      \"invariant\": \"RUNTIME_DETERMINISM\",\n      \"value\": \"S_{t+1} = K(S_t, I_t)\",\n      \"classification\": \"CORE\",\n      \"reason\": \"Cùng Snapshot đầu vào và cùng chuỗi Input phải cho ra kết quả Snapshot hoàn toàn giống nhau 100%.\"\n    },\n    {\n      \"invariant\": \"UNICODE_SERDE_CONSISTENCY\",\n      \"value\": \"Mọi ký tự tiếng Việt Unicode trong report L6 phải có mã Serialize ASCII tương ứng tại L4/L5.\",\n      \"classification\": \"CORE\",\n      \"reason\": \"Tránh lỗi mã hóa trên các hệ thống tích hợp khác nhau.\"\n    },\n    {\n      \"invariant\": \"FIREWALL_SEPARATION\",\n      \"value\": \"L3_OUTPUT INTERSECT L4_LABELS = EMPTY\",\n      \"classification\": \"CORE\",\n      \"reason\": \"Runtime L3 tuyệt đối không tự gắn nhãn ngữ nghĩa.\"\n    }\n  ],\n  \"test_vectors\": [\n    {\n      \"name\": \"TV-01-ENUM-VALIDATION\",\n      \"input\": {\"semantic_label\": \"HY\"},\n      \"expected\": \"PASSED (Khớp S07 Canonical)\"\n    },\n    {\n      \"name\": \"TV-02-LEGACY-REJECTION\",\n      \"input\": {\"semantic_label\": \"TỤ\"},\n      \"expected\": \"FAILED GATE-4 (SCHEMA_INVALID - Nhãn legacy không được vào Kernel)\"\n    },\n    {\n      \"name\": \"TV-03-UNICODE-CONSISTENCY\",\n      \"input\": {\"term_vi\": \"DƯỠNG\", \"code\": \"DUONG\"},\n      \"expected\": \"PASSED (Khớp bảng từ vựng Canonical)\"\n    },\n    {\n      \"name\": \"TV-04-MISSING-PROFILE\",\n      \"input\": {\"khi_vector\": {\"S\": 0.8, \"D\": 0.5, \"I\": 0.9, \"F\": 0.7, \"T\": 0.2}, \"profile\": null},\n      \"expected\": \"GATE-3 FAILURE -> MAPPING_UNRESOLVED (Không tự suy nhãn)\"\n    },\n    {\n      \"name\": \"TV-05-DPKE-ZERO-DIVISION\",\n      \"input\": {\"numerator\": 1.5, \"denominator\": 0.0},\n      \"expected\": \"PASSED (Safe division dùng epsilon 1e-7, không crash runtime)\"\n    },\n    {\n      \"name\": \"TV-06-BEC-BOUNDARY-CHECK\",\n      \"input\": {\"condensate_value\": 1.05},\n      \"expected\": \"FAILED GATE-2 (BEC_BOUNDARY_VIOLATION - Vượt ngưỡng 1.0)\"\n    },\n    {\n      \"name\": \"TV-07-60-TICKS-REPLAY-DETERMINISM\",\n      \"input\": \"Chuỗi 60 inputs ngẫu nhiên chạy trên TickEngine\",\n      \"expected\": \"PASSED (Mã hash của Snapshot_60 ở 2 lần chạy độc lập trùng nhau hoàn toàn)\"\n    }\n  ],\n  \"risks\": [\n    {\n      \"risk_id\": \"RSK-01\",\n      \"type\": \"Semantic Leakage\",\n      \"description\": \"File semantic.py hiện tại đang thực thi code bằng eval() trực tiếp từ file JSON, gây nguy cơ rò rỉ bảo mật và vi phạm Firewall.\",\n      \"mitigation\": \"Thay thế eval() bằng AST Declarative Evaluator an toàn ở L4.\"\n    },\n    {\n      \"risk_id\": \"RSK-02\",\n      \"type\": \"Uncalibrated Invariant Risk\",\n      \"description\": \"Coi các trọng số chưa kiểm chứng trong config.json là Hằng số Bất biến (Invariant).\",\n      \"mitigation\": \"Phân loại chính xác toàn bộ trọng số config làm Calibration Parameters (RESEARCH/PLACEHOLDER).\"\n    },\n    {\n      \"risk_id\": \"RSK-03\",\n      \"type\": \"Legacy Label Ingestion\",\n      \"description\": \"Dữ liệu lịch sử mang nhãn TỤ/HỢP/TÁN/LY đi thẳng vào Kernel gây sai lệch thống kê.\",\n      \"mitigation\": \"Bắt buộc đi qua Compatibility Decoder L5 để chuyển đổi và gắn provenance.\"\n    }\n  ],\n  \"source_conflicts\": [\n    {\n      \"conflict_id\": \"CF-01\",\n      \"file\": \"dd_engine1/semantic_thresholds.json\",\n      \"issue\": \"Sử dụng các nhãn legacy (TỤ, HỢP, TÁN, LY, HIỆN) làm đầu ra chính.\",\n      \"governance_resolution\": \"Hạ file này xuống COMPATIBILITY; tạo S07_mapping_profile.json chuẩn v3.1 sử dụng SAT, TA, NHIEU, HY, DUONG, AN.\"\n    },\n    {\n      \"conflict_id\": \"CF-02\",\n      \"file\": \"dd_engine1/semantic.py\",\n      \"issue\": \"Hàm _eval_condition dùng eval() Python và cơ chế SIE overrule trực tiếp đè kết quả.\",\n      \"governance_resolution\": \"Loại bỏ eval(), tách hoàn toàn SIE tương tác khỏi Kernel tính toán chính, thực hiện overrule có khai báo ở L4.\"\n    },\n    {\n      \"conflict_id\": \"CF-03\",\n      \"file\": \"dd_engine1/pipeline.py\",\n      \"issue\": \"Kết quả confidence trả về chung với nhãn ngữ nghĩa mà chưa qua các Validation Gates chuẩn hóa.\",\n      \"governance_resolution\": \"Tách pipeline thành các bước gọi qua Layer Contract từ L3 đến L5.\"\n    }\n  ],\n  \"file_changes\": [\n    {\n      \"action\": \"CREATE\",\n      \"path\": \"specs/v3.1/canonical_vocabulary.json\",\n      \"description\": \"Chứa định nghĩa chuẩn 6 mã S07 canonical và các mã compatibility.\"\n    },\n    {\n      \"action\": \"CREATE\",\n      \"path\": \"specs/v3.1/s07_mapping_profile_v31.json\",\n      \"description\": \"Profile ánh xạ S07 khai báo an toàn không dùng eval().\"\n    },\n    {\n      \"action\": \"MODIFY\",\n      \"path\": \"dd_engine1/semantic.py\",\n      \"description\": \"Thay thế eval() bằng AST Parser, chỉ xuất ra 6 mã S07 canonical.\"\n    },\n    {\n      \"action\": \"MODIFY\",\n      \"path\": \"dd_engine1/sie.py\",\n      \"description\": \"Bổ sung tham số an toàn safe_epsilon vào các phép tính mật độ và xung lực.\"\n    },\n    {\n      \"action\": \"MODIFY\",\n      \"path\": \"dd_engine1/pipeline.py\",\n      \"description\": \"Cập nhật pipeline tuân thủ Data Contract L5, gắn gate_results và uncertainty.\"\n    }\n  ],\n  \"open_questions\": [\n    {\n      \"question_id\": \"OQ-01\",\n      \"topic\": \"SDE/Bellman Annexes\",\n      \"description\": \"Công thức toán học chính xác của các toán tử pha SDE và phương trình Bellman trong v2.5 là gì? (Do chưa có file gốc trong repo).\",\n      \"impact\": \"L1 hiện phải giữ ở trạng thái PLACEHOLDER.\"\n    },\n    {\n      \"question_id\": \"OQ-02\",\n      \"topic\": \"SL-DIF/BEC Boundary Equations\",\n      \"description\": \"Hệ số tương tác trường vi phân SL-DIF và phương trình ngưng tụ BEC v2.8 được định nghĩa cụ thể như thế nào?\",\n      \"impact\": \"L2 hiện phải giữ ở trạng thái RESEARCH.\"\n    }\n  ],\n  \"classification_summary\": {\n    \"CORE\": 12,\n    \"COMPATIBILITY\": 4,\n    \"RESEARCH\": 5,\n    \"PLACEHOLDER\": 3\n  }\n}"
+}

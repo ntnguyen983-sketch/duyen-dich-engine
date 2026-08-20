@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "spec_id": "DD-V31-LEGACY-DECODER",
+  "version": "3.1.0",
+  "status": "COMPATIBILITY",
+  "source": {
+    "source_version": "legacy-v2.x",
+    "source_hash": "PENDING_SOURCE_HASH",
+    "provenance": "Historical labels observed in dd_engine1/semantic_thresholds.json; no canonical equivalence is asserted."
+  },
+  "legacy_labels": ["TỤ", "HỢP", "TÁN", "LY", "HIỆN", "ÂN"],
+  "decode_policy": {
+    "kernel_entry_allowed": false,
+    "canonical_target": null,
+    "result_code": "LEGACY_LABEL_REQUIRES_REVIEW",
+    "required_fields": ["source_version", "source_hash", "source_file", "observed_label", "compatibility_rule_id"],
+    "note": "Không được tự động map nhãn lịch sử vào SAT/TA/NHIEU/HY/DUONG/AN khi thiếu profile tương đương đã được phê duyệt."
+  }
+}

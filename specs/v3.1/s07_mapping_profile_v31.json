@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "profile_id": "S07_CANONICAL_V31_UNRESOLVED",
+  "version": "3.1.0",
+  "status": "RESEARCH",
+  "mapping_status": "MAPPING_UNRESOLVED",
+  "source": {
+    "source_version": "v3.1",
+    "source_hash": "PENDING_APPROVED_PROFILE_HASH",
+    "provenance": "No approved S07 profile with domain, calibration and test vectors was found in the selected repositories."
+  },
+  "input_space": {
+    "name": "KhiVector5D",
+    "components": ["S", "D", "I", "F", "T"],
+    "domain": "PENDING_SOURCE_PROFILE"
+  },
+  "rules": [],
+  "output_space": ["SAT", "TA", "NHIEU", "HY", "DUONG", "AN"],
+  "unresolved_behavior": {
+    "missing_profile": "MAPPING_UNRESOLVED",
+    "invalid_hash": "MAPPING_UNRESOLVED",
+    "out_of_domain": "MAPPING_UNRESOLVED",
+    "no_rule_match": "MAPPING_UNRESOLVED"
+  },
+  "approval_requirements": [
+    "profile_id",
+    "version",
+    "sha256",
+    "domain",
+    "parameter_calibration_status",
+    "ordered_rules_or_model",
+    "test_vectors",
+    "review_decision_id"
+  ]
+}
