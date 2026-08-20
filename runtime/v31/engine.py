@@ -271,7 +271,7 @@ def run_v31(
             ],
             "source_versions": ["3.1.0", "2.9.3-FULL", "2.9.1-NEW2"],
             "source_hashes": source_hashes,
-            "engine_commit": os.getenv("GIT_COMMIT", "working-tree"),
+            "engine_commit": os.getenv("GIT_COMMIT") or os.getenv("VERCEL_GIT_COMMIT_SHA") or "working-tree",
             "review_records": [
                 "specs/v3.1/artifacts/review/gemini_rewrite_round1.json",
                 "specs/v3.1/artifacts/review/gemini_rewrite_round2.json",
