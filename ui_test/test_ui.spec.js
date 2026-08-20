@@ -46,7 +46,14 @@ test('full v3.1 browser flow renders canonical output', async ({ page }) => {
   const l5Check = page.locator('#checks .check', { hasText: 'L5 canonical=true' });
   await expect(l5Check).toHaveClass(/pass/);
   await expect(page.locator('#checks')).toContainText('deterministic request');
-  await expect(page.locator('#summary')).toContainText('input hash');
+  await expect(page.locator('#core-result')).toContainText('Input hash');
+  await expect(page.locator('#microscope')).toContainText('H1');
+  await expect(page.locator('#microscope')).toContainText('H6');
+  await expect(page.locator('#microscope')).toContainText('UNSUPPORTED');
+  await expect(page.locator('#timing')).toContainText('ỨNG KỲ');
+  await expect(page.locator('#ground-truth')).toContainText('GROUND TRUTH');
+  await expect(page.locator('#comparison')).toContainText('ĐỐI CHIẾU');
+  await expect(page.locator('#summary')).toContainText('Nhắc nhở kiểm chứng');
 });
 
 test('hexagram data_1/data_2 payload runs through production UI', async ({ page }) => {
@@ -61,6 +68,30 @@ test('hexagram data_1/data_2 payload runs through production UI', async ({ page 
   await expect(page.locator('#layers')).toContainText('L6');
   await expect(page.locator('#checks')).toContainText('deterministic request');
   await expect(page.locator('#checks .check', { hasText: 'L5 canonical=true' })).toHaveClass(/pass/);
+  await expect(page.locator('#core-result')).toContainText('Root code');
+  await expect(page.locator('#microscope')).toContainText('Hào 1');
+  await expect(page.locator('#microscope')).toContainText('Hào 6');
+  await expect(page.locator('#matrix')).toContainText('Source Evidence');
+  await expect(page.locator('#cross-line')).toContainText('Cross relation');
+  await expect(page.locator('#timing')).toContainText('Expected window');
+  await expect(page.locator('#summary')).toContainText('PROVISIONAL');
+});
+
+test('mobile interpretation layout has no horizontal overflow or console errors', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const consoleErrors = [];
+  page.on('console', message => { if (message.type() === 'error') consoleErrors.push(message.text()); });
+  page.on('pageerror', error => consoleErrors.push(error.message));
+  await page.goto('/');
+  await page.locator('#use-hexagram').check();
+  await page.locator('#hexagram-payload').fill(hexagramPayload);
+  await page.locator('#run').click();
+  await expect(page.locator('#status')).toContainText('PASS', { timeout: 15000 });
+  const layout = await page.evaluate(() => ({ width: window.innerWidth, scrollWidth: document.documentElement.scrollWidth }));
+  expect(layout.scrollWidth).toBeLessThanOrEqual(layout.width + 1);
+  expect(consoleErrors).toEqual([]);
+  await expect(page.locator('#timing')).toContainText('ỨNG KỲ');
+  await expect(page.locator('#ground-truth')).toContainText('OBSERVATION REQUIRED');
 });
 
 test('missing question is blocked before API call', async ({ page }) => {

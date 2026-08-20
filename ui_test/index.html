@@ -3,32 +3,157 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Duyên Dịch v3.1 — Web Test</title>
+  <meta name="theme-color" content="#0d2037">
+  <title>Duyên Dịch v3.1 — Luận giải có kiểm chứng</title>
   <style>
-    :root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#172033;background:#eef2f7}
-    *{box-sizing:border-box}body{margin:0}main{max-width:1100px;margin:auto;padding:20px}
-    section{background:#fff;border:1px solid #d9e1ec;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 5px 18px #14213d0d}
-    h1{margin:0 0 8px;font-size:clamp(1.5rem,4vw,2.2rem)}h2{font-size:1.15rem;margin:0 0 12px}
-    label{display:block;font-weight:650;margin:12px 0 5px}input,textarea,button{width:100%;font:inherit;border:1px solid #aebbd0;border-radius:9px;padding:10px;background:#fff}
-    textarea{min-height:88px;resize:vertical}.json-input{min-height:260px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    button{margin-top:16px;background:#173b70;color:#fff;border-color:#173b70;font-weight:750;cursor:pointer}button:disabled{opacity:.65;cursor:wait}
-    .muted{color:#5d6b80}.status{font-weight:800;padding:10px;border-radius:8px;background:#f0f4fa}.pass{color:#137333}.fail{color:#b3261e}.warn{color:#9a6700}
-    .checks,.layers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.check,.layer{border:1px solid #dde4ee;border-radius:8px;padding:8px;background:#fafcff}
-    .mono{white-space:pre-wrap;overflow:auto;background:#111827;color:#e5edf9;border-radius:9px;padding:14px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;max-height:620px}
-    .summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.card{border:1px solid #dde4ee;border-radius:9px;padding:10px}.value{font-weight:750;word-break:break-word}
-    .toggle{display:flex;align-items:center;gap:8px;font-weight:650}.toggle input{width:auto}.hidden{display:none}
-    @media(max-width:700px){main{padding:12px}.grid,.checks,.layers,.summary{grid-template-columns:1fr}}
+    :root {
+      color-scheme: light;
+      --ink: #16253a;
+      --muted: #66758b;
+      --line: #dce4ee;
+      --paper: #ffffff;
+      --canvas: #f3f6fa;
+      --navy: #0d2037;
+      --blue: #1c5a91;
+      --blue-soft: #eaf4ff;
+      --violet: #604ca5;
+      --violet-soft: #f2efff;
+      --amber: #9a5d05;
+      --amber-soft: #fff4dc;
+      --green: #14734a;
+      --green-soft: #e9f8f0;
+      --red: #b42318;
+      --red-soft: #fff0ee;
+      --shadow: 0 12px 32px rgba(16, 39, 67, .08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--canvas); line-height: 1.48; }
+    main { width: min(1180px, 100%); margin: 0 auto; padding: 16px; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 8px; font-size: clamp(1.65rem, 5vw, 2.8rem); line-height: 1.08; letter-spacing: -.035em; }
+    h2 { margin-bottom: 5px; font-size: clamp(1.08rem, 2.5vw, 1.38rem); letter-spacing: -.015em; }
+    h3 { margin-bottom: 6px; font-size: 1rem; }
+    code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .hero { padding: 24px 20px; color: #f7fbff; background: linear-gradient(135deg, #0d2037, #184b76 60%, #3e5e98); border-radius: 22px; box-shadow: var(--shadow); }
+    .hero .eyebrow { color: #b9ddff; }
+    .eyebrow, .section-kicker { margin-bottom: 7px; font-size: .7rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    .hero p { max-width: 820px; margin-bottom: 0; color: #d8e9f8; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .pill, .badge { display: inline-flex; align-items: center; width: fit-content; padding: 4px 9px; border-radius: 999px; font-size: .72rem; font-weight: 800; letter-spacing: .02em; }
+    .pill { color: #dcefff; border: 1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.1); }
+    section { margin-top: 14px; padding: 18px; background: var(--paper); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); }
+    .section-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
+    .section-head p { margin-bottom: 0; color: var(--muted); font-size: .9rem; }
+    .zone-core { border-top: 5px solid var(--blue); }
+    .zone-micro { border-top: 5px solid var(--violet); }
+    .zone-provisional { border-top: 5px solid var(--amber); }
+    .zone-truth { border-top: 5px solid var(--green); }
+    .zone-summary { border-top: 5px solid var(--navy); }
+    .kicker-core { color: var(--blue); }
+    .kicker-micro { color: var(--violet); }
+    .kicker-provisional { color: var(--amber); }
+    .kicker-truth { color: var(--green); }
+    .muted { color: var(--muted); }
+    .note, .warning, .safe-note { padding: 11px 13px; border-radius: 12px; font-size: .88rem; }
+    .note { color: #224461; background: var(--blue-soft); border: 1px solid #cfe5fa; }
+    .warning { color: #754900; background: var(--amber-soft); border: 1px solid #f1d49c; }
+    .safe-note { color: #145c3d; background: var(--green-soft); border: 1px solid #bde7d0; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .metric, .data-card { min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 13px; background: #fbfdff; }
+    .metric-label, .data-label { color: var(--muted); font-size: .72rem; font-weight: 750; text-transform: uppercase; letter-spacing: .06em; }
+    .metric-value, .data-value { margin-top: 4px; font-weight: 800; overflow-wrap: anywhere; }
+    .metric-value { font-size: 1.18rem; }
+    .data-value { font-size: .92rem; }
+    label { display: block; margin: 11px 0 5px; font-weight: 750; }
+    input, textarea, button { width: 100%; padding: 11px 12px; color: var(--ink); font: inherit; border: 1px solid #afbdd0; border-radius: 10px; background: #fff; }
+    input:focus, textarea:focus, button:focus-visible { outline: 3px solid #9bd1ff; outline-offset: 2px; }
+    textarea { min-height: 90px; resize: vertical; }
+    .json-input { min-height: 250px; font: .76rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .toggle { display: flex; align-items: center; gap: 8px; }
+    .toggle input { width: auto; }
+    button { margin-top: 15px; color: #fff; font-weight: 850; cursor: pointer; background: var(--navy); border-color: var(--navy); }
+    button:disabled { opacity: .65; cursor: wait; }
+    .hidden { display: none !important; }
+    .status { padding: 12px 13px; color: #24405d; font-weight: 850; border-radius: 11px; background: #eef4fa; }
+    .status.pass { color: var(--green); background: var(--green-soft); }
+    .status.fail { color: var(--red); background: var(--red-soft); }
+    .checks, .layers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+    .check, .layer { padding: 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fbfdff; font-size: .84rem; }
+    .pass { color: var(--green); }
+    .fail { color: var(--red); }
+    .warn { color: var(--amber); }
+    .badge-core { color: var(--blue); background: var(--blue-soft); }
+    .badge-micro { color: var(--violet); background: var(--violet-soft); }
+    .badge-provisional { color: var(--amber); background: var(--amber-soft); }
+    .badge-truth { color: var(--green); background: var(--green-soft); }
+    .badge-unsupported { color: #6b7280; background: #eef1f4; }
+    .badge-pass { color: var(--green); background: var(--green-soft); }
+    .result-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 12px; }
+    .line-list { display: grid; gap: 10px; }
+    .line-card { padding: 14px; border: 1px solid #dfd8ff; border-radius: 14px; background: linear-gradient(180deg, #fcfbff, #f8f6ff); }
+    .line-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .line-title { color: var(--violet); font-size: 1rem; font-weight: 850; }
+    .field-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .field { min-width: 0; padding: 9px; border: 1px solid #e6e1f5; border-radius: 10px; background: rgba(255,255,255,.72); }
+    .field.full { grid-column: 1 / -1; }
+    .field .data-value { font-weight: 650; }
+    .unsupported { color: #667085; font-style: italic; }
+    .matrix-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+    table { width: 100%; min-width: 650px; border-collapse: collapse; font-size: .82rem; }
+    th, td { padding: 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { color: #36516e; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; background: #f4f8fc; }
+    tr:last-child td { border-bottom: 0; }
+    .timeline { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 17px 0 4px; }
+    .timeline::before { content: ""; position: absolute; top: 31px; right: 8%; left: 8%; height: 3px; background: linear-gradient(90deg, var(--violet), var(--amber), var(--green), #8ba4bc); }
+    .time-node { position: relative; z-index: 1; text-align: center; }
+    .time-dot { width: 28px; height: 28px; margin: 0 auto 8px; border: 5px solid var(--paper); border-radius: 50%; background: var(--violet); box-shadow: 0 0 0 2px var(--violet); }
+    .time-node:nth-child(2) .time-dot { background: var(--amber); box-shadow: 0 0 0 2px var(--amber); }
+    .time-node:nth-child(3) .time-dot { background: var(--green); box-shadow: 0 0 0 2px var(--green); }
+    .time-node:nth-child(4) .time-dot { background: #8ba4bc; box-shadow: 0 0 0 2px #8ba4bc; }
+    .time-label { font-size: .78rem; font-weight: 850; }
+    .time-value { margin-top: 3px; color: var(--muted); font-size: .75rem; }
+    .summary-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .summary-list li { padding: 10px 12px; border-left: 4px solid var(--navy); border-radius: 7px; background: #f5f8fb; }
+    details { margin-top: 12px; }
+    summary { cursor: pointer; color: #36516e; font-weight: 800; }
+    .mono { max-height: 520px; margin-top: 10px; padding: 14px; overflow: auto; color: #dbeafe; background: #111827; border-radius: 12px; white-space: pre-wrap; font-size: .75rem; }
+    .spacer { height: 2px; }
+    @media (max-width: 760px) {
+      main { padding: 10px; }
+      section { padding: 14px; border-radius: 15px; }
+      .grid, .result-grid, .metric-grid { grid-template-columns: 1fr 1fr; }
+      .grid-3 { grid-template-columns: 1fr 1fr; }
+      .checks, .layers { grid-template-columns: 1fr; }
+      .timeline { gap: 3px; }
+      .timeline::before { right: 7%; left: 7%; }
+    }
+    @media (max-width: 480px) {
+      .hero { padding: 20px 15px; border-radius: 17px; }
+      .grid, .grid-3, .result-grid, .metric-grid, .field-list { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .timeline { grid-template-columns: 1fr; gap: 14px; padding: 2px 0; text-align: left; }
+      .timeline::before { top: 5%; right: auto; bottom: 5%; left: 13px; width: 3px; height: auto; }
+      .time-node { display: grid; grid-template-columns: 28px 1fr; column-gap: 12px; text-align: left; align-items: center; }
+      .time-dot { grid-row: span 2; margin: 0; }
+      .time-label, .time-value { align-self: end; }
+      .time-value { align-self: start; }
+    }
   </style>
 </head>
 <body>
 <main>
-  <section>
-    <h1>Duyên Dịch v3.1 — Full End-to-End Web Test</h1>
-    <p class="muted">UI → <code>POST /api/v31</code> → runtime v3.1 → canonical JSON → UI. Các toán tử chưa có hồ sơ nguồn được đánh dấu PROVISIONAL/RESEARCH.</p>
-  </section>
+  <header class="hero">
+    <div class="eyebrow">Duyên Dịch v3.1 · Frontend interpretation view</div>
+    <h1>Luận giải có kiểm chứng</h1>
+    <p>INPUT → CORE RESULT → DD-3A MICROSCOPE H1–H6 → SOURCE × INTERACTION → CROSS-HÀO → ỨNG KỲ → GROUND TRUTH → ĐỐI CHIẾU → TỔNG KẾT</p>
+    <div class="hero-meta"><span class="pill">CORE không sửa</span><span class="pill">Canonical-only</span><span class="pill">Không Gemini</span><span class="pill">Mobile-first</span></div>
+  </header>
 
-  <section>
-    <h2>Input</h2>
+  <section id="input-section">
+    <div class="section-head"><div><div class="section-kicker kicker-core">INPUT</div><h2>Nạp dữ liệu phiên</h2><p>Frontend chỉ gửi payload hiện có tới <code>POST /api/v31</code>.</p></div><span class="badge badge-core">SOURCE INPUT</span></div>
     <form id="form" novalidate>
       <label class="toggle"><input id="use-hexagram" type="checkbox"> Nạp payload quẻ data_1/data_2</label>
       <div id="hexagram-box" class="hidden">
@@ -56,19 +181,12 @@
     "quy_tac_luan": "QT LỰC 1"
   }
 }</textarea>
-        <p class="muted">Adapter chỉ chuyển time/GPS/question/number vào Core runtime; không dùng Gemini và không luận giải lại.</p>
+        <p class="muted">Adapter chỉ chuyển time/GPS/question/number vào Core runtime; các trường hiển thị bên dưới chỉ lấy từ canonical response hoặc được đánh dấu unsupported.</p>
       </div>
       <div id="flat-input">
-        <label for="question">Câu hỏi *</label>
-        <textarea id="question" required>tình cảm</textarea>
-        <div class="grid">
-          <div><label for="number">Number 6 chữ số *</label><input id="number" required inputmode="numeric" pattern="[0-9]{6}" value="369147"></div>
-          <div><label for="time">Time *</label><input id="time" type="datetime-local" required></div>
-        </div>
-        <div class="grid">
-          <div><label for="lat">GPS latitude</label><input id="lat" inputmode="decimal" placeholder="10.755124"></div>
-          <div><label for="lng">GPS longitude</label><input id="lng" inputmode="decimal" placeholder="106.616242"></div>
-        </div>
+        <label for="question">Câu hỏi *</label><textarea id="question" required>tình cảm</textarea>
+        <div class="grid"><div><label for="number">Number 6 chữ số *</label><input id="number" required inputmode="numeric" pattern="[0-9]{6}" value="369147"></div><div><label for="time">Time *</label><input id="time" type="datetime-local" required></div></div>
+        <div class="grid"><div><label for="lat">GPS latitude</label><input id="lat" inputmode="decimal" placeholder="10.755124"></div><div><label for="lng">GPS longitude</label><input id="lng" inputmode="decimal" placeholder="106.616242"></div></div>
         <label for="address">Địa chỉ</label><input id="address" autocomplete="street-address" placeholder="test">
         <label for="image">Upload ảnh / camera mobile</label><input id="image" type="file" accept="image/*" capture="environment">
       </div>
@@ -76,46 +194,88 @@
     </form>
   </section>
 
-  <section>
-    <h2>Runtime status</h2>
+  <section id="run-status" class="zone-core">
+    <div class="section-head"><div><div class="section-kicker kicker-core">RUN STATUS</div><h2>Trạng thái phiên</h2><p id="run-caption">Chưa chạy.</p></div><span id="status-badge" class="badge badge-core">IDLE</span></div>
     <div id="status" class="status">Chưa chạy</div>
     <div id="checks" class="checks" aria-live="polite"></div>
   </section>
-  <section><h2>L1–L6</h2><div id="layers" class="layers"><div class="muted">Chưa có kết quả.</div></div></section>
-  <section><h2>Semantic, uncertainty, provenance</h2><div id="summary" class="summary"><div class="card"><div class="muted">Chưa có kết quả.</div></div></div></section>
-  <section><h2>Canonical JSON</h2><pre id="out" class="mono">—</pre></section>
 
+  <section id="core-result" class="zone-core">
+    <div class="section-head"><div><div class="section-kicker kicker-core">CORE RESULT</div><h2>Kết quả lõi</h2><p>Chỉ các trường xác nhận từ canonical response được trình bày ở vùng CORE.</p></div><span class="badge badge-core">LOCKED / FORWARD ONLY</span></div>
+    <div id="core-metrics" class="metric-grid"><div class="data-card"><div class="muted">Chưa có kết quả</div></div></div>
+    <div class="spacer"></div><div id="core-detail" class="grid"></div>
+    <div class="spacer"></div><div id="layers" class="layers"><div class="muted">Chưa có L1–L6.</div></div>
+  </section>
+
+  <section id="microscope" class="zone-micro">
+    <div class="section-head"><div><div class="section-kicker kicker-micro">DD-3A MICROSCOPE H1–H6</div><h2>Vi soi từng hào</h2><p>Mỗi hào được hiển thị riêng. Khi canonical response chưa có dữ liệu per-line, UI giữ nguyên trạng thái <strong>UNSUPPORTED</strong>, không suy diễn.</p></div><span class="badge badge-micro">NO FABRICATION</span></div>
+    <div id="microscope-note" class="note">Chưa có canonical response.</div>
+    <div id="microscope-lines" class="line-list" style="margin-top:12px"></div>
+  </section>
+
+  <section id="matrix" class="zone-micro">
+    <div class="section-head"><div><div class="section-kicker kicker-micro">SOURCE × INTERACTION MATRIX</div><h2>Ma trận nguồn và tương tác</h2><p>Không tự tạo quan hệ giữa Source và Interaction khi response không cung cấp evidence.</p></div><span class="badge badge-unsupported">UNSUPPORTED SAFE</span></div>
+    <div id="matrix-content"></div>
+  </section>
+
+  <section id="cross-line" class="zone-micro">
+    <div class="section-head"><div><div class="section-kicker kicker-micro">CROSS-HÀO</div><h2>Liên kết chéo giữa các hào</h2><p>Chỉ xác nhận những liên kết có trong canonical response.</p></div><span class="badge badge-unsupported">NO INFERENCE</span></div>
+    <div id="cross-content"></div>
+  </section>
+
+  <section id="timing" class="zone-provisional">
+    <div class="section-head"><div><div class="section-kicker kicker-provisional">ỨNG KỲ · TIME AXIS</div><h2>Ứng kỳ làm trục chốt</h2><p>Ứng kỳ nối Microscope với Ground Truth; không có time window trong canonical response thì không dựng lịch giả.</p></div><span class="badge badge-provisional">PROVISIONAL</span></div>
+    <div id="timeline" class="timeline"></div>
+    <div id="timing-note" class="warning" style="margin-top:14px">Chưa có expected time window được canonical response xác nhận.</div>
+  </section>
+
+  <section id="ground-truth" class="zone-truth">
+    <div class="section-head"><div><div class="section-kicker kicker-truth">GROUND TRUTH</div><h2>Điểm kiểm chứng quan sát</h2><p>Ground Truth phải đến từ sự kiện quan sát thực tế, không được lấy từ suy đoán của UI.</p></div><span class="badge badge-truth">OBSERVATION REQUIRED</span></div>
+    <div id="truth-content" class="grid"></div>
+  </section>
+
+  <section id="comparison" class="zone-truth">
+    <div class="section-head"><div><div class="section-kicker kicker-truth">ĐỐI CHIẾU</div><h2>Đối chiếu dự kiến và thực tế</h2><p>Trạng thái chỉ chuyển khi người vận hành nhập hoặc kết nối Ground Truth hợp lệ.</p></div><span class="badge badge-unsupported">WAITING DATA</span></div>
+    <div id="comparison-content"></div>
+  </section>
+
+  <section id="summary" class="zone-summary">
+    <div class="section-head"><div><div class="section-kicker">TỔNG KẾT · TÓM TẮT · NHẮC NHỞ · ĐỀ XUẤT</div><h2>Điểm chốt vận hành</h2><p>Tóm tắt này chỉ mô tả trạng thái dữ liệu, không biến provisional thành kết luận chắc chắn.</p></div><span class="badge badge-core">TRACEABLE</span></div>
+    <div id="summary-content" class="grid"></div>
+  </section>
+
+  <section id="canonical-debug">
+    <details><summary>Canonical response gốc (debug / traceability)</summary><pre id="out" class="mono">—</pre></details>
+  </section>
+</main>
 <script>
 const $ = (id) => document.getElementById(id);
 const CANONICAL = ['SAT','TA','NHIEU','HY','DUONG','AN'];
 function nowLocal(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)}
 $('time').value = nowLocal();
 $('use-hexagram').addEventListener('change',()=>{$('hexagram-box').classList.toggle('hidden',!$('use-hexagram').checked);$('flat-input').classList.toggle('hidden',$('use-hexagram').checked)});
+function escapeHtml(value){return String(value??'—').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function display(value){if(value===null||value===undefined||value==='')return '—';if(typeof value==='object')return JSON.stringify(value);return String(value)}
+function unsupported(text='Chưa có trong canonical response'){return `<span class="unsupported">${escapeHtml(text)}</span>`}
 function addCheck(name, ok, detail=''){const item=document.createElement('div');item.className='check '+(ok?'pass':'fail');item.textContent=(ok?'✓ ':'✗ ')+name+(detail?' — '+detail:'');$('checks').appendChild(item);return ok}
 function validateGps(gps){if(!gps||typeof gps!=='object'||!Number.isFinite(Number(gps.lat))||!Number.isFinite(Number(gps.lng)))return false;return Number(gps.lat)>=-90&&Number(gps.lat)<=90&&Number(gps.lng)>=-180&&Number(gps.lng)<=180}
-function validateHexagram(){
-  let payload;try{payload=JSON.parse($('hexagram-payload').value)}catch(error){return {ok:false,checks:[['hexagram JSON',false,error.message]],payload:null}}
-  const d1=payload?.data_1,d2=payload?.data_2;
-  const checks=[['hexagram JSON',!!payload&&typeof payload==='object'],['required question',typeof d2?.question==='string'&&!!d2.question.trim()],['required number',/^\d+$/.test(String(d1?.number??''))],['required time',typeof d1?.time==='string'&&!!d1.time.trim()],['GPS validation',validateGps(d1?.gps_show)]];
-  return {ok:checks.every(x=>x[1]),checks,payload};
-}
-function validateInput(){
-  if($('use-hexagram').checked)return validateHexagram();
-  const question=$('question').value.trim(), number=$('number').value.trim(), time=$('time').value.trim(), lat=$('lat').value.trim(), lng=$('lng').value.trim();
-  const checks=[]; checks.push(['required question',!!question]); checks.push(['required number',!!number]); checks.push(['required time',!!time]); checks.push(['number validation',/^\d{6}$/.test(number)]);
-  const gpsPair=(!lat&&!lng)||(!!lat&&!!lng); let gpsValid=gpsPair;if(lat&&lng){const a=Number(lat),b=Number(lng);gpsValid=Number.isFinite(a)&&Number.isFinite(b)&&a>=-90&&a<=90&&b>=-180&&b<=180}checks.push(['GPS validation',gpsValid]);checks.push(['image input',true]);
-  const isoTime = time ? new Date(time).toISOString() : '';
-  return {ok:checks.every(x=>x[1]),checks,payload:{question,number:Number(number),time:isoTime,gps:(lat&&lng)?{lat:Number(lat),lng:Number(lng)}:null,address:$('address').value.trim()||null,image:$('image').files[0]?{name:$('image').files[0].name,type:$('image').files[0].type,size:$('image').files[0].size}:null}};
-}
+function validateHexagram(){let payload;try{payload=JSON.parse($('hexagram-payload').value)}catch(error){return {ok:false,checks:[['hexagram JSON',false,error.message]],payload:null}}const d1=payload?.data_1,d2=payload?.data_2;const checks=[['hexagram JSON',!!payload&&typeof payload==='object'],['required question',typeof d2?.question==='string'&&!!d2.question.trim()],['required number',/^\d+$/.test(String(d1?.number??''))],['required time',typeof d1?.time==='string'&&!!d1.time.trim()],['GPS validation',validateGps(d1?.gps_show)]];return {ok:checks.every(x=>x[1]),checks,payload}}
+function validateInput(){if($('use-hexagram').checked)return validateHexagram();const question=$('question').value.trim(),number=$('number').value.trim(),time=$('time').value.trim(),lat=$('lat').value.trim(),lng=$('lng').value.trim();const checks=[['required question',!!question],['required number',!!number],['required time',!!time],['number validation',/^\d{6}$/.test(number)]];const gpsPair=(!lat&&!lng)||(!!lat&&!!lng);let gpsValid=gpsPair;if(lat&&lng){const a=Number(lat),b=Number(lng);gpsValid=Number.isFinite(a)&&Number.isFinite(b)&&a>=-90&&a<=90&&b>=-180&&b<=180}checks.push(['GPS validation',gpsValid]);checks.push(['image input',true]);const isoTime=time?new Date(time).toISOString():'';return {ok:checks.every(x=>x[1]),checks,payload:{question,number:Number(number),time:isoTime,gps:(lat&&lng)?{lat:Number(lat),lng:Number(lng)}:null,address:$('address').value.trim()||null,image:$('image').files[0]?{name:$('image').files[0].name,type:$('image').files[0].type,size:$('image').files[0].size}:null}}}
 async function callApi(payload){const response=await fetch('/api/v31',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});const body=await response.json();if(!response.ok)throw new Error(body.error||('HTTP '+response.status));return body}
-function renderLayers(result){$('layers').replaceChildren();const trace=Object.fromEntries((result.raw_measurements?.runtime_trace||[]).map(x=>[x.layer,x.status]));[['L1','Input normalized',trace.L1||'UNKNOWN'],['L2','Field operator',trace.L2||'UNKNOWN'],['L3','Force/vector',trace.L3||'UNKNOWN'],['L4','Semantic mapping',trace.L4||'UNKNOWN'],['L5','Canonical contract',trace.L5||'UNKNOWN'],['L6','API ready',trace.L6||'UNKNOWN']].forEach(([key,label,status])=>{const item=document.createElement('div');item.className='layer';item.innerHTML='<strong>'+key+'</strong> — '+label+'<br><span class="'+(status.startsWith('PASSED')?'pass':'warn')+'">'+status+'</span>';$('layers').appendChild(item)})}
-function renderSummary(result){$('summary').replaceChildren();$('summary').append(card('semantic state',result.semantic_state?.status||'—'),card('primary label',result.semantic_state?.primary_label||'—'),card('uncertainty',JSON.stringify(result.uncertainty?.confidence||{})),card('provenance',result.provenance?.source_versions?.join(', ')||'—'),card('input hash',result.execution?.input_hash||'—'),card('gate results',JSON.stringify(result.gate_results||{})))}
-function card(label,value){const item=document.createElement('div');item.className='card';const key=document.createElement('div');key.className='muted';key.textContent=label;const val=document.createElement('div');val.className='value';val.textContent=value;item.append(key,val);return item}
-$('form').addEventListener('submit',async(event)=>{event.preventDefault();$('run').disabled=true;$('status').textContent='Đang chạy…';$('status').className='status';$('checks').replaceChildren();$('out').textContent='—';const validation=validateInput();validation.checks.forEach(([name,ok,detail])=>addCheck(name,ok,detail));if(!validation.ok){$('status').textContent='FAIL — input không hợp lệ';$('status').className='status fail';$('run').disabled=false;return}
-  try{addCheck('API reachable',true);const first=await callApi(validation.payload);const second=await callApi(validation.payload);const trace=Object.fromEntries((first.raw_measurements?.runtime_trace||[]).map(x=>[x.layer,x.status]));addCheck('L1',trace.L1==='PASSED');addCheck('L2 PASS/PROVISIONAL',String(trace.L2||'').startsWith('PASSED'));addCheck('L3 PASS/PROVISIONAL',String(trace.L3||'').startsWith('PASSED'));addCheck('L4 canonical vocabulary',CANONICAL.includes(first.semantic_state?.primary_label));addCheck('L5 canonical=true',first.execution?.runtime_status==='PASSED'&&first.gate_results?.G1_SCHEMA==='PASSED'&&['identity','dynamic_state','raw_measurements','semantic_state','uncertainty','provenance','gate_results','output_a','output_b'].every(key=>Object.prototype.hasOwnProperty.call(first,key)));addCheck('L6 API ready',trace.L6==='PASSED');addCheck('contract_version = 3.1.0',first.contract_version==='3.1.0');addCheck('f_net_out_excluded = true',first.uncertainty?.confidence?.f_net_out_excluded===true);addCheck('provenance tồn tại',!!first.provenance&&Object.keys(first.provenance).length>0);addCheck('input hash tồn tại',/^sha256:[0-9a-f]{64}$/.test(first.execution?.input_hash||''));addCheck('output JSON hợp lệ',typeof first==='object');addCheck('deterministic request',JSON.stringify(first)===JSON.stringify(second));renderLayers(first);renderSummary(first);$('out').textContent=JSON.stringify(first,null,2);$('status').textContent='PASS — canonical response nhận được';$('status').className='status pass';
-  }catch(error){$('status').textContent='FAIL — '+error.message;$('status').className='status fail';addCheck('API reachable',false,error.message)}finally{$('run').disabled=false}
-});
+function card(label,value,badge=''){return `<div class="data-card"><div class="data-label">${escapeHtml(label)}</div><div class="data-value">${value}${badge?`<div style="margin-top:7px">${badge}</div>`:''}</div></div>`}
+function field(label,value,full=false){return `<div class="field${full?' full':''}"><div class="data-label">${escapeHtml(label)}</div><div class="data-value">${value}</div></div>`}
+function renderLayers(result){$('layers').replaceChildren();const trace=Object.fromEntries((result.raw_measurements?.runtime_trace||[]).map(x=>[x.layer,x.status]));[['L1','Input normalized',trace.L1||'UNKNOWN'],['L2','Field operator',trace.L2||'UNKNOWN'],['L3','Force/vector',trace.L3||'UNKNOWN'],['L4','Semantic mapping',trace.L4||'UNKNOWN'],['L5','Canonical contract',trace.L5||'UNKNOWN'],['L6','API ready',trace.L6||'UNKNOWN']].forEach(([key,label,status])=>{const item=document.createElement('div');item.className='layer';item.innerHTML=`<strong>${key}</strong> — ${label}<br><span class="${status.startsWith('PASSED')?'pass':'warn'}">${escapeHtml(status)}</span>`;$('layers').appendChild(item)})}
+function renderCore(result){const id=result.identity||{}, execution=result.execution||{}, force=result.raw_measurements?.khi_vector||{}, confidence=result.uncertainty?.confidence||{}, phase=result.dynamic_state?.phase?.state||'—';$('core-metrics').innerHTML=[card('Root code',display(id.root_code),'<span class="badge badge-pass">CORE</span>'),card('Transformed code',display(id.transformed_code),'<span class="badge badge-pass">CORE</span>'),card('Runtime status',display(execution.runtime_status),'<span class="badge badge-pass">LOCKED</span>'),card('Contract',display(result.contract_version),'<span class="badge badge-core">CANONICAL</span>')].join('');$('core-detail').innerHTML=[field('Root bits',escapeHtml(display(id.root_bits))),field('Moving lines',escapeHtml(display(id.moving_lines))),field('Khi vector',escapeHtml(display(force))),field('Phase',escapeHtml(display(phase))),field('Execution ID',escapeHtml(display(execution.execution_id))),field('Snapshot',escapeHtml(display(execution.snapshot_id))),field('Engine commit',escapeHtml(display(result.provenance?.engine_commit))),field('Input hash',escapeHtml(display(execution.input_hash)),true),field('Firewall',escapeHtml(display(confidence.method)),true)].join('');renderLayers(result)}
+function renderMicroscope(result){$('microscope-note').innerHTML=`<span class="badge badge-micro">MICROSCOPE</span> Per-line Source, Interaction, Derived Event, Phase, Trigger, Expected Time Window và Ground Truth không có trong canonical response hiện tại. Các ô dưới đây được khóa là <strong>UNSUPPORTED</strong>; UI không suy diễn.`;const lineNames=['Hào 1','Hào 2','Hào 3','Hào 4','Hào 5','Hào 6'];$('microscope-lines').innerHTML=lineNames.map((name,index)=>`<article class="line-card"><div class="line-top"><div class="line-title">H${index+1} · ${name}</div><span class="badge badge-unsupported">UNSUPPORTED</span></div><div class="field-list">${field('Source',unsupported())}${field('Source Evidence',unsupported())}${field('Interaction',unsupported())}${field('Interaction Evidence',unsupported())}${field('Derived Event',unsupported('Không suy diễn'))}${field('Phase',unsupported())}${field('Trigger',unsupported())}${field('Expected Time Window',unsupported())}${field('Observable Ground Truth',unsupported('Chưa ghi nhận'))}${field('Confidence / Unsupported','<span class="badge badge-unsupported">UNSUPPORTED · no per-line canonical field</span>',true)}</div></article>`).join('')}
+function renderMatrix(){const rows=['H1','H2','H3','H4','H5','H6'];$('matrix-content').innerHTML=`<div class="matrix-wrap"><table><thead><tr><th>Hào</th><th>Source</th><th>Source Evidence</th><th>Interaction</th><th>Interaction Evidence</th><th>Confidence</th></tr></thead><tbody>${rows.map(row=>`<tr><td><strong>${row}</strong></td><td>${unsupported()}</td><td>${unsupported()}</td><td>${unsupported()}</td><td>${unsupported()}</td><td><span class="badge badge-unsupported">UNSUPPORTED</span></td></tr>`).join('')}</tbody></table></div>`}
+function renderCross(){const rows=['H1 ↔ H2','H2 ↔ H3','H3 ↔ H4','H4 ↔ H5','H5 ↔ H6','H1 ↔ H6'];$('cross-content').innerHTML=`<div class="matrix-wrap"><table><thead><tr><th>Cặp hào</th><th>Cross relation</th><th>Evidence</th><th>Confidence</th></tr></thead><tbody>${rows.map(row=>`<tr><td><strong>${row}</strong></td><td>${unsupported('Chưa có cross-hào trong canonical response')}</td><td>${unsupported()}</td><td><span class="badge badge-unsupported">UNSUPPORTED</span></td></tr>`).join('')}</tbody></table></div>`}
+function renderTiming(result){const tick=result.execution?.tick;const labels=[['MICROSCOPE','Per-line data', 'Chưa có'],['ỨNG KỲ','Expected window','Chưa xác lập'],['GROUND TRUTH','Observed event','Chưa ghi nhận'],['ĐỐI CHIẾU','Comparison','Đang chờ']];$('timeline').innerHTML=labels.map(([label,sub,value])=>`<div class="time-node"><div class="time-dot"></div><div class="time-label">${label}</div><div class="time-value">${sub}: ${value}</div></div>`).join('');$('timing-note').innerHTML=`Ứng kỳ chưa được canonical response cung cấp. Tick hiện tại: <strong>${escapeHtml(display(tick))}</strong>. Không tạo expected time window; Ground Truth chỉ được chốt sau khi có sự kiện quan sát thực tế.`}
+function renderTruth(){const empty=unsupported('Chưa có observables/ground truth trong canonical response');$('truth-content').innerHTML=[field('Observable event',empty),field('Observed time',empty),field('Observed source',empty),field('Evidence',empty,true)].join('')}
+function renderComparison(){const empty=unsupported('Chưa đủ dữ liệu để đối chiếu');$('comparison-content').innerHTML=`<div class="grid-3">${card('Predicted / derived',empty,'<span class="badge badge-unsupported">UNSUPPORTED</span>')}${card('Observed / ground truth',empty,'<span class="badge badge-truth">WAITING OBSERVATION</span>')}${card('Match status',empty,'<span class="badge badge-unsupported">NOT EVALUATED</span>')}</div>`}
+function renderSummary(result){const semantic=result.semantic_state||{},mapping=semantic.mapping_profile||{},confidence=result.uncertainty?.confidence||{};$('summary-content').innerHTML=`<div class="data-card"><div class="data-label">Tóm tắt CORE</div><div class="data-value">Runtime ${escapeHtml(display(result.execution?.runtime_status))}; root code ${escapeHtml(display(result.identity?.root_code))}; contract ${escapeHtml(display(result.contract_version))}.</div></div><div class="data-card"><div class="data-label">Trạng thái PROVISIONAL</div><div class="data-value">${escapeHtml(display(semantic.primary_label))} · ${escapeHtml(display(semantic.status))}<div style="margin-top:7px"><span class="badge badge-provisional">${escapeHtml(display(mapping.status))}</span></div></div></div><div class="data-card"><div class="data-label">Nhắc nhở kiểm chứng</div><div class="data-value">Không xem primary label hoặc S07 là kết luận chắc chắn. Cần Ground Truth độc lập trước khi đối chiếu.</div></div><div class="data-card"><div class="data-label">Đề xuất vận hành</div><div class="data-value">Ghi nhận thời điểm, sự kiện quan sát và bằng chứng thực tế; không dùng UI này để tạo dữ liệu thiếu hoặc promote provisional vào CORE.</div></div><div class="safe-note" style="grid-column:1/-1">Confidence firewall: ${escapeHtml(display(confidence.method))}; f_net_out_excluded = ${escapeHtml(display(confidence.f_net_out_excluded))}; f_net_out_found = ${escapeHtml(display(confidence.f_net_out_found))}. Đây là rào chắn truy vết, không phải điểm số tiên đoán.</div>`}
+function renderInterpretation(result){renderCore(result);renderMicroscope(result);renderMatrix();renderCross();renderTiming(result);renderTruth();renderComparison();renderSummary(result);$('out').textContent=JSON.stringify(result,null,2)}
+$('form').addEventListener('submit',async(event)=>{event.preventDefault();$('run').disabled=true;$('status').textContent='Đang chạy…';$('status').className='status';$('status-badge').textContent='RUNNING';$('status-badge').className='badge badge-core';$('run-caption').textContent='Đang gọi canonical API và chờ response.';$('checks').replaceChildren();const validation=validateInput();validation.checks.forEach(([name,ok,detail])=>addCheck(name,ok,detail));if(!validation.ok){$('status').textContent='FAIL — input không hợp lệ';$('status').className='status fail';$('status-badge').textContent='INPUT ERROR';$('status-badge').className='badge badge-unsupported';$('run').disabled=false;return}try{const first=await callApi(validation.payload);const second=await callApi(validation.payload);const trace=Object.fromEntries((first.raw_measurements?.runtime_trace||[]).map(x=>[x.layer,x.status]));addCheck('API reachable',true);addCheck('L1',trace.L1==='PASSED');addCheck('L2 PASS/PROVISIONAL',String(trace.L2||'').startsWith('PASSED'));addCheck('L3 PASS/PROVISIONAL',String(trace.L3||'').startsWith('PASSED'));addCheck('L4 canonical vocabulary',CANONICAL.includes(first.semantic_state?.primary_label));addCheck('L5 canonical=true',first.execution?.runtime_status==='PASSED'&&first.gate_results?.G1_SCHEMA==='PASSED');addCheck('L6 API ready',trace.L6==='PASSED');addCheck('contract_version = 3.1.0',first.contract_version==='3.1.0');addCheck('f_net_out_excluded = true',first.uncertainty?.confidence?.f_net_out_excluded===true);addCheck('provenance tồn tại',!!first.provenance&&Object.keys(first.provenance).length>0);addCheck('input hash tồn tại',/^sha256:[0-9a-f]{64}$/.test(first.execution?.input_hash||''));addCheck('deterministic request',JSON.stringify(first)===JSON.stringify(second));renderInterpretation(first);$('status').textContent='PASS — canonical response đã được phân lớp để luận giải';$('status').className='status pass';$('status-badge').textContent='PASS';$('status-badge').className='badge badge-pass';$('run-caption').textContent='CORE đã khóa; MICROSCOPE, ỨNG KỲ và GROUND TRUTH được tách theo mức bằng chứng.'}catch(error){$('status').textContent='FAIL — '+error.message;$('status').className='status fail';$('status-badge').textContent='ERROR';$('status-badge').className='badge badge-unsupported';addCheck('API reachable',false,error.message)}finally{$('run').disabled=false}});
+renderMatrix();renderCross();renderMicroscope({});renderTiming({});renderTruth();renderComparison();
 </script>
-</main>
 </body>
 </html>
