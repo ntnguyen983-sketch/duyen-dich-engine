@@ -1,0 +1,1 @@
+v3.1 runtime audit branch created. Existing engine is preserved; implementation work must remain non-destructive until audit is complete.
