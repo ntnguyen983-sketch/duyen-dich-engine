@@ -13,7 +13,7 @@ export default defineConfig({
   webServer: {
     command: 'python3 app.py',
     url: 'http://127.0.0.1:8000/',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     timeout: 30000,
   },
 });
