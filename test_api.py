@@ -65,6 +65,39 @@ class ApiV31Tests(unittest.TestCase):
         bad_gps = self.client.post("/api/v31", json=dict(self.payload, gps={"lat": 100, "lng": 0}))
         self.assertEqual(bad_gps.status_code, 400)
 
+    def test_hexagram_envelope_is_adapted_without_changing_canonical_output(self):
+        payload = {
+            "data_1": {
+                "time": "2026-08-21T01:26:43+07:00",
+                "gps_show": {"lat": 10.75554, "lng": 106.611772},
+                "number": "3458769",
+                "dong": 3,
+            },
+            "data_2": {
+                "question": "Ca làm việc shipper từ 01:45 AM đến 06:00 AM, số đơn và thu nhập.",
+                "dq_g": "110",
+                "dq_b": "100",
+                "que_goc_s": "Phong Lôi Ích",
+                "que_bien_s": "Phong Hỏa Gia Nhân",
+                "sl_am": 8,
+                "sl_duong": 10,
+                "dq_gs": "Đoài (Trạch)",
+                "dq_bs": "Chấn (Lôi)",
+                "engine_field": "HƯỚNG Âm động chuyển Dương",
+                "truong": {"Moc": 2, "Hoa": 4, "Tho": -2, "Kim": -4, "Thuy": -6},
+                "the": 1,
+                "quy_tac_luan": "QT LỰC 1",
+            },
+        }
+        response = self.client.post("/api/v31", json=payload)
+        self.assertEqual(response.status_code, 200)
+        result = response.get_json()
+        errors = list(self.validator.iter_errors(result))
+        self.assertEqual(errors, [], [error.message for error in errors])
+        self.assertEqual(result["contract_version"], "3.1.0")
+        self.assertEqual(result["execution"]["runtime_status"], "PASSED")
+        self.assertTrue(result["uncertainty"]["confidence"]["f_net_out_excluded"])
+
     def test_deterministic_request_and_canonical_json(self):
         first = run_v31(self.payload)
         second = run_v31(self.payload)

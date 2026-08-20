@@ -1,4 +1,3 @@
-"""Vercel/Flask adapter for the Duyên Dịch v3.1 runtime."""
 from __future__ import annotations
 
 import json
@@ -15,6 +14,51 @@ app = Flask(__name__, static_folder=None)
 
 def _error(message: str, status: int = 400):
     return jsonify({"error": message, "code": "INVALID_INPUT"}), status
+
+
+def _is_hexagram_payload(payload: dict[str, Any]) -> bool:
+    return isinstance(payload.get("data_1"), dict) and isinstance(payload.get("data_2"), dict)
+
+
+def normalize_run_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], str]:
+    """Map the supplied hexagram envelope to the unchanged core runtime payload.
+
+    The adapter accepts the canonical UI payload as well as the production test
+    envelope. Hexagram metadata is validated at the boundary but is not injected
+    into the core L1-L6 calculation or used for interpretation.
+    """
+    if not _is_hexagram_payload(payload):
+        return payload, "flat"
+
+    data_1 = payload["data_1"]
+    data_2 = payload["data_2"]
+    time = data_1.get("time")
+    number = data_1.get("number")
+    question = data_2.get("question")
+    gps = data_1.get("gps_show")
+
+    if not isinstance(question, str) or not question.strip():
+        raise ValueError("data_2.question is required")
+    if not isinstance(time, str) or not time.strip():
+        raise ValueError("data_1.time is required")
+    if number is None or not str(number).strip().isdigit():
+        raise ValueError("data_1.number phải là số nguyên không âm.")
+    if not isinstance(gps, dict) or "lat" not in gps or "lng" not in gps:
+        raise ValueError("data_1.gps_show phải có lat và lng.")
+
+    # The supplied number is a quẻ/session identifier and is preserved in the
+    # core run. The legacy flat UI contract remains strict six digits; the
+    # hexagram envelope uses the runtime's non-negative integer mode.
+    number_text = str(number).strip()
+    core_payload = {
+        "question": question.strip(),
+        "number": int(number_text),
+        "time": time.strip(),
+        "gps": {"lat": gps["lat"], "lng": gps["lng"]},
+        "address": payload.get("address"),
+        "image": payload.get("image"),
+    }
+    return core_payload, "hexagram"
 
 
 @app.get("/")
@@ -42,7 +86,8 @@ def v31_endpoint():
     if not isinstance(payload, dict):
         return _error("Request body phải là một JSON object.")
     try:
-        result = canonical_response(run_v31(payload, strict_number=True))
+        core_payload, source = normalize_run_payload(payload)
+        result = canonical_response(run_v31(core_payload, strict_number=(source == "flat")))
     except (TypeError, ValueError, OverflowError) as exc:
         return _error(str(exc))
     return app.response_class(
