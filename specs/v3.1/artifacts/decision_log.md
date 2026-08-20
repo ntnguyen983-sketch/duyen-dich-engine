@@ -39,3 +39,21 @@ Bản v3.1 khóa **vocabulary, firewall, gate architecture, failure behavior, pr
 | `gemini_round2.json` | Prompt, model, thời điểm và phản biện Vòng 2 |
 | `SOURCE_INVENTORY.md` | Repository, commit và giới hạn bằng chứng |
 | `DUYEN_DICH_v3.1.md` | Đặc tả hợp nhất đã viết lại |
+
+
+## DD31-DEC-013 — Full rewrite from Drive source corpus
+
+**Status:** ACCEPTED FOR RELEASE CANDIDATE
+**Basis:** Corpus trích xuất từ Google Docs nguồn v2.5.3, v2.5.6, v2.8.6, BEC Unified v2.8.7, v2.9 overview, v2.9.1 NEW2, Py v2.9.3 và canonical v3.0.0.
+**Decision:** Thay bản khung placeholder bằng đặc tả có công thức, pseudocode, profile, guard, gate, error behavior, provenance và test vectors. `CALIBRATION_REQUIRED` là trạng thái có behavior, không phải nội dung trống.
+**Boundary:** Không nâng S07 activation, RGS normalization, BEC lambda/gamma, threshold profile, ΦSystem=60 ticks hoặc H1 Drain/Reserve thành CORE nếu chưa có approval/calibration độc lập.
+
+## DD31-DEC-014 — Profile conflict isolation
+
+**Status:** ACCEPTED
+**Decision:** `DD-DELAY-2.9.2-TF1` và `DD-DELAY-REV-A` là named profiles không composable trong cùng execution. Runtime phải ghi profile selection và từ chối `PROFILE_SELECTION_CONFLICT` khi chọn đồng thời.
+
+## DD31-DEC-015 — Gemini Round 2 required changes
+
+**Status:** APPLIED
+**Decision:** Đã thêm S07 boundary vectors và `rule_config_sha256`, guard `persistence_denominator_missing=QUARANTINE`, confidence tree audit với `f_net_out_found=false`, TV-017 overlap và TV-018 denominator missing. `ΦSystem=60` và H1 Drain/Reserve được hạ về `RESEARCH`.

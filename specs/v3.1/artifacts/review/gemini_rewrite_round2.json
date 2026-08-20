@@ -1,0 +1,92 @@
+{
+  "verdict": "PASS_WITH_REQUIRED_CHANGES",
+  "core_decisions": [
+    "Duy trì Frozen Core Lock tại S01 để bảo vệ tính toàn vẹn của Identity (snapshot_id, root_bits, moving_lines, initial_time).",
+    "Thực thi luồng dữ liệu một chiều nghiêm ngặt (Forward-Only Pipeline) từ S00 đến S11, ngăn chặn mọi vòng lặp phản hồi ngược.",
+    "Bảo vệ Semantic Firewall bằng cách cô lập hoàn toàn dữ liệu ngôn ngữ tự nhiên khỏi các tầng tính toán lõi trước S10.",
+    "Đóng băng ma trận tương tác phân cực M_POL (10x10), M_SIE (3x3) và M_FLUX (5x5) dưới dạng CORE_PROFILE được định danh bằng mã băm SHA-256.",
+    "Tách biệt hoàn toàn Decoder thành một hàm thuần túy (Read-Only Decoder) không có quyền thay đổi trạng thái Kernel."
+  ],
+  "required_changes": [
+    {
+      "id": "RC-V31-001",
+      "severity": "HIGH",
+      "location": "RUNTIME PROFILES -> S07-HIST-2.9.1-NEW2",
+      "evidence": "Trường 'required_calibration_artifacts' chứa danh sách các yêu cầu hiệu chuẩn nhưng thiếu các giá trị cụ thể cho 'boundary_vectors' và 'profile_sha256' thực tế trong registry.",
+      "fix": "Cung cấp mã băm SHA-256 thực tế của cấu hình quy tắc S07 và định nghĩa rõ ràng các vector biên (boundary vectors) làm mẫu kiểm thử trong profile."
+    },
+    {
+      "id": "RC-V31-002",
+      "severity": "MEDIUM",
+      "location": "SCHEMA -> properties/uncertainty/properties/confidence",
+      "evidence": "Schema yêu cầu 'f_net_out_excluded': {'const': true} nhưng chưa có cơ chế kiểm tra tự động ở mức Gate để đảm bảo f_net_out không bị lén lút đưa vào tính toán độ tin cậy.",
+      "fix": "Bổ sung ràng buộc logic vào Gate G5 hoặc G7 để quét qua cấu trúc dữ liệu đầu ra và từ chối nếu phát hiện f_net_out nằm trong danh sách inputs của confidence."
+    },
+    {
+      "id": "RC-V31-003",
+      "severity": "HIGH",
+      "location": "SPEC V3.1 REWRITE -> Mục 7.3 (DWL và force)",
+      "evidence": "Công thức tính toán DWL có điều kiện 'Nếu N_observed=0 trả PERSISTENCE_DENOMINATOR_MISSING' nhưng trong RUNTIME PROFILES -> DWL-0.1-REV-A-FNORM -> guards chưa khai báo mã lỗi này.",
+      "fix": "Thêm 'persistence_denominator_missing': 'QUARANTINE' hoặc 'REJECT' vào trường 'guards' của profile 'DWL-0.1-REV-A-FNORM'."
+    }
+  ],
+  "downgrade_to_research": [
+    {
+      "item": "Chu kỳ đồng pha 60 ticks (ΦSystem)",
+      "reason": "Mặc dù đã được chuyển thành cờ SYNC_RESONANCE và không tự ý kích hoạt chuyển pha, chu kỳ này vẫn mang tính chất giả thuyết đồng pha toán học LCM(12,5,12) chưa có bằng chứng thực nghiệm vật lý lõi."
+    },
+    {
+      "item": "Giả thuyết BEC H1 Drain/Reserve",
+      "reason": "Đây là mô hình thực nghiệm động lực học tiêu hao chưa được hiệu chuẩn đầy đủ và có thể làm nhiễu loạn trạng thái ổn định của Core nếu tự ý kích hoạt."
+    }
+  ],
+  "missing_tests": [
+    {
+      "id": "TV-017",
+      "description": "Kiểm thử chồng lấn ranh giới S07 (S07 Boundary Overlap).",
+      "input": {
+        "S": 0.6,
+        "D": 0.55,
+        "I": 0.65,
+        "F": 0.52,
+        "T": 1
+      },
+      "expected_behavior": "Hệ thống phải phát hiện trạng thái này thỏa mãn cả quy tắc 'DUONG' (I>=0.70 là sai nhưng gần đúng, cần test sát biên) và 'HY' (I>=0.60, D>0.5, S>=0.5). Nếu cả hai cùng thỏa mãn, hệ thống phải trả về lỗi MAPPING_AMBIGUOUS."
+    },
+    {
+      "id": "TV-018",
+      "description": "Kiểm thử lỗi thiếu mẫu số của độ bền bỉ (Persistence Denominator Missing).",
+      "input": {
+        "N_observed": 0,
+        "N_active": 0
+      },
+      "expected_behavior": "Hệ thống phải dừng tính toán DWL tại S05 và trả về mã lỗi PERSISTENCE_DENOMINATOR_MISSING."
+    }
+  ],
+  "profile_conflicts": [
+    {
+      "conflict_id": "CF-V31-001",
+      "description": "Xung đột giữa công thức tính delay cục bộ của tác nhân (DD-DELAY-2.9.2-TF1) và công thức delay tích lũy hình học (DD-DELAY-REV-A).",
+      "resolution": "Đã xử lý triệt để bằng cách tách thành hai profile độc lập trong Registry và sử dụng thuộc tính 'not_composable_with' để ngăn chặn việc trộn lẫn cấu hình trong cùng một phiên thực thi."
+    }
+  ],
+  "provenance_audit": [
+    {
+      "claim": "Ma trận tương tác phân cực M_POL (10x10)",
+      "provenance": "Đầy đủ. Khớp chính xác với tài liệu Py v2.9.3 (1nGmMp7Gg5PVc9QeYpmTr7HKIVpGXcBNqDQ52vrO3LX8)."
+    },
+    {
+      "claim": "Sáu quy tắc phân loại nhãn S07 (DUONG, HY, AN, NHIEU, TA, SAT)",
+      "provenance": "Đầy đủ. Khớp chính xác với tài liệu v2.9.1_new2 (180a8LwwV1OH3H2claoO89xih8h55lUY9tdbNgp0vTY0)."
+    },
+    {
+      "claim": "Hàm normalize() của bộ giải hình học rắn L2-RGS",
+      "provenance": "Thiếu provenance rõ ràng trong tài liệu nguồn. Đã xử lý đúng bằng cách hạ cấp xuống CALIBRATION_REQUIRED và yêu cầu gắn cờ RIGID_NORMALIZATION_REQUIRED khi chưa có profile hiệu chuẩn."
+    }
+  ],
+  "final_release_conditions": [
+    "Phải chạy thành công toàn bộ 18 test vectors (bao gồm cả 2 test vectors bổ sung TV-017 và TV-018) mà không xảy ra ngoại lệ hệ thống.",
+    "Mã băm SHA-256 của file 'runtime_profiles_v31.json' phải được tính toán lại và ghi cứng vào trường 'source_hash' của VOCABULARY trước khi đóng gói.",
+    "Kiểm tra thủ công (Manual Audit) luồng dữ liệu đa luồng để đảm bảo G7_FIREWALL_DIRECTION chặn đứng hoàn toàn mọi hành vi ghi ngược (write-back) từ Decoder vào Kernel."
+  ]
+}

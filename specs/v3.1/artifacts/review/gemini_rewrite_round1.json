@@ -1,0 +1,669 @@
+{
+  "timestamp_utc": "2026-08-20T09:31:50.277897+00:00",
+  "model": "gemini-3.5-flash",
+  "round": 1,
+  "review_type": "complete_rewrite_review",
+  "input_files": [
+    "/home/ubuntu/dd_v31_source_matrix_rewrite.md",
+    "/home/ubuntu/dd_v31_key_source_findings.md",
+    "/home/ubuntu/dd_v31_rewrite_design.md"
+  ],
+  "response": {
+    "source_authority_decisions": [
+      {
+        "layer": "L1 Lý thuyết động lực",
+        "source": "v2.5.3 Engine Specification (1T_VN8r5g2uKzT7vgL3Us4Fp-w2V_NNYRMTfA6PTHKsQ)",
+        "decision": "Giữ làm tài liệu tham chiếu lý thuyết (Theory Reference). Không chạy trực tiếp các toán tử Bellman/SDE trong runtime v3.1 trừ khi được đóng gói thành adapter và profile riêng biệt.",
+        "reason": "Tránh xung đột với mô hình trường động lực học thực tế của v2.8/v2.9."
+      },
+      {
+        "layer": "L2 Cơ chế trường SL-DIF/BEC",
+        "source": "v2.8.7 BEC Unified Logic (112YN7bwAHHebKLa5Amd_fFtVkQ5079Z-AZQk3XzVHBM)",
+        "decision": "Sử dụng làm nền tảng cho cấu trúc mạng lưới, SIE, DWL, Vector Khí và các cổng kiểm soát G1-G5.",
+        "reason": "Đây là nguồn hợp nhất cao nhất về logic hệ thống và cơ chế bảo vệ Frozen Core."
+      },
+      {
+        "layer": "L3 Runtime tính toán xác định",
+        "source": "v2.9.1_new2 (180a8LwwV1OH3H2claoO89xih8h55lUY9tdbNgp0vTY0) và Py v2.9.3 (1nGmMp7Gg5PVc9QeYpmTr7HKIVpGXcBNqDQ52vrO3LX8)",
+        "decision": "Trích xuất các công thức tính toán cụ thể cho DWL, DPKE, vận tốc, delay và chu kỳ 60 ticks làm bằng chứng thực thi (Runtime Evidence).",
+        "reason": "Cung cấp các thuật toán khả thi và các điều kiện biên thực tế cho runtime."
+      },
+      {
+        "layer": "L4 Mapping ngữ nghĩa và decoder",
+        "source": "v3.0.0 (1OaIykatXspd9HlDds6WeBHtQC0P7DAv3DEc93wKi_Dg)",
+        "decision": "Thiết lập làm canonical authority mặc định cho enum, schema và gates. Tách biệt hoàn toàn decoder khỏi kernel tính toán.",
+        "reason": "Đảm bảo tính nhất quán của hợp đồng dữ liệu và ngăn chặn rò rỉ ngữ nghĩa (Semantic Leakage)."
+      }
+    ],
+    "constraints": [
+      {
+        "name": "Frozen Core Lock",
+        "description": "Ngay sau khi Canonical State được xác lập tại S01, hệ thống phải khóa cứng Identity (snapshot_id, root_hexagram, moving_lines, initial_time). Không một tầng nào phía sau được phép thay đổi các trường này.",
+        "enforcement": "G3_CORE_LOCK gate sẽ kích hoạt lỗi HALT nếu phát hiện bất kỳ sự thay đổi nào đối với Identity."
+      },
+      {
+        "name": "Deterministic Forward-Only Pipeline",
+        "description": "Luồng dữ liệu đi tuyến tính từ S00 đến S11. Nghiêm cấm mọi vòng lặp phản hồi (Feedback Loop) ghi ngược dữ liệu vào quá khứ hoặc sửa đổi trạng thái đã khóa.",
+        "enforcement": "Kiến trúc luồng một chiều (One-way flow) được thực thi ở cấp độ runtime engine."
+      },
+      {
+        "name": "Semantic Firewall",
+        "description": "Cấm tuyệt đối việc đưa dữ liệu ngôn ngữ tự nhiên hoặc các nhãn ngữ nghĩa vào tính toán Core trước bước S07. Decoder chỉ được phép đọc trạng thái toán học và ánh xạ sang nhãn.",
+        "enforcement": "Tách biệt hoàn toàn cấu trúc dữ liệu của Output A (Structural) và Output B (BEC/Projection)."
+      },
+      {
+        "name": "Read-Only Decoder",
+        "description": "Decoder là một hàm thuần túy (pure function) nhận Model State và trả về nhãn ngữ nghĩa dựa trên profile hoạt động. Decoder không có quyền thay đổi bất kỳ biến nào trong Kernel.",
+        "enforcement": "Kiểm tra quyền truy cập bộ nhớ và luồng dữ liệu tại G7_FIREWALL_DIRECTION."
+      }
+    ],
+    "layer_review": {
+      "L1_theory": {
+        "status": "REFERENCE",
+        "issues": "Chứa các khái niệm trừu tượng như Ψ, SDE và Bellman chưa được kiểm chứng thực tế. Cần được cô lập khỏi runtime tính toán chính."
+      },
+      "L2_field": {
+        "status": "CORE",
+        "issues": "Ma trận tương tác SIE và các trọng số DWL cần được quản lý thông qua Registry để tránh việc tự ý gán giá trị số học không có provenance."
+      },
+      "L3_runtime": {
+        "status": "CORE",
+        "issues": "Độ chính xác tính toán phải đạt 6 chữ số thập phân. Cần áp dụng các guard condition nghiêm ngặt để tránh lỗi chia cho 0 hoặc tràn số."
+      },
+      "L4_decoder": {
+        "status": "COMPATIBILITY_REQUIRED",
+        "issues": "Bộ dịch S07 lịch sử chứa các nhãn có thể chồng lấn. Phải được cấu hình dưới dạng một profile hiệu chuẩn riêng biệt, không được đặt làm mặc định của hệ thống."
+      },
+      "L5_contract": {
+        "status": "CORE",
+        "issues": "JSON Schema phải được chuẩn hóa, sắp xếp các khóa theo thứ tự alphabet trước khi băm SHA-256 để đảm bảo tính xác định."
+      },
+      "L6_interface": {
+        "status": "INTERFACE_ONLY",
+        "issues": "Chỉ được phép tiêu thụ dữ liệu từ Canonical JSON. Tuyệt đối không chứa logic tính toán hoặc ghi ngược vào Core."
+      },
+      "dependencies": "L1 -> L2 -> L3 -> L4 -> L5 -> L6. Luồng phụ thuộc một chiều nghiêm ngặt.",
+      "forbidden_backward_edges": [
+        "S12 -> S00",
+        "Interpretation -> SL-DIF",
+        "Decoder -> Kernel",
+        "Outcome -> Snapshot"
+      ]
+    },
+    "pipeline_review": {
+      "stages": [
+        {
+          "stage": "S00",
+          "name": "Raw Input",
+          "input": "Payload thô từ sự kiện thực tế",
+          "output": "Raw State Record",
+          "mutation": "Khởi tạo context ban đầu",
+          "gates": [
+            "G1_SCHEMA"
+          ]
+        },
+        {
+          "stage": "S01",
+          "name": "Canonical Core",
+          "input": "Raw State Record",
+          "output": "Locked Core Identity",
+          "mutation": "Thực hiện Core Lock, không cho phép thay đổi về sau",
+          "gates": [
+            "G2_IDENTITY",
+            "G3_CORE_LOCK"
+          ]
+        },
+        {
+          "stage": "S02",
+          "name": "Structural Decode",
+          "input": "Locked Core Identity",
+          "output": "Six-Line Vector |Q>",
+          "mutation": "Thực thi các toán tử cấu trúc (M_k, P, C, H)",
+          "gates": []
+        },
+        {
+          "stage": "S03",
+          "name": "Topology",
+          "input": "Six-Line Vector |Q>",
+          "output": "Interaction Graph (Nodes, Edges)",
+          "mutation": "Xây dựng cấu trúc mạng lưới tương tác dựa trên quan sát",
+          "gates": []
+        },
+        {
+          "stage": "S04",
+          "name": "Firewalls/Gates",
+          "input": "Interaction Graph",
+          "output": "Validated Graph State",
+          "mutation": "Kiểm tra tính toàn vẹn và phân tách L2-RGS",
+          "gates": [
+            "G4_RESEARCH_CALIBRATION",
+            "G6_MATRIX_LOGIC_CONSISTENCY"
+          ]
+        },
+        {
+          "stage": "S05",
+          "name": "DWL/Force",
+          "input": "Validated Graph State",
+          "output": "Force Field & Vector Khí",
+          "mutation": "Tính toán trọng số động DWL và lực trường chuẩn hóa F_norm",
+          "gates": []
+        },
+        {
+          "stage": "S06",
+          "name": "L2-RGS",
+          "input": "Force Field & Vector Khí",
+          "output": "Rigid Fit Status & Geometric Invariants",
+          "mutation": "Khớp hình học rắn Procrustes, tính toán E_rigid",
+          "gates": []
+        },
+        {
+          "stage": "S07",
+          "name": "DPKE/Spacetime",
+          "input": "Geometric Invariants",
+          "output": "Velocity & Actor Delay",
+          "mutation": "Tính toán vận tốc v_i và độ trễ delay_i",
+          "gates": []
+        },
+        {
+          "stage": "S08",
+          "name": "Emergence",
+          "input": "Velocity & Actor Delay",
+          "output": "Canonical Record State",
+          "mutation": "Đóng gói trạng thái động lực học chuẩn hóa",
+          "gates": []
+        },
+        {
+          "stage": "S09",
+          "name": "BEC Observation",
+          "input": "Canonical Record State",
+          "output": "BEC Density & Recurrence Projections",
+          "mutation": "Tính toán mật độ nén f_BEC và dự báo chuyển pha",
+          "gates": []
+        },
+        {
+          "stage": "S10",
+          "name": "Knowledge Mapping",
+          "input": "BEC Density & Recurrence Projections",
+          "output": "Semantic Decoded Labels (S07)",
+          "mutation": "Ánh xạ ngữ nghĩa thông qua Read-Only Decoder",
+          "gates": [
+            "G7_FIREWALL_DIRECTION"
+          ]
+        },
+        {
+          "stage": "S11",
+          "name": "Reporting",
+          "input": "Semantic Decoded Labels",
+          "output": "Canonical JSON & SHA-256 Hash",
+          "mutation": "Xuất bản ghi đầu ra Nhánh A và Nhánh B",
+          "gates": [
+            "G5_CANONICAL_HASH"
+          ]
+        }
+      ]
+    },
+    "formula_review": [
+      {
+        "formula_name": "Ψ/SDE Reference",
+        "source": "v2.5.3 Engine Specification",
+        "profile_id": "L1-REF-PSI",
+        "status": "RESEARCH",
+        "guard": "None",
+        "issues": "Chỉ mang tính chất tham chiếu lý thuyết, không có giá trị thực thi trong runtime v3.1."
+      },
+      {
+        "formula_name": "Override Cascade",
+        "source": "v2.8.6 Master Spec",
+        "profile_id": "MPOL-CANONICAL-V2.9.0",
+        "status": "CORE",
+        "guard": "Nếu không khớp bất kỳ quan hệ nào, trả về B_ij = 0.0 và nhãn NO_RELATION.",
+        "issues": "Phải tuân thủ nghiêm ngặt thứ tự ưu tiên: Tam Hợp/Lục Hợp (+1.5) > Khắc Nhập (-2.0) > Khắc Xuất (-1.5) > Sinh Nhập (+1.2) > Sinh Xuất (-1.0) > Tỷ Hòa (+1.0)."
+      },
+      {
+        "formula_name": "DWL v3.1",
+        "source": "v2.8.7 BEC Unified Logic",
+        "profile_id": "DWL-0.1-REV-A-FNORM",
+        "status": "CORE",
+        "guard": "Nếu A_max <= 1e-6, chuyển trạng thái sang QUARANTINE với lỗi DIVISION_BY_ZERO_RISK.",
+        "issues": "Công thức chứa nguy cơ chia cho 0 nếu mẫu số không được bảo vệ bằng epsilon."
+      },
+      {
+        "formula_name": "F_norm",
+        "source": "v2.8.7 BEC Unified Logic",
+        "profile_id": "FORCE-SOLVER-1",
+        "status": "CORE",
+        "guard": "Nếu N_edges == 0, trả về lỗi NO_EDGES và dừng tính toán lực.",
+        "issues": "Yêu cầu số lượng cạnh phải lớn hơn 0 để tránh chuẩn hóa sai lệch."
+      },
+      {
+        "formula_name": "Vector Khí 5D",
+        "source": "v2.8.7 BEC Unified Logic / v2.9 Engine",
+        "profile_id": "V-KHI-5D",
+        "status": "CORE",
+        "guard": "S, D, I, F, T phải nằm trong miền xác định toán học trước khi chuyển sang Decoder.",
+        "issues": "Vector Khí là mô tả hình học phi ngữ nghĩa, không được tự ý gán nhãn tại tầng này."
+      },
+      {
+        "formula_name": "BEC Density",
+        "source": "v2.9.1_new2",
+        "profile_id": "BEC-OBS-1",
+        "status": "CALIBRATION_REQUIRED",
+        "guard": "Độ chính xác đầu ra phải đạt đúng 4 chữ số thập phân.",
+        "issues": "Các tham số lambda (0.35) và gamma (0.08) là thực nghiệm, cần được hiệu chuẩn theo từng ngữ cảnh."
+      },
+      {
+        "formula_name": "DPKE Velocity",
+        "source": "v2.8.7 BEC Unified Logic",
+        "profile_id": "DPKE-1",
+        "status": "CORE",
+        "guard": "Yêu cầu 20 <= v_final <= 50. Nếu ngoài miền, trả về lỗi DPKE_DOMAIN_ERROR.",
+        "issues": "Vận tốc cơ sở phải được giới hạn nghiêm ngặt để đảm bảo tính ổn định của hệ thống."
+      },
+      {
+        "formula_name": "Delay Formula",
+        "source": "v2.8.7 BEC Unified Logic vs v2.9.1_new2",
+        "profile_id": "DD-DELAY-2.9.2-TF1 / DD-DELAY-REV-A",
+        "status": "COMPATIBILITY",
+        "guard": "Nếu v_i <= 0, trả về lỗi DPKE_DOMAIN_ERROR. Không được trộn lẫn hai công thức delay.",
+        "issues": "Có sự mâu thuẫn giữa công thức delay của Rev.A và v2.9.1_new2. Phải tách biệt thành hai profile rõ ràng."
+      },
+      {
+        "formula_name": "Rigid Geometry Solver (L2-RGS)",
+        "source": "v2.8.7 BEC Unified Logic",
+        "profile_id": "L2-RGS-PROCRUSTES",
+        "status": "CORE",
+        "guard": "Nếu hàm normalize() chưa được formalize, chỉ xuất ra raw E_rigid và gắn cờ RIGID_NORMALIZATION_REQUIRED.",
+        "issues": "Tách biệt rõ ràng RIGID_ERROR (toán học thuần túy, CORE) khỏi RIGID_FIT (cần hiệu chuẩn normalization)."
+      },
+      {
+        "formula_name": "ΦSystem 60 Ticks",
+        "source": "v2.9.1_new2",
+        "profile_id": "PHI-SYSTEM-60",
+        "status": "RESEARCH",
+        "guard": "Chỉ gắn cờ SYNC_RESONANCE khi tick mod 60 == 0. Không tự ý kích hoạt chuyển pha.",
+        "issues": "Chu kỳ 60 ticks là một giả thuyết đồng pha, không được coi là một invariant vật lý tự động kích hoạt."
+      }
+    ],
+    "s07_profile_review": {
+      "profile_id": "S07-HIST-2.9.1-NEW2",
+      "status": "CALIBRATION_REQUIRED",
+      "rules": [
+        {
+          "code": "DUONG",
+          "predicate": "I >= 0.70 && D > 0.2 && F >= 0.5"
+        },
+        {
+          "code": "HY",
+          "predicate": "I >= 0.60 && D > 0.5 && S >= 0.5"
+        },
+        {
+          "code": "AN",
+          "predicate": "I * S < 0.30 && F <= 0.4"
+        },
+        {
+          "code": "NHIEU",
+          "predicate": "abs(D) <= 0.2 && F > 0.6 && I >= 0.3 && I <= 0.6"
+        },
+        {
+          "code": "TA",
+          "predicate": "D < -0.3 && F >= 0.7 && S < 0.30"
+        },
+        {
+          "code": "SAT",
+          "predicate": "I < 0.30 && D < -0.5 && F >= 0.6"
+        }
+      ],
+      "overlap_handling": "Nếu có nhiều hơn một quy tắc thỏa mãn, resolver phải trả về lỗi MAPPING_AMBIGUOUS kèm danh sách các mã trùng lặp. Không được tự ý chọn nhãn theo thứ tự ưu tiên không có trong đặc tả.",
+      "domain": "Chỉ áp dụng khi Vector Khí [S, D, I, F, T] được tính toán đầy đủ và hợp lệ.",
+      "fingerprint": "Chưa có fingerprint độc lập cho profile này. Trạng thái hiện tại là CALIBRATION_REQUIRED.",
+      "activation_requirements": "Yêu cầu phải có bộ test vector hoàn chỉnh cho từng nhãn và được phê duyệt bởi Calibration Protocol trước khi chuyển sang trạng thái ACTIVE.",
+      "unresolved_behavior": "Nếu không có quy tắc nào thỏa mãn, resolver phải trả về mã lỗi MAPPING_UNRESOLVED."
+    },
+    "data_contract_review": {
+      "required_fields": [
+        "spec_version",
+        "snapshot_id",
+        "runtime_profile_id",
+        "mapping_profile_id",
+        "source_refs",
+        "content_fingerprint",
+        "uncertainty",
+        "gate_results",
+        "error_codes",
+        "generated_at"
+      ],
+      "provenance": {
+        "requirement": "Mọi bản ghi đầu ra phải chứa thông tin truy vết nguồn gốc rõ ràng bao gồm source_document_id, version và thời điểm thu thập dữ liệu."
+      },
+      "uncertainty": {
+        "requirement": "Phải công khai độ bất định thời gian sigma_time và sai số hình học E_rigid trong Canonical JSON."
+      },
+      "errors": {
+        "requirement": "Mọi lỗi phát sinh trong quá trình chạy pipeline phải được ghi nhận dưới dạng mã lỗi chuẩn hóa trong trường error_codes, không được ném ngoại lệ làm sập hệ thống."
+      },
+      "hashes": {
+        "requirement": "Bản ghi Canonical JSON phải được sắp xếp các khóa theo thứ tự alphabet trước khi tính toán SHA-256 hash để đảm bảo tính nhất quán tuyệt đối."
+      }
+    },
+    "gate_review": {
+      "gates": [
+        {
+          "id": "G1_SCHEMA",
+          "description": "Kiểm tra tính hợp lệ của cấu trúc Payload đầu vào.",
+          "failure_semantic": "REJECT - Từ chối xử lý ngay lập tức."
+        },
+        {
+          "id": "G2_IDENTITY",
+          "description": "Kiểm tra tính nhất quán của cấu trúc 6-bit ban đầu.",
+          "failure_semantic": "QUARANTINE - Đưa vào vùng cách ly để kiểm tra thủ công."
+        },
+        {
+          "id": "G3_CORE_LOCK",
+          "description": "Kiểm tra sự xâm phạm hoặc thay đổi các trường dữ liệu đã khóa trong Core Identity.",
+          "failure_semantic": "HALT - Dừng toàn bộ tiến trình hệ thống."
+        },
+        {
+          "id": "G4_RESEARCH_CALIBRATION",
+          "description": "Kiểm tra trạng thái hiệu chuẩn của các tham số thực nghiệm.",
+          "failure_semantic": "WARNING - Ghi cảnh báo vào bản ghi nhưng cho phép tiếp tục chạy."
+        },
+        {
+          "id": "G5_CANONICAL_HASH",
+          "description": "Kiểm tra tính đầy đủ của bản ghi và tính toán SHA-256 hash cuối cùng.",
+          "failure_semantic": "BLOCK_PUBLICATION - Ngăn chặn việc xuất bản ghi ra ngoài hệ thống."
+        },
+        {
+          "id": "G6_MATRIX_LOGIC_CONSISTENCY",
+          "description": "Kiểm tra tính nhất quán logic của ma trận tương tác SIE và Mpol.",
+          "failure_semantic": "QUARANTINE - Cách ly bản ghi nếu phát hiện mâu thuẫn kích thước hoặc giá trị ngoài miền."
+        },
+        {
+          "id": "G7_FIREWALL_DIRECTION",
+          "description": "Kiểm tra và ngăn chặn mọi luồng dữ liệu ghi ngược từ Decoder hoặc UI vào Kernel.",
+          "failure_semantic": "HALT - Dừng hệ thống ngay lập tức vì vi phạm an toàn bảo mật."
+        }
+      ]
+    },
+    "invariants": [
+      {
+        "name": "6-bit State Space",
+        "evidence": "Được định nghĩa nhất quán từ v2.5 đến v3.0.0. Trạng thái hào là nhị phân {0, 1}."
+      },
+      {
+        "name": "Forward-Only Flow",
+        "evidence": "Được quy định rõ ràng trong BEC Unified Logic Ch.3 và v2.9 Engine. Không có phản hồi ngược."
+      },
+      {
+        "name": "Semantic Firewall",
+        "evidence": "BEC Unified Logic Ch.9 và v2.9 Engine. Ngăn chặn rò rỉ ngữ nghĩa vào tính toán Core."
+      },
+      {
+        "name": "Read-Only Decoder",
+        "evidence": "v2.8.7 BEC Unified Logic Ch.17. Decoder không được phép thay đổi trạng thái Kernel."
+      }
+    ],
+    "calibration_registry": {
+      "parameters": [
+        {
+          "name": "alpha",
+          "default_value": 0.15,
+          "domain": "R >= 0"
+        },
+        {
+          "name": "beta",
+          "default_value": 0.2,
+          "domain": "R >= 0"
+        },
+        {
+          "name": "epsilon",
+          "default_value": 1e-06,
+          "domain": "R > 0"
+        },
+        {
+          "name": "gamma",
+          "default_value": 0.08,
+          "domain": "R >= 0"
+        },
+        {
+          "name": "eta",
+          "default_value": 0.05,
+          "domain": "R >= 0"
+        },
+        {
+          "name": "lambda",
+          "default_value": 0.35,
+          "domain": "R >= 0"
+        },
+        {
+          "name": "theta_I",
+          "default_value": 0.7,
+          "domain": "[0, 1]"
+        },
+        {
+          "name": "theta_F",
+          "default_value": 0.5,
+          "domain": "[0, 1]"
+        },
+        {
+          "name": "theta_P",
+          "default_value": 0.6,
+          "domain": "[0, 1]"
+        },
+        {
+          "name": "theta_A",
+          "default_value": 0.5,
+          "domain": "R >= 0"
+        }
+      ],
+      "profile_metadata": {
+        "required_fields": [
+          "profile_id",
+          "version",
+          "hash",
+          "effective_domain",
+          "test_vectors"
+        ]
+      },
+      "acceptance_criteria": "Mọi profile hiệu chuẩn phải vượt qua 100% các test vector biên và được ký duyệt bởi Chief Systems Architect trước khi kích hoạt."
+    },
+    "test_vectors": [
+      {
+        "id": "TV-001",
+        "description": "Kiểm thử biên với số lượng cạnh bằng 0 (N_edges = 0).",
+        "input": {
+          "N_edges": 0,
+          "F_field_raw": [
+            1.2,
+            -0.5,
+            0.8
+          ]
+        },
+        "expected_behavior": "Hệ thống phải dừng tại S05, trả về mã lỗi NO_EDGES và không phát hành nhãn S07."
+      },
+      {
+        "id": "TV-002",
+        "description": "Kiểm thử nguy cơ chia cho 0 khi A_max gần bằng 0.",
+        "input": {
+          "A_max": 1e-07,
+          "P_ij": 0.5,
+          "F_norm": 0.8
+        },
+        "expected_behavior": "Hệ thống phải chuyển sang trạng thái QUARANTINE với mã lỗi DIVISION_BY_ZERO_RISK."
+      },
+      {
+        "id": "TV-003",
+        "description": "Kiểm thử giới hạn vận tốc v_final ngoài miền cho phép.",
+        "input": {
+          "v_final": 15.0
+        },
+        "expected_behavior": "Hệ thống phải từ chối xử lý và trả về lỗi DPKE_DOMAIN_ERROR."
+      },
+      {
+        "id": "TV-004",
+        "description": "Kiểm thử vận tốc cục bộ v_i nhỏ hơn hoặc bằng 0.",
+        "input": {
+          "v_raw": -0.5
+        },
+        "expected_behavior": "Hệ thống phải kẹp giá trị v_i về 0.1 theo quy tắc Clamp(v_raw, 0.1, 2.0) và ghi nhận cảnh báo."
+      },
+      {
+        "id": "TV-005",
+        "description": "Kiểm thử độ bất định thời gian khi F_norm bằng 0.",
+        "input": {
+          "F_norm": 0.0,
+          "F_max": 1.5,
+          "F_min": 0.5
+        },
+        "expected_behavior": "Hệ thống phải áp dụng epsilon để tránh chia cho 0 trong công thức tính sigma_time."
+      },
+      {
+        "id": "TV-006",
+        "description": "Kiểm thử chu kỳ đồng pha 60 ticks.",
+        "input": {
+          "runtime_tick": 60
+        },
+        "expected_behavior": "Hệ thống gắn cờ SYNC_RESONANCE nhưng không tự ý kích hoạt chuyển pha nếu thiếu transmutation profile."
+      },
+      {
+        "id": "TV-007",
+        "description": "Kiểm thử ranh giới chuyển pha BEC.",
+        "input": {
+          "I": 0.75,
+          "F": 0.55,
+          "P": 0.65,
+          "A": 0.6
+        },
+        "expected_behavior": "Hệ thống phải chuyển trạng thái sang STABLE_EMERGENCE."
+      },
+      {
+        "id": "TV-008",
+        "description": "Kiểm thử nhãn lịch sử tương thích (Ân -> AN).",
+        "input": {
+          "legacy_label": "Ân"
+        },
+        "expected_behavior": "Hệ thống phải tự động chuyển đổi sang mã serialize chuẩn hóa AN và ghi nhận vào Compatibility Registry."
+      },
+      {
+        "id": "TV-009",
+        "description": "Kiểm thử ký tự Unicode tiếng Việt trong dữ liệu đầu vào.",
+        "input": {
+          "name": "Duyên Dịch v3.1"
+        },
+        "expected_behavior": "Hệ thống phải xử lý bình thường, không gây lỗi mã hóa hoặc sai lệch mã băm SHA-256."
+      },
+      {
+        "id": "TV-010",
+        "description": "Kiểm thử tường lửa bảo vệ độ tin cậy (Confidence Firewall).",
+        "input": {
+          "f_net_out": 0.85
+        },
+        "expected_behavior": "Hệ thống nghiêm cấm việc sử dụng trực tiếp f_net_out làm confidence_score trong Canonical JSON."
+      }
+    ],
+    "conflicts_found": [
+      {
+        "conflict_id": "CF-001",
+        "description": "Trộn lẫn hai công thức tính delay giữa Rev.A và v2.9.1_new2.",
+        "impact": "Gây sai lệch nghiêm trọng trong việc tính toán thời gian thực tế T_real.",
+        "resolution": "Tách biệt hoàn toàn thành hai profile DD-DELAY-2.9.2-TF1 và DD-DELAY-REV-A. Yêu cầu khai báo rõ ràng trong context."
+      },
+      {
+        "conflict_id": "CF-002",
+        "description": "Sử dụng profile S07 lịch sử làm canonical mặc định.",
+        "impact": "Vi phạm nguyên tắc hiệu chuẩn vì profile này chưa được đóng băng và thiếu test vector đầy đủ.",
+        "resolution": "Đặt trạng thái của S07-HIST-2.9.1-NEW2 là CALIBRATION_REQUIRED. Nếu không đạt gate, trả về MAPPING_UNRESOLVED."
+      },
+      {
+        "conflict_id": "CF-003",
+        "description": "Sự chồng lấn (overlap) giữa các quy tắc của bộ nhãn S07.",
+        "impact": "Một trạng thái Vector Khí có thể thỏa mãn nhiều nhãn cùng lúc, gây mất tính xác định.",
+        "resolution": "Nếu phát hiện trùng lặp, resolver bắt buộc phải trả về lỗi MAPPING_AMBIGUOUS thay vì tự ý chọn nhãn."
+      },
+      {
+        "conflict_id": "CF-004",
+        "description": "Đưa giả thuyết BEC H1 (Drain/Reserve) trực tiếp vào Core.",
+        "impact": "Làm ô nhiễm Kernel bằng các công thức thực nghiệm chưa được hiệu chuẩn.",
+        "resolution": "Chuyển toàn bộ giả thuyết H1 sang tầng RESEARCH và chỉ kích hoạt khi có profile nghiên cứu hợp lệ."
+      }
+    ],
+    "required_changes": [
+      {
+        "change_id": "RC-001",
+        "description": "Tách biệt hoàn toàn hai công thức delay thành các profile độc lập và cấm trộn lẫn trong runtime."
+      },
+      {
+        "change_id": "RC-002",
+        "description": "Cô lập bộ nhãn S07 lịch sử vào một Calibration Profile riêng biệt, không đặt làm mặc định của hệ thống."
+      },
+      {
+        "change_id": "RC-003",
+        "description": "Triển khai đầy đủ hai cổng kiểm soát mới G6_MATRIX_LOGIC_CONSISTENCY và G7_FIREWALL_DIRECTION."
+      },
+      {
+        "change_id": "RC-004",
+        "description": "Áp dụng các guard condition nghiêm ngặt cho N_edges=0, A_max≈0, v_final ngoài [20,50], v_i<=0 và F_norm=0."
+      },
+      {
+        "change_id": "RC-005",
+        "description": "Tách biệt rõ ràng RIGID_ERROR (CORE) khỏi RIGID_FIT (CALIBRATION_REQUIRED) trong bộ giải L2-RGS."
+      }
+    ],
+    "safe_to_core": [
+      {
+        "item": "Toán tử cấu trúc Lục Hào (M_k, P, C, H)",
+        "evidence": "Được định nghĩa nhất quán và toán học hóa hoàn toàn trong SL-COL Ch.4."
+      },
+      {
+        "item": "Quy trình Core Lock tại S01",
+        "evidence": "Được quy định rõ ràng trong BEC Unified Logic Ch.1 và Ch.3 nhằm bảo vệ tính toàn vẹn của hệ thống."
+      },
+      {
+        "item": "Ma trận tương tác phân cực Mpol (10x10) Canonical v2.9.0",
+        "evidence": "Đã được hòa giải và chốt toàn bộ các hàng/cột theo bản v2.8.3 và v2.9.0."
+      },
+      {
+        "item": "Kiến trúc luồng dữ liệu một chiều (Forward-Only Pipeline)",
+        "evidence": "Được thực thi nghiêm ngặt xuyên suốt các phiên bản v2.8/v2.9 để ngăn chặn Circular Causality."
+      }
+    ],
+    "must_not_core": [
+      {
+        "item": "Bộ nhãn S07 lịch sử (S07-HIST-2.9.1-NEW2)",
+        "reason": "Chưa được hiệu chuẩn đầy đủ, thiếu fingerprint độc lập và có nguy cơ chồng lấn quy tắc."
+      },
+      {
+        "item": "Giả thuyết BEC H1 (Drain/Reserve)",
+        "reason": "Đây là một họ giả thuyết thực nghiệm (Hypothesis Family), chưa đạt cấp độ đóng băng của Core."
+      },
+      {
+        "item": "Các tham số thực nghiệm (alpha, beta, gamma, lambda, eta)",
+        "reason": "Các tham số này phụ thuộc vào từng ngữ cảnh quan sát và bắt buộc phải đi qua Calibration Protocol."
+      },
+      {
+        "item": "Hàm normalize() của bộ giải L2-RGS",
+        "reason": "Chưa được formalize trong tài liệu nguồn. Việc tự ý đưa vào Core sẽ vi phạm nguyên tắc bảo toàn nguồn gốc."
+      }
+    ],
+    "open_questions": [
+      {
+        "question_id": "OQ-001",
+        "description": "Làm thế nào để formalize hàm normalize() cho L2-RGS một cách nhất quán mà không tự bịa công thức?"
+      },
+      {
+        "question_id": "OQ-002",
+        "description": "Cơ sở vật lý và thực nghiệm nào hỗ trợ cho chu kỳ đồng pha 60 ticks ngoài việc tính toán LCM(12,5,12)?"
+      },
+      {
+        "question_id": "OQ-003",
+        "description": "Làm thế nào để giải quyết triệt để sự chồng lấn giữa các quy tắc S07 mà không làm mất đi tính khách quan của dữ liệu?"
+      }
+    ],
+    "classification_summary": {
+      "CORE": 12,
+      "COMPATIBILITY": 4,
+      "RESEARCH": 6,
+      "CALIBRATION_REQUIRED": 8
+    }
+  },
+  "raw_response": "{\n  \"source_authority_decisions\": [\n    {\n      \"layer\": \"L1 Lý thuyết động lực\",\n      \"source\": \"v2.5.3 Engine Specification (1T_VN8r5g2uKzT7vgL3Us4Fp-w2V_NNYRMTfA6PTHKsQ)\",\n      \"decision\": \"Giữ làm tài liệu tham chiếu lý thuyết (Theory Reference). Không chạy trực tiếp các toán tử Bellman/SDE trong runtime v3.1 trừ khi được đóng gói thành adapter và profile riêng biệt.\",\n      \"reason\": \"Tránh xung đột với mô hình trường động lực học thực tế của v2.8/v2.9.\"\n    },\n    {\n      \"layer\": \"L2 Cơ chế trường SL-DIF/BEC\",\n      \"source\": \"v2.8.7 BEC Unified Logic (112YN7bwAHHebKLa5Amd_fFtVkQ5079Z-AZQk3XzVHBM)\",\n      \"decision\": \"Sử dụng làm nền tảng cho cấu trúc mạng lưới, SIE, DWL, Vector Khí và các cổng kiểm soát G1-G5.\",\n      \"reason\": \"Đây là nguồn hợp nhất cao nhất về logic hệ thống và cơ chế bảo vệ Frozen Core.\"\n    },\n    {\n      \"layer\": \"L3 Runtime tính toán xác định\",\n      \"source\": \"v2.9.1_new2 (180a8LwwV1OH3H2claoO89xih8h55lUY9tdbNgp0vTY0) và Py v2.9.3 (1nGmMp7Gg5PVc9QeYpmTr7HKIVpGXcBNqDQ52vrO3LX8)\",\n      \"decision\": \"Trích xuất các công thức tính toán cụ thể cho DWL, DPKE, vận tốc, delay và chu kỳ 60 ticks làm bằng chứng thực thi (Runtime Evidence).\",\n      \"reason\": \"Cung cấp các thuật toán khả thi và các điều kiện biên thực tế cho runtime.\"\n    },\n    {\n      \"layer\": \"L4 Mapping ngữ nghĩa và decoder\",\n      \"source\": \"v3.0.0 (1OaIykatXspd9HlDds6WeBHtQC0P7DAv3DEc93wKi_Dg)\",\n      \"decision\": \"Thiết lập làm canonical authority mặc định cho enum, schema và gates. Tách biệt hoàn toàn decoder khỏi kernel tính toán.\",\n      \"reason\": \"Đảm bảo tính nhất quán của hợp đồng dữ liệu và ngăn chặn rò rỉ ngữ nghĩa (Semantic Leakage).\"\n    }\n  ],\n  \"constraints\": [\n    {\n      \"name\": \"Frozen Core Lock\",\n      \"description\": \"Ngay sau khi Canonical State được xác lập tại S01, hệ thống phải khóa cứng Identity (snapshot_id, root_hexagram, moving_lines, initial_time). Không một tầng nào phía sau được phép thay đổi các trường này.\",\n      \"enforcement\": \"G3_CORE_LOCK gate sẽ kích hoạt lỗi HALT nếu phát hiện bất kỳ sự thay đổi nào đối với Identity.\"\n    },\n    {\n      \"name\": \"Deterministic Forward-Only Pipeline\",\n      \"description\": \"Luồng dữ liệu đi tuyến tính từ S00 đến S11. Nghiêm cấm mọi vòng lặp phản hồi (Feedback Loop) ghi ngược dữ liệu vào quá khứ hoặc sửa đổi trạng thái đã khóa.\",\n      \"enforcement\": \"Kiến trúc luồng một chiều (One-way flow) được thực thi ở cấp độ runtime engine.\"\n    },\n    {\n      \"name\": \"Semantic Firewall\",\n      \"description\": \"Cấm tuyệt đối việc đưa dữ liệu ngôn ngữ tự nhiên hoặc các nhãn ngữ nghĩa vào tính toán Core trước bước S07. Decoder chỉ được phép đọc trạng thái toán học và ánh xạ sang nhãn.\",\n      \"enforcement\": \"Tách biệt hoàn toàn cấu trúc dữ liệu của Output A (Structural) và Output B (BEC/Projection).\"\n    },\n    {\n      \"name\": \"Read-Only Decoder\",\n      \"description\": \"Decoder là một hàm thuần túy (pure function) nhận Model State và trả về nhãn ngữ nghĩa dựa trên profile hoạt động. Decoder không có quyền thay đổi bất kỳ biến nào trong Kernel.\",\n      \"enforcement\": \"Kiểm tra quyền truy cập bộ nhớ và luồng dữ liệu tại G7_FIREWALL_DIRECTION.\"\n    }\n  ],\n  \"layer_review\": {\n    \"L1_theory\": {\n      \"status\": \"REFERENCE\",\n      \"issues\": \"Chứa các khái niệm trừu tượng như Ψ, SDE và Bellman chưa được kiểm chứng thực tế. Cần được cô lập khỏi runtime tính toán chính.\"\n    },\n    \"L2_field\": {\n      \"status\": \"CORE\",\n      \"issues\": \"Ma trận tương tác SIE và các trọng số DWL cần được quản lý thông qua Registry để tránh việc tự ý gán giá trị số học không có provenance.\"\n    },\n    \"L3_runtime\": {\n      \"status\": \"CORE\",\n      \"issues\": \"Độ chính xác tính toán phải đạt 6 chữ số thập phân. Cần áp dụng các guard condition nghiêm ngặt để tránh lỗi chia cho 0 hoặc tràn số.\"\n    },\n    \"L4_decoder\": {\n      \"status\": \"COMPATIBILITY_REQUIRED\",\n      \"issues\": \"Bộ dịch S07 lịch sử chứa các nhãn có thể chồng lấn. Phải được cấu hình dưới dạng một profile hiệu chuẩn riêng biệt, không được đặt làm mặc định của hệ thống.\"\n    },\n    \"L5_contract\": {\n      \"status\": \"CORE\",\n      \"issues\": \"JSON Schema phải được chuẩn hóa, sắp xếp các khóa theo thứ tự alphabet trước khi băm SHA-256 để đảm bảo tính xác định.\"\n    },\n    \"L6_interface\": {\n      \"status\": \"INTERFACE_ONLY\",\n      \"issues\": \"Chỉ được phép tiêu thụ dữ liệu từ Canonical JSON. Tuyệt đối không chứa logic tính toán hoặc ghi ngược vào Core.\"\n    },\n    \"dependencies\": \"L1 -> L2 -> L3 -> L4 -> L5 -> L6. Luồng phụ thuộc một chiều nghiêm ngặt.\",\n    \"forbidden_backward_edges\": [\n      \"S12 -> S00\",\n      \"Interpretation -> SL-DIF\",\n      \"Decoder -> Kernel\",\n      \"Outcome -> Snapshot\"\n    ]\n  },\n  \"pipeline_review\": {\n    \"stages\": [\n      {\n        \"stage\": \"S00\",\n        \"name\": \"Raw Input\",\n        \"input\": \"Payload thô từ sự kiện thực tế\",\n        \"output\": \"Raw State Record\",\n        \"mutation\": \"Khởi tạo context ban đầu\",\n        \"gates\": [\"G1_SCHEMA\"]\n      },\n      {\n        \"stage\": \"S01\",\n        \"name\": \"Canonical Core\",\n        \"input\": \"Raw State Record\",\n        \"output\": \"Locked Core Identity\",\n        \"mutation\": \"Thực hiện Core Lock, không cho phép thay đổi về sau\",\n        \"gates\": [\"G2_IDENTITY\", \"G3_CORE_LOCK\"]\n      },\n      {\n        \"stage\": \"S02\",\n        \"name\": \"Structural Decode\",\n        \"input\": \"Locked Core Identity\",\n        \"output\": \"Six-Line Vector |Q>\",\n        \"mutation\": \"Thực thi các toán tử cấu trúc (M_k, P, C, H)\",\n        \"gates\": []\n      },\n      {\n        \"stage\": \"S03\",\n        \"name\": \"Topology\",\n        \"input\": \"Six-Line Vector |Q>\",\n        \"output\": \"Interaction Graph (Nodes, Edges)\",\n        \"mutation\": \"Xây dựng cấu trúc mạng lưới tương tác dựa trên quan sát\",\n        \"gates\": []\n      },\n      {\n        \"stage\": \"S04\",\n        \"name\": \"Firewalls/Gates\",\n        \"input\": \"Interaction Graph\",\n        \"output\": \"Validated Graph State\",\n        \"mutation\": \"Kiểm tra tính toàn vẹn và phân tách L2-RGS\",\n        \"gates\": [\"G4_RESEARCH_CALIBRATION\", \"G6_MATRIX_LOGIC_CONSISTENCY\"]\n      },\n      {\n        \"stage\": \"S05\",\n        \"name\": \"DWL/Force\",\n        \"input\": \"Validated Graph State\",\n        \"output\": \"Force Field & Vector Khí\",\n        \"mutation\": \"Tính toán trọng số động DWL và lực trường chuẩn hóa F_norm\",\n        \"gates\": []\n      },\n      {\n        \"stage\": \"S06\",\n        \"name\": \"L2-RGS\",\n        \"input\": \"Force Field & Vector Khí\",\n        \"output\": \"Rigid Fit Status & Geometric Invariants\",\n        \"mutation\": \"Khớp hình học rắn Procrustes, tính toán E_rigid\",\n        \"gates\": []\n      },\n      {\n        \"stage\": \"S07\",\n        \"name\": \"DPKE/Spacetime\",\n        \"input\": \"Geometric Invariants\",\n        \"output\": \"Velocity & Actor Delay\",\n        \"mutation\": \"Tính toán vận tốc v_i và độ trễ delay_i\",\n        \"gates\": []\n      },\n      {\n        \"stage\": \"S08\",\n        \"name\": \"Emergence\",\n        \"input\": \"Velocity & Actor Delay\",\n        \"output\": \"Canonical Record State\",\n        \"mutation\": \"Đóng gói trạng thái động lực học chuẩn hóa\",\n        \"gates\": []\n      },\n      {\n        \"stage\": \"S09\",\n        \"name\": \"BEC Observation\",\n        \"input\": \"Canonical Record State\",\n        \"output\": \"BEC Density & Recurrence Projections\",\n        \"mutation\": \"Tính toán mật độ nén f_BEC và dự báo chuyển pha\",\n        \"gates\": []\n      },\n      {\n        \"stage\": \"S10\",\n        \"name\": \"Knowledge Mapping\",\n        \"input\": \"BEC Density & Recurrence Projections\",\n        \"output\": \"Semantic Decoded Labels (S07)\",\n        \"mutation\": \"Ánh xạ ngữ nghĩa thông qua Read-Only Decoder\",\n        \"gates\": [\"G7_FIREWALL_DIRECTION\"]\n      },\n      {\n        \"stage\": \"S11\",\n        \"name\": \"Reporting\",\n        \"input\": \"Semantic Decoded Labels\",\n        \"output\": \"Canonical JSON & SHA-256 Hash\",\n        \"mutation\": \"Xuất bản ghi đầu ra Nhánh A và Nhánh B\",\n        \"gates\": [\"G5_CANONICAL_HASH\"]\n      }\n    ]\n  },\n  \"formula_review\": [\n    {\n      \"formula_name\": \"Ψ/SDE Reference\",\n      \"source\": \"v2.5.3 Engine Specification\",\n      \"profile_id\": \"L1-REF-PSI\",\n      \"status\": \"RESEARCH\",\n      \"guard\": \"None\",\n      \"issues\": \"Chỉ mang tính chất tham chiếu lý thuyết, không có giá trị thực thi trong runtime v3.1.\"\n    },\n    {\n      \"formula_name\": \"Override Cascade\",\n      \"source\": \"v2.8.6 Master Spec\",\n      \"profile_id\": \"MPOL-CANONICAL-V2.9.0\",\n      \"status\": \"CORE\",\n      \"guard\": \"Nếu không khớp bất kỳ quan hệ nào, trả về B_ij = 0.0 và nhãn NO_RELATION.\",\n      \"issues\": \"Phải tuân thủ nghiêm ngặt thứ tự ưu tiên: Tam Hợp/Lục Hợp (+1.5) > Khắc Nhập (-2.0) > Khắc Xuất (-1.5) > Sinh Nhập (+1.2) > Sinh Xuất (-1.0) > Tỷ Hòa (+1.0).\"\n    },\n    {\n      \"formula_name\": \"DWL v3.1\",\n      \"source\": \"v2.8.7 BEC Unified Logic\",\n      \"profile_id\": \"DWL-0.1-REV-A-FNORM\",\n      \"status\": \"CORE\",\n      \"guard\": \"Nếu A_max <= 1e-6, chuyển trạng thái sang QUARANTINE với lỗi DIVISION_BY_ZERO_RISK.\",\n      \"issues\": \"Công thức chứa nguy cơ chia cho 0 nếu mẫu số không được bảo vệ bằng epsilon.\"\n    },\n    {\n      \"formula_name\": \"F_norm\",\n      \"source\": \"v2.8.7 BEC Unified Logic\",\n      \"profile_id\": \"FORCE-SOLVER-1\",\n      \"status\": \"CORE\",\n      \"guard\": \"Nếu N_edges == 0, trả về lỗi NO_EDGES và dừng tính toán lực.\",\n      \"issues\": \"Yêu cầu số lượng cạnh phải lớn hơn 0 để tránh chuẩn hóa sai lệch.\"\n    },\n    {\n      \"formula_name\": \"Vector Khí 5D\",\n      \"source\": \"v2.8.7 BEC Unified Logic / v2.9 Engine\",\n      \"profile_id\": \"V-KHI-5D\",\n      \"status\": \"CORE\",\n      \"guard\": \"S, D, I, F, T phải nằm trong miền xác định toán học trước khi chuyển sang Decoder.\",\n      \"issues\": \"Vector Khí là mô tả hình học phi ngữ nghĩa, không được tự ý gán nhãn tại tầng này.\"\n    },\n    {\n      \"formula_name\": \"BEC Density\",\n      \"source\": \"v2.9.1_new2\",\n      \"profile_id\": \"BEC-OBS-1\",\n      \"status\": \"CALIBRATION_REQUIRED\",\n      \"guard\": \"Độ chính xác đầu ra phải đạt đúng 4 chữ số thập phân.\",\n      \"issues\": \"Các tham số lambda (0.35) và gamma (0.08) là thực nghiệm, cần được hiệu chuẩn theo từng ngữ cảnh.\"\n    },\n    {\n      \"formula_name\": \"DPKE Velocity\",\n      \"source\": \"v2.8.7 BEC Unified Logic\",\n      \"profile_id\": \"DPKE-1\",\n      \"status\": \"CORE\",\n      \"guard\": \"Yêu cầu 20 <= v_final <= 50. Nếu ngoài miền, trả về lỗi DPKE_DOMAIN_ERROR.\",\n      \"issues\": \"Vận tốc cơ sở phải được giới hạn nghiêm ngặt để đảm bảo tính ổn định của hệ thống.\"\n    },\n    {\n      \"formula_name\": \"Delay Formula\",\n      \"source\": \"v2.8.7 BEC Unified Logic vs v2.9.1_new2\",\n      \"profile_id\": \"DD-DELAY-2.9.2-TF1 / DD-DELAY-REV-A\",\n      \"status\": \"COMPATIBILITY\",\n      \"guard\": \"Nếu v_i <= 0, trả về lỗi DPKE_DOMAIN_ERROR. Không được trộn lẫn hai công thức delay.\",\n      \"issues\": \"Có sự mâu thuẫn giữa công thức delay của Rev.A và v2.9.1_new2. Phải tách biệt thành hai profile rõ ràng.\"\n    },\n    {\n      \"formula_name\": \"Rigid Geometry Solver (L2-RGS)\",\n      \"source\": \"v2.8.7 BEC Unified Logic\",\n      \"profile_id\": \"L2-RGS-PROCRUSTES\",\n      \"status\": \"CORE\",\n      \"guard\": \"Nếu hàm normalize() chưa được formalize, chỉ xuất ra raw E_rigid và gắn cờ RIGID_NORMALIZATION_REQUIRED.\",\n      \"issues\": \"Tách biệt rõ ràng RIGID_ERROR (toán học thuần túy, CORE) khỏi RIGID_FIT (cần hiệu chuẩn normalization).\"\n    },\n    {\n      \"formula_name\": \"ΦSystem 60 Ticks\",\n      \"source\": \"v2.9.1_new2\",\n      \"profile_id\": \"PHI-SYSTEM-60\",\n      \"status\": \"RESEARCH\",\n      \"guard\": \"Chỉ gắn cờ SYNC_RESONANCE khi tick mod 60 == 0. Không tự ý kích hoạt chuyển pha.\",\n      \"issues\": \"Chu kỳ 60 ticks là một giả thuyết đồng pha, không được coi là một invariant vật lý tự động kích hoạt.\"\n    }\n  ],\n  \"s07_profile_review\": {\n    \"profile_id\": \"S07-HIST-2.9.1-NEW2\",\n    \"status\": \"CALIBRATION_REQUIRED\",\n    \"rules\": [\n      { \"code\": \"DUONG\", \"predicate\": \"I >= 0.70 && D > 0.2 && F >= 0.5\" },\n      { \"code\": \"HY\", \"predicate\": \"I >= 0.60 && D > 0.5 && S >= 0.5\" },\n      { \"code\": \"AN\", \"predicate\": \"I * S < 0.30 && F <= 0.4\" },\n      { \"code\": \"NHIEU\", \"predicate\": \"abs(D) <= 0.2 && F > 0.6 && I >= 0.3 && I <= 0.6\" },\n      { \"code\": \"TA\", \"predicate\": \"D < -0.3 && F >= 0.7 && S < 0.30\" },\n      { \"code\": \"SAT\", \"predicate\": \"I < 0.30 && D < -0.5 && F >= 0.6\" }\n    ],\n    \"overlap_handling\": \"Nếu có nhiều hơn một quy tắc thỏa mãn, resolver phải trả về lỗi MAPPING_AMBIGUOUS kèm danh sách các mã trùng lặp. Không được tự ý chọn nhãn theo thứ tự ưu tiên không có trong đặc tả.\",\n    \"domain\": \"Chỉ áp dụng khi Vector Khí [S, D, I, F, T] được tính toán đầy đủ và hợp lệ.\",\n    \"fingerprint\": \"Chưa có fingerprint độc lập cho profile này. Trạng thái hiện tại là CALIBRATION_REQUIRED.\",\n    \"activation_requirements\": \"Yêu cầu phải có bộ test vector hoàn chỉnh cho từng nhãn và được phê duyệt bởi Calibration Protocol trước khi chuyển sang trạng thái ACTIVE.\",\n    \"unresolved_behavior\": \"Nếu không có quy tắc nào thỏa mãn, resolver phải trả về mã lỗi MAPPING_UNRESOLVED.\"\n  },\n  \"data_contract_review\": {\n    \"required_fields\": [\n      \"spec_version\",\n      \"snapshot_id\",\n      \"runtime_profile_id\",\n      \"mapping_profile_id\",\n      \"source_refs\",\n      \"content_fingerprint\",\n      \"uncertainty\",\n      \"gate_results\",\n      \"error_codes\",\n      \"generated_at\"\n    ],\n    \"provenance\": {\n      \"requirement\": \"Mọi bản ghi đầu ra phải chứa thông tin truy vết nguồn gốc rõ ràng bao gồm source_document_id, version và thời điểm thu thập dữ liệu.\"\n    },\n    \"uncertainty\": {\n      \"requirement\": \"Phải công khai độ bất định thời gian sigma_time và sai số hình học E_rigid trong Canonical JSON.\"\n    },\n    \"errors\": {\n      \"requirement\": \"Mọi lỗi phát sinh trong quá trình chạy pipeline phải được ghi nhận dưới dạng mã lỗi chuẩn hóa trong trường error_codes, không được ném ngoại lệ làm sập hệ thống.\"\n    },\n    \"hashes\": {\n      \"requirement\": \"Bản ghi Canonical JSON phải được sắp xếp các khóa theo thứ tự alphabet trước khi tính toán SHA-256 hash để đảm bảo tính nhất quán tuyệt đối.\"\n    }\n  },\n  \"gate_review\": {\n    \"gates\": [\n      {\n        \"id\": \"G1_SCHEMA\",\n        \"description\": \"Kiểm tra tính hợp lệ của cấu trúc Payload đầu vào.\",\n        \"failure_semantic\": \"REJECT - Từ chối xử lý ngay lập tức.\"\n      },\n      {\n        \"id\": \"G2_IDENTITY\",\n        \"description\": \"Kiểm tra tính nhất quán của cấu trúc 6-bit ban đầu.\",\n        \"failure_semantic\": \"QUARANTINE - Đưa vào vùng cách ly để kiểm tra thủ công.\"\n      },\n      {\n        \"id\": \"G3_CORE_LOCK\",\n        \"description\": \"Kiểm tra sự xâm phạm hoặc thay đổi các trường dữ liệu đã khóa trong Core Identity.\",\n        \"failure_semantic\": \"HALT - Dừng toàn bộ tiến trình hệ thống.\"\n      },\n      {\n        \"id\": \"G4_RESEARCH_CALIBRATION\",\n        \"description\": \"Kiểm tra trạng thái hiệu chuẩn của các tham số thực nghiệm.\",\n        \"failure_semantic\": \"WARNING - Ghi cảnh báo vào bản ghi nhưng cho phép tiếp tục chạy.\"\n      },\n      {\n        \"id\": \"G5_CANONICAL_HASH\",\n        \"description\": \"Kiểm tra tính đầy đủ của bản ghi và tính toán SHA-256 hash cuối cùng.\",\n        \"failure_semantic\": \"BLOCK_PUBLICATION - Ngăn chặn việc xuất bản ghi ra ngoài hệ thống.\"\n      },\n      {\n        \"id\": \"G6_MATRIX_LOGIC_CONSISTENCY\",\n        \"description\": \"Kiểm tra tính nhất quán logic của ma trận tương tác SIE và Mpol.\",\n        \"failure_semantic\": \"QUARANTINE - Cách ly bản ghi nếu phát hiện mâu thuẫn kích thước hoặc giá trị ngoài miền.\"\n      },\n      {\n        \"id\": \"G7_FIREWALL_DIRECTION\",\n        \"description\": \"Kiểm tra và ngăn chặn mọi luồng dữ liệu ghi ngược từ Decoder hoặc UI vào Kernel.\",\n        \"failure_semantic\": \"HALT - Dừng hệ thống ngay lập tức vì vi phạm an toàn bảo mật.\"\n      }\n    ]\n  },\n  \"invariants\": [\n    {\n      \"name\": \"6-bit State Space\",\n      \"evidence\": \"Được định nghĩa nhất quán từ v2.5 đến v3.0.0. Trạng thái hào là nhị phân {0, 1}.\"\n    },\n    {\n      \"name\": \"Forward-Only Flow\",\n      \"evidence\": \"Được quy định rõ ràng trong BEC Unified Logic Ch.3 và v2.9 Engine. Không có phản hồi ngược.\"\n    },\n    {\n      \"name\": \"Semantic Firewall\",\n      \"evidence\": \"BEC Unified Logic Ch.9 và v2.9 Engine. Ngăn chặn rò rỉ ngữ nghĩa vào tính toán Core.\"\n    },\n    {\n      \"name\": \"Read-Only Decoder\",\n      \"evidence\": \"v2.8.7 BEC Unified Logic Ch.17. Decoder không được phép thay đổi trạng thái Kernel.\"\n    }\n  ],\n  \"calibration_registry\": {\n    \"parameters\": [\n      { \"name\": \"alpha\", \"default_value\": 0.15, \"domain\": \"R >= 0\" },\n      { \"name\": \"beta\", \"default_value\": 0.20, \"domain\": \"R >= 0\" },\n      { \"name\": \"epsilon\", \"default_value\": 1e-6, \"domain\": \"R > 0\" },\n      { \"name\": \"gamma\", \"default_value\": 0.08, \"domain\": \"R >= 0\" },\n      { \"name\": \"eta\", \"default_value\": 0.05, \"domain\": \"R >= 0\" },\n      { \"name\": \"lambda\", \"default_value\": 0.35, \"domain\": \"R >= 0\" },\n      { \"name\": \"theta_I\", \"default_value\": 0.70, \"domain\": \"[0, 1]\" },\n      { \"name\": \"theta_F\", \"default_value\": 0.50, \"domain\": \"[0, 1]\" },\n      { \"name\": \"theta_P\", \"default_value\": 0.60, \"domain\": \"[0, 1]\" },\n      { \"name\": \"theta_A\", \"default_value\": 0.50, \"domain\": \"R >= 0\" }\n    ],\n    \"profile_metadata\": {\n      \"required_fields\": [\"profile_id\", \"version\", \"hash\", \"effective_domain\", \"test_vectors\"]\n    },\n    \"acceptance_criteria\": \"Mọi profile hiệu chuẩn phải vượt qua 100% các test vector biên và được ký duyệt bởi Chief Systems Architect trước khi kích hoạt.\"\n  },\n  \"test_vectors\": [\n    {\n      \"id\": \"TV-001\",\n      \"description\": \"Kiểm thử biên với số lượng cạnh bằng 0 (N_edges = 0).\",\n      \"input\": { \"N_edges\": 0, \"F_field_raw\": [1.2, -0.5, 0.8] },\n      \"expected_behavior\": \"Hệ thống phải dừng tại S05, trả về mã lỗi NO_EDGES và không phát hành nhãn S07.\"\n    },\n    {\n      \"id\": \"TV-002\",\n      \"description\": \"Kiểm thử nguy cơ chia cho 0 khi A_max gần bằng 0.\",\n      \"input\": { \"A_max\": 1e-7, \"P_ij\": 0.5, \"F_norm\": 0.8 },\n      \"expected_behavior\": \"Hệ thống phải chuyển sang trạng thái QUARANTINE với mã lỗi DIVISION_BY_ZERO_RISK.\"\n    },\n    {\n      \"id\": \"TV-003\",\n      \"description\": \"Kiểm thử giới hạn vận tốc v_final ngoài miền cho phép.\",\n      \"input\": { \"v_final\": 15.0 },\n      \"expected_behavior\": \"Hệ thống phải từ chối xử lý và trả về lỗi DPKE_DOMAIN_ERROR.\"\n    },\n    {\n      \"id\": \"TV-004\",\n      \"description\": \"Kiểm thử vận tốc cục bộ v_i nhỏ hơn hoặc bằng 0.\",\n      \"input\": { \"v_raw\": -0.5 },\n      \"expected_behavior\": \"Hệ thống phải kẹp giá trị v_i về 0.1 theo quy tắc Clamp(v_raw, 0.1, 2.0) và ghi nhận cảnh báo.\"\n    },\n    {\n      \"id\": \"TV-005\",\n      \"description\": \"Kiểm thử độ bất định thời gian khi F_norm bằng 0.\",\n      \"input\": { \"F_norm\": 0.0, \"F_max\": 1.5, \"F_min\": 0.5 },\n      \"expected_behavior\": \"Hệ thống phải áp dụng epsilon để tránh chia cho 0 trong công thức tính sigma_time.\"\n    },\n    {\n      \"id\": \"TV-006\",\n      \"description\": \"Kiểm thử chu kỳ đồng pha 60 ticks.\",\n      \"input\": { \"runtime_tick\": 60 },\n      \"expected_behavior\": \"Hệ thống gắn cờ SYNC_RESONANCE nhưng không tự ý kích hoạt chuyển pha nếu thiếu transmutation profile.\"\n    },\n    {\n      \"id\": \"TV-007\",\n      \"description\": \"Kiểm thử ranh giới chuyển pha BEC.\",\n      \"input\": { \"I\": 0.75, \"F\": 0.55, \"P\": 0.65, \"A\": 0.60 },\n      \"expected_behavior\": \"Hệ thống phải chuyển trạng thái sang STABLE_EMERGENCE.\"\n    },\n    {\n      \"id\": \"TV-008\",\n      \"description\": \"Kiểm thử nhãn lịch sử tương thích (Ân -> AN).\",\n      \"input\": { \"legacy_label\": \"Ân\" },\n      \"expected_behavior\": \"Hệ thống phải tự động chuyển đổi sang mã serialize chuẩn hóa AN và ghi nhận vào Compatibility Registry.\"\n    },\n    {\n      \"id\": \"TV-009\",\n      \"description\": \"Kiểm thử ký tự Unicode tiếng Việt trong dữ liệu đầu vào.\",\n      \"input\": { \"name\": \"Duyên Dịch v3.1\" },\n      \"expected_behavior\": \"Hệ thống phải xử lý bình thường, không gây lỗi mã hóa hoặc sai lệch mã băm SHA-256.\"\n    },\n    {\n      \"id\": \"TV-010\",\n      \"description\": \"Kiểm thử tường lửa bảo vệ độ tin cậy (Confidence Firewall).\",\n      \"input\": { \"f_net_out\": 0.85 },\n      \"expected_behavior\": \"Hệ thống nghiêm cấm việc sử dụng trực tiếp f_net_out làm confidence_score trong Canonical JSON.\"\n    }\n  ],\n  \"conflicts_found\": [\n    {\n      \"conflict_id\": \"CF-001\",\n      \"description\": \"Trộn lẫn hai công thức tính delay giữa Rev.A và v2.9.1_new2.\",\n      \"impact\": \"Gây sai lệch nghiêm trọng trong việc tính toán thời gian thực tế T_real.\",\n      \"resolution\": \"Tách biệt hoàn toàn thành hai profile DD-DELAY-2.9.2-TF1 và DD-DELAY-REV-A. Yêu cầu khai báo rõ ràng trong context.\"\n    },\n    {\n      \"conflict_id\": \"CF-002\",\n      \"description\": \"Sử dụng profile S07 lịch sử làm canonical mặc định.\",\n      \"impact\": \"Vi phạm nguyên tắc hiệu chuẩn vì profile này chưa được đóng băng và thiếu test vector đầy đủ.\",\n      \"resolution\": \"Đặt trạng thái của S07-HIST-2.9.1-NEW2 là CALIBRATION_REQUIRED. Nếu không đạt gate, trả về MAPPING_UNRESOLVED.\"\n    },\n    {\n      \"conflict_id\": \"CF-003\",\n      \"description\": \"Sự chồng lấn (overlap) giữa các quy tắc của bộ nhãn S07.\",\n      \"impact\": \"Một trạng thái Vector Khí có thể thỏa mãn nhiều nhãn cùng lúc, gây mất tính xác định.\",\n      \"resolution\": \"Nếu phát hiện trùng lặp, resolver bắt buộc phải trả về lỗi MAPPING_AMBIGUOUS thay vì tự ý chọn nhãn.\"\n    },\n    {\n      \"conflict_id\": \"CF-004\",\n      \"description\": \"Đưa giả thuyết BEC H1 (Drain/Reserve) trực tiếp vào Core.\",\n      \"impact\": \"Làm ô nhiễm Kernel bằng các công thức thực nghiệm chưa được hiệu chuẩn.\",\n      \"resolution\": \"Chuyển toàn bộ giả thuyết H1 sang tầng RESEARCH và chỉ kích hoạt khi có profile nghiên cứu hợp lệ.\"\n    }\n  ],\n  \"required_changes\": [\n    {\n      \"change_id\": \"RC-001\",\n      \"description\": \"Tách biệt hoàn toàn hai công thức delay thành các profile độc lập và cấm trộn lẫn trong runtime.\"\n    },\n    {\n      \"change_id\": \"RC-002\",\n      \"description\": \"Cô lập bộ nhãn S07 lịch sử vào một Calibration Profile riêng biệt, không đặt làm mặc định của hệ thống.\"\n    },\n    {\n      \"change_id\": \"RC-003\",\n      \"description\": \"Triển khai đầy đủ hai cổng kiểm soát mới G6_MATRIX_LOGIC_CONSISTENCY và G7_FIREWALL_DIRECTION.\"\n    },\n    {\n      \"change_id\": \"RC-004\",\n      \"description\": \"Áp dụng các guard condition nghiêm ngặt cho N_edges=0, A_max≈0, v_final ngoài [20,50], v_i<=0 và F_norm=0.\"\n    },\n    {\n      \"change_id\": \"RC-005\",\n      \"description\": \"Tách biệt rõ ràng RIGID_ERROR (CORE) khỏi RIGID_FIT (CALIBRATION_REQUIRED) trong bộ giải L2-RGS.\"\n    }\n  ],\n  \"safe_to_core\": [\n    {\n      \"item\": \"Toán tử cấu trúc Lục Hào (M_k, P, C, H)\",\n      \"evidence\": \"Được định nghĩa nhất quán và toán học hóa hoàn toàn trong SL-COL Ch.4.\"\n    },\n    {\n      \"item\": \"Quy trình Core Lock tại S01\",\n      \"evidence\": \"Được quy định rõ ràng trong BEC Unified Logic Ch.1 và Ch.3 nhằm bảo vệ tính toàn vẹn của hệ thống.\"\n    },\n    {\n      \"item\": \"Ma trận tương tác phân cực Mpol (10x10) Canonical v2.9.0\",\n      \"evidence\": \"Đã được hòa giải và chốt toàn bộ các hàng/cột theo bản v2.8.3 và v2.9.0.\"\n    },\n    {\n      \"item\": \"Kiến trúc luồng dữ liệu một chiều (Forward-Only Pipeline)\",\n      \"evidence\": \"Được thực thi nghiêm ngặt xuyên suốt các phiên bản v2.8/v2.9 để ngăn chặn Circular Causality.\"\n    }\n  ],\n  \"must_not_core\": [\n    {\n      \"item\": \"Bộ nhãn S07 lịch sử (S07-HIST-2.9.1-NEW2)\",\n      \"reason\": \"Chưa được hiệu chuẩn đầy đủ, thiếu fingerprint độc lập và có nguy cơ chồng lấn quy tắc.\"\n    },\n    {\n      \"item\": \"Giả thuyết BEC H1 (Drain/Reserve)\",\n      \"reason\": \"Đây là một họ giả thuyết thực nghiệm (Hypothesis Family), chưa đạt cấp độ đóng băng của Core.\"\n    },\n    {\n      \"item\": \"Các tham số thực nghiệm (alpha, beta, gamma, lambda, eta)\",\n      \"reason\": \"Các tham số này phụ thuộc vào từng ngữ cảnh quan sát và bắt buộc phải đi qua Calibration Protocol.\"\n    },\n    {\n      \"item\": \"Hàm normalize() của bộ giải L2-RGS\",\n      \"reason\": \"Chưa được formalize trong tài liệu nguồn. Việc tự ý đưa vào Core sẽ vi phạm nguyên tắc bảo toàn nguồn gốc.\"\n    }\n  ],\n  \"open_questions\": [\n    {\n      \"question_id\": \"OQ-001\",\n      \"description\": \"Làm thế nào để formalize hàm normalize() cho L2-RGS một cách nhất quán mà không tự bịa công thức?\"\n    },\n    {\n      \"question_id\": \"OQ-002\",\n      \"description\": \"Cơ sở vật lý và thực nghiệm nào hỗ trợ cho chu kỳ đồng pha 60 ticks ngoài việc tính toán LCM(12,5,12)?\"\n    },\n    {\n      \"question_id\": \"OQ-003\",\n      \"description\": \"Làm thế nào để giải quyết triệt để sự chồng lấn giữa các quy tắc S07 mà không làm mất đi tính khách quan của dữ liệu?\"\n    }\n  ],\n  \"classification_summary\": {\n    \"CORE\": 12,\n    \"COMPATIBILITY\": 4,\n    \"RESEARCH\": 6,\n    \"CALIBRATION_REQUIRED\": 8\n  }\n}"
+}

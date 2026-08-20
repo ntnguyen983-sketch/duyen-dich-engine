@@ -1,196 +1,287 @@
-# Duyên Dịch v3.1
+# DUYÊN DỊCH v3.1
 
-**Trạng thái:** Canonical integration specification — `CORE + COMPATIBILITY + RESEARCH + PLACEHOLDER`  
-**Phiên bản:** `3.1.0`  
-**Chủ thể quyết định:** Manus, có phản biện kỹ thuật Gemini hai vòng  
-**Phạm vi:** Hợp nhất sáu phụ lục theo lớp kiến trúc, không gộp cơ học theo số hiệu version.
+**Đặc tả hợp nhất theo lớp — bản viết lại hoàn chỉnh**
+**Phiên bản:** `3.1.0`
+**Trạng thái:** `RELEASE_CANDIDATE — FULL SPECIFICATION`
+**Ngày:** 2026-08-20
+**Tác giả:** Manus AI
+**Repository:** `ntnguyen983-sketch/duyen-dich-engine`
 
-> **Tuyên bố canonical:** Duyên Dịch v3.1 là một đặc tả hợp nhất về kiến trúc, ranh giới logic, ký hiệu, ngôn ngữ ánh xạ, hợp đồng dữ liệu và quy trình vận hành. Những công thức hoặc tham số của v2.5, v2.8 và v2.9.2 chưa có tài liệu gốc trong các repository đã truy xuất không được coi là CORE; chúng được ghi nhận minh bạch ở `RESEARCH` hoặc `PLACEHOLDER` để chờ bổ sung bằng chứng.
+> **Tuyên bố phạm vi.** Duyên Dịch là hệ thống tính toán điều kiện, động lực trường và ánh xạ ngữ nghĩa có truy vết. Quẻ là snapshot của điều kiện tại `t0`, không phải tác nhân gây ra sự kiện. Runtime không phát biểu chắc chắn về thực tại, không tự gán tốt/xấu, không suy ý định chủ quan và không dùng diễn giải để sửa ngược trạng thái tính toán.
 
-## 1. Nguyên lý hợp nhất
+## 1. Mục tiêu và cách đọc đặc tả
 
-Duyên Dịch v3.1 không xem v2.5, v2.8 và v2.9.2 là các bản vá tuần tự. Chúng là các lớp có chức năng khác nhau: lý thuyết động lực, mô hình trường, runtime số học, mapping ngữ nghĩa, hợp đồng dữ liệu và giao diện vận hành. Vì vậy, phiên bản 3.1 khóa **quan hệ phụ thuộc và ranh giới trách nhiệm**, nhưng giữ `source_version` của từng nguồn trong provenance để có thể truy vết ngược.
+Sáu phụ lục được hợp nhất theo lớp thay vì gộp tuần tự theo số version. v2.5 cung cấp lineage lý thuyết `Ψ`, `F0`, `ΔF`, SDE/Bellman/MDP và 12 temporal phase operators; v2.8.6/v2.8.7 cung cấp SL-DIF, SIE, Mpol, DWL, Vector Khí, BEC, Frozen Core và gates; v2.9/v2.9.1/v2.9.3 cung cấp topology 12 node, runtime, DPKE, delay, 60 ticks và canonical serialization. [1] [2] [3] [4] [5] [6] [7]
 
-Tư duy Duyên Dịch xuyên suốt được giữ bằng sáu nguyên tắc. Hệ thống là phản ánh có điều kiện, không phải bộ tiên tri tất định; trạng thái luôn có thể vận động theo tick và điều kiện; Actor không được xem như một thực thể biệt lập; mọi kết luận phải quay về input, runtime, mapping, gate và provenance; thay đổi điều kiện phải có khả năng làm thay đổi kết quả; và mọi output phải phân biệt Data, Signal, Pattern, Inference, Action, uncertainty, confidence, warning và provenance.
+Bản này được viết lại hoàn chỉnh về **định nghĩa, behavior, công thức, pseudocode, guards, provenance, gates, JSON contract và test vectors**. `CALIBRATION_REQUIRED` không còn là chỗ trống: nó là một trạng thái có profile, điều kiện kích hoạt, kết quả khi chưa kích hoạt và test bắt buộc. Các nội dung chưa đủ căn cứ không bị biến thành CORE.
 
-## 2. Sáu lớp canonical
+Mỗi assertion định lượng phải gắn `source_ref`, `source_version`, `source_document_id`, `profile_id` và `content_fingerprint`. Khi hai nguồn xung đột, v3.1 tạo hai named profiles; một execution chỉ chọn một profile và ghi lựa chọn vào context.
 
-| Lớp | Tên canonical | Nguồn/nguồn gốc | Trạng thái v3.1 | Trách nhiệm |
-|---|---|---|---|---|
-| L1 | Theoretical Dynamics Reference | v2.5: Ψ, SDE, Bellman/MDP, phase operators | `PLACEHOLDER` khi thiếu phụ lục gốc | Chứa lý thuyết tham chiếu; không chạy trực tiếp trong Kernel mặc định |
-| L2 | Coupled Field Model | v2.8: SL-DIF/BEC, coupled field, SIE, delay, pipeline | `RESEARCH` khi thiếu phương trình và calibration | Định nghĩa mô hình trường; chỉ được kích hoạt khi đạt gate và có provenance |
-| L3 | Deterministic Runtime | v2.9.2: matrix/delay runtime; phần Snapshot/TickEngine hiện hữu | `RESEARCH` cho matrix/delay chưa xác minh; contract determinism là `CORE` | Tính toán số học xác định, phát raw measurements và runtime trace |
-| L4 | S07 Semantic Mapping | S07 canonical mapping | `CORE` về firewall và failure behavior; profile/rules là `RESEARCH` nếu chưa phê duyệt | Dịch số liệu runtime thành trạng thái S07 qua profile hợp lệ |
-| L5 | Canonical Data Contract | Canonical JSON/validation | `CORE` | Ràng buộc input/output, enum, provenance, uncertainty và gate result |
-| L6 | Operations/UI Contract | UI/Operations v3.0_dd | `CORE` về boundary | Chỉ gọi API theo L5; không chứa logic mô phỏng hoặc mapping |
+## 2. Thứ bậc nguồn và phân loại
 
-### 2.1. Đồ thị phụ thuộc
-
-```text
-L1 Reference → L2 Field Model → L3 Runtime → [COMPUTE–INTERPRETATION FIREWALL]
-                                           → L4 S07 Mapping → L5 Data Contract → L6 Operations/UI
-```
-
-Mũi tên chỉ hướng dữ liệu và dependency được phép. L6 không gọi ngược L1–L4. L5 không gọi trực tiếp mô phỏng. L4 không ghi đè `raw_measurements`. L3 không phát nhãn S07. L2 không tự nhận trạng thái semantic. L1 chỉ là nền lý thuyết tham chiếu cho đến khi có phụ lục và kiểm định tương ứng.
-
-## 3. Ký hiệu và từ vựng thống nhất
-
-### 3.1. Ký hiệu runtime
-
-| Ký hiệu | Ý nghĩa | Lớp | Quy tắc |
+| Cấp | Nguồn | Quyền sử dụng | Classification |
 |---|---|---|---|
-| `S_t` | Snapshot tại tick `t` | L3 | Trạng thái vật chất hóa đầy đủ, có thể replay |
-| `I_t` | Input event tại tick `t` | L3/L5 | Dữ liệu đầu vào đã validate |
-| `K` | Kernel transition operator | L3 | `S_(t+1) = K(S_t, I_t)`; deterministic khi cùng input/config |
-| `R` | Runtime trace | L3 | Chuỗi snapshot và gate, không mang semantic label |
-| `κ_t` | Vectơ Khí 5D raw | L3 | `κ_t = (κ.S, κ.D, κ.I, κ.F, κ.T)`; không phải trạng thái S07 |
-| `f_net_out` | Lực/đại lượng lực do model phát | L2/L3 | Không được dùng trực tiếp làm confidence |
-| `M` | `S07_MAPPING_PROFILE` | L4 | Phải có id, version, hash, domain, calibration và test vectors |
-| `σ_t` | Trạng thái S07 semantic | L4 | Chỉ nhận sáu mã canonical hoặc `MAPPING_UNRESOLVED` ở boundary |
-| `U` | Uncertainty | L3–L5 | Phân biệt measurement, model và semantic uncertainty |
-| `C` | Confidence | L5 | Chỉ là tổng hợp có provenance; không đồng nhất với lực |
-| `G_i` | Validation gate | L1–L6 | Mỗi gate có status và failure code |
+| Constitutional | v3.0.0, Frozen Core, Rev.A | ontology, firewall, direction, schema authority | `CORE` |
+| Theory | v2.5.3–v2.5.6 | Ψ, SDE/Bellman, 12 phase operators | `REFERENCE` |
+| Field | v2.8.6 Master, BEC Unified v2.8.7 | SIE, Mpol, DWL, Vector Khí, BEC, gates | `CORE` theo profile |
+| Runtime | v2.9, v2.9.1, v2.9.1_new2, Py v2.9.3 | six-line, 12-node, force, RGS, DPKE, delay, ticks | `RUNTIME_EVIDENCE` |
+| Decoder | v2.9.1_new2 và canonical v3.0.0 | S07 rules, enum, decoder contract | `CALIBRATION_REQUIRED` |
+| Interface | UI/Operations v3.0_dd | render, session, API boundary | `INTERFACE_ONLY` |
+| Historical | merged/full spec, legacy thresholds | migration và audit | `COMPATIBILITY` |
 
-Chữ `S` trong `κ.S` là một trục số của Vectơ Khí, không phải mã trạng thái S07. Văn bản phải viết `S07` khi nói về bộ trạng thái semantic và `κ.S` khi nói về thành phần Vectơ Khí để tránh nhập nhằng.
+## 3. Sáu lớp canonical
 
-### 3.2. Bộ trạng thái S07 canonical
+### L1 — Dynamic Theory Reference
 
-| Thứ tự | Tiếng Việt chuẩn | Mã serialize | Phân loại |
-|---:|---|---|---|
-| 1 | SÁT | `SAT` | `CORE` |
-| 2 | TÀ | `TA` | `CORE` |
-| 3 | NHIỄU | `NHIEU` | `CORE` |
-| 4 | HỶ | `HY` | `CORE` |
-| 5 | DƯỠNG | `DUONG` | `CORE` |
-| 6 | ẨN | `AN` | `CORE` |
+L1 giữ ontology, `Ψ`, `F0`, `ΔF`, potential surface, SDE/Bellman/MDP và 12 phase operators. L1 giải thích lineage và cách đặt câu hỏi động lực, nhưng không được gọi trực tiếp từ Core runtime. Một adapter L1 chỉ được kích hoạt khi có `theory_adapter_id`, miền biến, numerical guard, provenance và test vector.
 
-Chỉ sáu mã này được xuất hiện trong Kernel và canonical JSON. `DUONG` là mã serialize của **DƯỠNG**, không phải một trạng thái thứ bảy. Các nhãn lịch sử như `TỤ`, `HỢP`, `TÁN`, `LY`, `HIỆN` và `ÂN` chỉ được đọc bởi Compatibility Decoder với provenance đầy đủ; chúng không được tự động chuyển thành một mã S07 nếu chưa có profile tương đương được phê duyệt.
+### L2 — SL-DIF/BEC Field Mechanism
 
-## 4. Compute–Interpretation Firewall
-
-Firewall là ranh giới bắt buộc giữa L3 và L4. L3 chỉ phát `raw_measurements`, `field_state`, `runtime_trace`, `uncertainty` và `gate_results`. L3 không được phát `primary_label`, không được gọi decoder semantic và không được dùng văn bản diễn giải làm biến tính toán.
-
-L4 chỉ được nhận output số của L3 cùng `S07_MAPPING_PROFILE`. L4 phải kiểm tra profile trước khi đánh giá rule. Nếu profile thiếu, sai hash, ngoài domain, chưa calibration hoặc không có test vectors, L4 trả `MAPPING_UNRESOLVED`, giữ nguyên raw data và ghi lý do vào `mapping_provenance`. L4 không được sửa Snapshot, lực, Vectơ Khí hoặc runtime trace.
-
-Confidence được tính ở L5 từ các nguồn đã khai báo như gate status, mức hoàn chỉnh của provenance, measurement uncertainty và model uncertainty. `f_net_out` có thể được lưu như raw measurement nếu nguồn cho phép, nhưng luôn bị loại khỏi `confidence.inputs`; contract bắt buộc `f_net_out_excluded = true`.
-
-## 5. Hợp đồng từng lớp
-
-### L1 — Theoretical Dynamics Reference
-
-L1 có thể chứa định nghĩa Ψ, SDE, Bellman/MDP và 12 phase operators khi phụ lục v2.5 được cung cấp. Trong bản 3.1 hiện tại, các nội dung đó là `PLACEHOLDER` vì chưa có file gốc, phương trình, miền biến và test vector trong các repository đã truy xuất. L1 không được chạy mặc định và không được đẩy nhãn semantic xuống L2–L6.
-
-### L2 — Coupled Field Model
-
-L2 là nơi đặt SL-DIF/BEC, coupled field, SIE, delay và pipeline trường. Bản 3.1 khóa **vị trí và contract** của L2, không khóa công thức BEC hoặc hệ số SL-DIF chưa có nguồn. Mọi tham số như hệ số tương tác, critical exponent, decay, delay kernel và boundary constant phải ghi classification `RESEARCH` hoặc `PLACEHOLDER`, cùng calibration plan.
-
-Không được dùng công thức suy đoán như `I × F / (1 + epsilon)` để thay cho phương trình BEC gốc. BEC boundary chỉ được kiểm tra sau khi có định nghĩa nguồn; test boundary phải kiểm tra đúng các miền được tài liệu gốc quy định, trong đó tối thiểu phải chuẩn bị vector tại `R = 0.30` và `R = 0.10` theo governance, không được tự suy ra ý nghĩa vật lý từ việc clamp.
+L2 xây dựng observed nodes, edges, topology, Mpol/SIE, Override Cascade, DWL, persistence, accumulation, Vector Khí, BEC density, emergence và recurrence. L2 không đọc semantic label và không nhận Output B để thay đổi lực.
 
 ### L3 — Deterministic Runtime
 
-L3 thực hiện transition trên Snapshot và phát dữ liệu số. Phần Snapshot/TickEngine hiện hữu chứng minh được nguyên tắc stateless history, rollback, replay và determinism ở mức implementation test. Matrix/delay runtime v2.9.2 chưa có trong các repository nên status của toán tử tương ứng là `RESEARCH`.
+L3 thực hiện canonicalization, structural operators, 12-node graph, matrix lookup, force normalization, L2-RGS, DPKE, delay, tick state machine, replay và hash. L3 chỉ phát numeric state, runtime trace, uncertainty, profile IDs và gate results.
 
-Pseudocode canonical ở mức contract là:
+### L4 — Semantic Decoder
 
-```text
-validate(I_t)
-S_next = K(S_t, I_t, runtime_profile)
-assert tick(S_next) = tick(S_t) + 1
-emit raw_measurements, field_state, runtime_trace, uncertainty, gate_results
-assert no semantic_label in L3 output
-```
+L4 là read-only mapping từ state sang S07. Profile lịch sử có rule đầy đủ nhưng mặc định `CALIBRATION_REQUIRED`; thiếu fingerprint/domain/test vectors thì trả `MAPPING_UNRESOLVED`. Nhiều rule match thì trả `MAPPING_AMBIGUOUS`; không phá overlap bằng thứ tự ngầm.
 
-Nếu L2 chưa đạt gate hoặc thiếu phương trình, L3 không được giả vờ tính field model; phải phát `RUNTIME_UNVERIFIED` cùng provenance và không tạo semantic inference từ phần thiếu đó.
+### L5 — Data Contract and Governance
 
-### L4 — S07 Semantic Mapping
-
-L4 sử dụng một profile đã đăng ký. Profile tối thiểu có `profile_id`, `version`, `sha256`, `domain`, `ordered_rules_or_model`, `parameter_calibration_status`, `test_vectors` và `review_decision_id`. Profile v3.1 hiện tại là `S07_CANONICAL_V31_UNRESOLVED`, không có rules và luôn trả `MAPPING_UNRESOLVED` cho đến khi có profile được phê duyệt.
-
-Không được lấy trực tiếp các threshold trong `dd_engine1/semantic_thresholds.json` làm profile canonical, vì các threshold đó đang gắn nhãn lịch sử và chưa có provenance/calibration đủ điều kiện. Không dùng `eval()` trên chuỗi điều kiện; evaluator tương lai phải là declarative AST hoặc bộ toán tử whitelist, có giới hạn miền và test biên.
-
-### L5 — Canonical Data Contract
-
-L5 là điểm duy nhất chuẩn hóa JSON ra ngoài. Response tối thiểu gồm `contract_version`, `execution`, `raw_measurements`, `semantic_state`, `uncertainty`, `provenance` và `gate_results`. Schema chi tiết nằm tại `schemas/canonical_response.schema.json`.
-
-`semantic_state.primary_label` chỉ nhận `SAT`, `TA`, `NHIEU`, `HY`, `DUONG`, `AN` hoặc `MAPPING_UNRESOLVED`. Nhãn legacy, nhãn lạ, Unicode lỗi và mã không dấu sai không được pass Schema. Mọi output phải chứa `source_version`, `source_hashes`, `engine_commit`, record review, uncertainty và kết quả từng gate.
+L5 định nghĩa canonical JSON, enum, provenance, uncertainty, profile registry, compatibility decoder, errors, gates, hash và release manifest. L5 không tính lực, không chọn S07 và không sửa runtime state.
 
 ### L6 — Operations/UI
 
-L6 chỉ render và điều phối theo L5. UI không được chứa công thức, threshold, mapping rule, gọi trực tiếp L2/L3 hoặc thay đổi canonical state. Gemini ở L6 chỉ được diễn giải canonical response; prompt phải nói rõ Engine/Core output là nguồn sự thật về số liệu và Gemini không được sửa, tính lại hoặc phủ định raw output.
+L6 gọi API theo L5, hiển thị Output A/B, warning, gate status, uncertainty và provenance. L6 không có formula, threshold hoặc mapping rule; không write-back vào L3/L4.
 
-## 6. Validation gates
+## 4. Bất biến và firewall
 
-| Gate | Điểm nối | Pass khi | Failure code |
-|---|---|---|---|
-| `GATE-1-THEORY-FIELD` | L1 → L2 | Có nguồn phương trình, biến, miền giá trị, version và test vectors | `PLACEHOLDER_THEORY` |
-| `GATE-2-RUNTIME` | L2 → L3 | Matrix/delay deterministic, division safety đăng ký, BEC boundary có nguồn | `RUNTIME_UNVERIFIED` hoặc `RUNTIME_ERROR` |
-| `GATE-3-INTERPRETATION` | L3 → L4 | Profile hợp lệ, hash đúng, trong domain, calibration/test vectors được phê duyệt | `MAPPING_UNRESOLVED` |
-| `GATE-4-DATA` | L4 → L5 | JSON Schema, enum, provenance, uncertainty và type contract hợp lệ | `SCHEMA_INVALID` |
-| `GATE-5-OPERATIONS` | L5 → L6 | UI/API chỉ truyền contract, không rò logic Kernel | `UI_CONTRACT_VIOLATION` |
+### 4.1. Frozen Core
 
-Mỗi gate là một phần của output, không chỉ là log nội bộ. Khi gate fail, hệ thống không được làm im lặng lỗi hoặc thay bằng giá trị semantic đoán trước.
+Sau `S01`, hệ thống khóa `snapshot_id`, `root_bits`, `root_hexagram`, `moving_lines`, `initial_time`, `primary_actor`, `semantic_target` và `initial_context_hash`. `observe(state,evidence)` chỉ append evidence tại tick tiếp theo; không reset identity. Vi phạm là `CORE_IDENTITY_MISMATCH` và `HALT`.
 
-## 7. Classification và quyết định canonical
+### 4.2. Forward-only
 
-| Classification | Được phép | Không được phép |
+```text
+RAW → STRUCTURE → SNAPSHOT → FIELD → RUNTIME_STATE → DECODER → REPORT → ACTION
+```
+
+Cấm `Interpretation → Kernel`, `Decoder → Kernel`, `Outcome → Snapshot`, `UI → Runtime State` và `S12 → S00` trong cùng execution trace. [2] [5]
+
+### 4.3. Semantic firewall
+
+Trước `S10`, runtime chỉ dùng dữ liệu đã schema hóa: bits, topology, timestamp, profile, numeric evidence và context. Natural language được lưu như raw observation/provenance nhưng không được biến thành force, velocity, threshold, confidence hoặc S07.
+
+### 4.4. Confidence firewall
+
+`f_net_out` là raw measurement nếu profile cho phép; nó luôn bị loại khỏi `confidence.inputs`. `confidence_score` chỉ là tổng hợp có provenance từ gate status, measurement uncertainty, model uncertainty và completeness; contract bắt buộc `f_net_out_excluded=true`.
+
+## 5. Pipeline S00–S11
+
+| Stage | Tên | Input | Output | Quyền ghi | Gate |
+|---|---|---|---|---|---|
+| S00 | Raw Input | payload | raw record | tạo context | G1 |
+| S01 | Canonical Core | raw record | locked identity | khóa Core | G2, G3 |
+| S02 | Structural State | identity | `Q`, operators | derived structure | — |
+| S03 | Topology | `Q`, relation profiles | 12-node graph | derived graph | G6 |
+| S04 | Validation | graph, profiles | validated graph | gate metadata | G4, G6 |
+| S05 | DWL/Force | graph, matrices | weights, force, Vector Khí | numeric | force guards |
+| S06 | L2-RGS | coordinates | error, fit state | numeric | RGS guard |
+| S07 | DPKE/Spacetime | force, resistance | velocity, delay, time | numeric | DPKE guard |
+| S08 | Emergence | dynamic state | emergence state | numeric | threshold policy |
+| S09 | BEC Observation | history, state | density, recurrence, projection | append only | no write-back |
+| S10 | Knowledge Mapping | state, S07 profile | semantic result | read-only | G7 |
+| S11 | Reporting | Output A/B | canonical JSON, SHA-256 | publish only | G5 |
+
+Runtime API:
+
+```python
+initialize(raw_input):
+    validate(G1, raw_input)
+    identity = canonicalize_and_lock(raw_input)
+    return Context(identity=identity, tick=0, history=[])
+
+observe(context, evidence):
+    assert_hash(context.identity)
+    t_next = context.tick + 1
+    e = normalize_evidence(evidence, effective_tick=t_next)
+    derived = run_forward_pipeline(context.identity, e, t_next)
+    return Context(identity=context.identity,
+                   tick=t_next,
+                   history=context.history + [derived])
+```
+
+## 6. Structural model
+
+Với `Q=(b1,…,b6)`, `bk∈{0,1}`, `Q∈Z_2^6`. `root_code` và `transformed_code` là số 0–63 từ chuỗi bit canonical; moving lines là tập tăng dần trong `1..6`.
+
+```text
+M_k(Q) = flip bit k
+P(Q)   = reverse(Q)
+C(Q)   = (1-b1,…,1-b6)
+H(Q)   = (b2,b3,b4,b3,b4,b5)
+```
+
+Operators chỉ biến đổi cấu trúc; mỗi output lưu `operator_id`, input hash và output hash; không được sinh semantic label.
+
+Nếu có root và transformed state, `N1..N6` là root, `N7..N12` là transformed, `N(i+6)` là cặp tương ứng. Edges được tạo từ relation profile gồm `LUC_HOP`, `LUC_XUNG`, `TUONG_HINH`, `TAM_HOP`, `TUONG_HAI`, `TY_HOA`, `ROOT_TRANSFORM_PAIR` và `ADJACENT`. Mapping 6-line→12-node là `topology_profile_id`, không phải giả định không có nguồn.
+
+## 7. Matrices, relation và field
+
+### 7.1. Matrix registry
+
+`M_POL` 10×10, `M_SIE` 3×3 và `M_FLUX` 5×5 được lấy nguyên bản từ Py v2.9.3; dữ liệu và SHA-256 nằm trong `runtime_profiles_v31.json`. Runtime chỉ đọc matrices từ profile, không tái tạo numeric values.
+
+`M_POL` canonical:
+
+```text
+[ [ 1.0,  0.8,  1.5,  1.2, -2.0, -1.5, -1.0, -0.8,  0.5,  0.3],
+  [ 0.8,  0.5,  1.2,  1.0, -1.5, -1.2, -0.8, -0.6,  0.3,  0.2],
+  [ 0.3,  0.2,  1.0,  0.8,  1.5,  1.2, -2.0, -1.5, -1.0, -0.8],
+  [-1.0, -0.8,  0.8,  0.3,  1.2,  1.0, -1.5, -1.2, -0.8, -0.6],
+  [-0.8, -0.6,  0.5,  0.3,  1.0,  0.8,  1.5,  1.2, -2.0, -1.5],
+  [-2.0, -1.5,  0.3,  0.2,  0.8,  0.5,  1.2,  1.0, -1.5, -1.2],
+  [-2.0, -1.2, -1.0, -0.8,  0.5,  0.3,  1.0,  0.8,  1.5,  1.2],
+  [-1.0, -0.8, -0.8, -0.6,  0.3,  0.2,  0.8,  0.5,  1.2,  1.0],
+  [ 1.5,  1.2, -2.0, -1.5, -1.0, -0.8,  0.5,  0.3,  1.0,  0.8],
+  [ 1.2,  1.0, -1.5, -1.2, -0.8, -0.6,  0.3,  0.2,  0.8,  0.5] ]
+```
+
+### 7.2. Override Cascade
+
+`B_ij` lấy quan hệ đầu tiên trong thứ tự: `LUC_HOP/TAM_HOP +1.5`, `LUC_XUNG −2.0`, `TUONG_HINH −1.5`, `SINH_NHAP +1.2`, `SINH_XUAT −1.0`, `TY_HOA +1.0`, không khớp `0.0` kèm `NO_RELATION`. Edge lưu `relation_source`, `precedence_rank`, `profile_id`.
+
+### 7.3. DWL và force
+
+```text
+W_ij = B_ij * (1 + α*P_ij + β*A_ij/(A_max+ε)) * F_norm
+F_field_raw = Σ_ij(W_ij * D_ij)
+F_norm = ||F_field_raw||/(4*N_edges+ε)
+```
+
+Profile `DWL-0.1-REV-A-FNORM` dùng `α=0.15`, `β=0.20`, `ε=1e−6`, precision 6. Nếu `A_max≤ε`, `QUARANTINE` với `DIVISION_BY_ZERO_RISK`. Nếu `N_edges=0`, trả `NO_EDGES` tại S05. `P_ij=N_active/N_observed`; `N_observed=0` trả `PERSISTENCE_DENOMINATOR_MISSING`, không suy mặc định.
+
+Profile legacy `DWL-V293-CONTEXT-TIME` được giữ để replay tương thích, không chạy đồng thời với profile chính.
+
+### 7.4. Vector Khí
+
+`V_Khi=[S,D,I,F,T]`: `S=0/0.5/1` theo line zone 1–2/3–4/5–6; `D=ΔH*ψ∈[-1,1]`; `I=active_edges/max_edges`; `F=F_norm`; `T=tick mod 12`. Đây là measurement vector phi ngữ nghĩa. `D_ij`, `ψ`, `max_edges` và Element profile phải có trong context; thiếu profile trả `INPUT_PROFILE_MISSING`.
+
+## 8. L2-RGS
+
+Với `P,Q∈R^(n×d)`, center hai point sets, SVD Procrustes tìm `R`; nếu `det(R)<0`, sửa reflection. `t=mean(Q)−mean(P)R`. `E_rigid=mean(||P R+t−Q||²)` là CORE numeric output. `RIGID_FIT=clamp(1−E_rigid/E_threshold,0,1)` chỉ xuất khi `normalization_profile_id` hợp lệ; nếu không, trả `RIGID_NORMALIZATION_REQUIRED` và giữ raw error.
+
+## 9. DPKE và Spacetime
+
+```text
+require 20 ≤ v_final ≤ 50
+v_base = v_final/50
+v_raw  = v_base + α*f_net − β*w_resist
+v_i    = round(clamp(v_raw,0.1,2.0),6)
+```
+
+`v_final` ngoài miền trả `DPKE_DOMAIN_ERROR`; clamp phải ghi `CLAMP_APPLIED` và raw value.
+
+Execution chọn một delay profile:
+
+```text
+DD-DELAY-2.9.2-TF1:
+  delay_i = clamp(round((w_resist/v_final)*(1+μ_topology)
+                         + simulation_ticks/v_i),0,12)
+
+DD-DELAY-REV-A:
+  delay_i = clamp(round(sum_i((1+μ_topology,i)/v_i)),0,12)
+```
+
+Profile chính là `DD-DELAY-2.9.2-TF1`; profile Rev.A là compatibility. `T_real=t0+τ_trigger*BASE_SCALE(context)*(50/v_final)`. `σ_time=|F_max−F_min|/(F_norm+ε)*(1−v_final/100)`. Azimuth dùng `[start,end)` và 315° thuộc sector kế tiếp.
+
+## 10. BEC, emergence và observation
+
+Profile `BEC-OBS-1`:
+
+```text
+acc_t = acc_(t−1)*exp(−γ)+f_net_out(t)
+f_BEC = sigmoid(λ*acc_t)
+```
+
+`λ=0.35`, `γ=0.08`, reporting precision 4; đây là calibration profile. Emergence states:
+
+| State | Điều kiện |
+|---|---|
+| `NO_EMERGENCE` | `I<θI ∧ F<θF` |
+| `TRANSIENT_FORCE` | `I<θI ∧ F≥θF` |
+| `LATENT_ACCUMULATION` | `I≥θI ∧ F<θF ∧ P≥θP ∧ A≥θA` |
+| `STABLE_EMERGENCE` | `I≥θI ∧ F≥θF ∧ P≥θP ∧ A≥θA` |
+
+Nếu threshold profile chưa active, trả `THRESHOLD_PROFILE_REQUIRED`; không dùng `0.75` ngầm. H1 Drain/Reserve là Research:
+
+```text
+D(t)=D0*exp(γ*ΩForce)*(1+η*FD_drag)
+R(t+1)=max(0,R(t)−D(t)*Δt)
+CircuitBreaker=(R(t)≤Threshold_stop)
+```
+
+H1 không mutate Core. `ΦSystem=LCM(12,5,12)=60` được giữ ở classification `RESEARCH`; runtime chỉ có thể phát cờ `SYNC_RESONANCE` khi `tick mod 60=0`, không tự phase shift, transmutation hoặc action. Cờ này là derived schedule marker, không phải bằng chứng vật lý hay semantic conclusion.
+
+## 11. S07 mapping
+
+Profile `S07-HIST-2.9.1-NEW2` có sáu rule đầy đủ:
+
+| Code | Predicate |
+|---|---|
+| `DUONG` | `I≥0.70 ∧ D>0.2 ∧ F≥0.5` |
+| `HY` | `I≥0.60 ∧ D>0.5 ∧ S≥0.5` |
+| `AN` | `I*S<0.30 ∧ F≤0.4` |
+| `NHIEU` | `|D|≤0.2 ∧ F>0.6 ∧ 0.3≤I≤0.6` |
+| `TA` | `D<−0.3 ∧ F≥0.7 ∧ S<0.30` |
+| `SAT` | `I<0.30 ∧ D<−0.5 ∧ F≥0.6` |
+
+Resolver phải kiểm `profile_id`, SHA-256, domain, calibration status và test vectors. Không match trả `MAPPING_UNRESOLVED`; nhiều match trả `MAPPING_AMBIGUOUS`; chỉ một match mới trả code. Legacy `TỤ/HỢP/TÁN/LY/HIỆN/ÂN` chỉ compatibility.
+
+## 12. Gates, errors và JSON
+
+Gates gồm `G1_SCHEMA`, `G2_IDENTITY`, `G3_CORE_LOCK`, `G4_RESEARCH_CALIBRATION`, `G5_CANONICAL_HASH`, `G6_MATRIX_LOGIC_CONSISTENCY`, `G7_FIREWALL_DIRECTION`. Error codes gồm `SCHEMA_REJECTED`, `CORE_IDENTITY_MISMATCH`, `NO_EDGES`, `DIVISION_BY_ZERO_RISK`, `PERSISTENCE_DENOMINATOR_MISSING`, `DPKE_DOMAIN_ERROR`, `CLAMP_APPLIED`, `PROFILE_SELECTION_CONFLICT`, `PROFILE_HASH_MISMATCH`, `RIGID_NORMALIZATION_REQUIRED`, `THRESHOLD_PROFILE_REQUIRED`, `MAPPING_UNRESOLVED`, `MAPPING_AMBIGUOUS`, `SEMANTIC_LEAKAGE`, `PROVENANCE_INCOMPLETE` và `HASH_MISMATCH`.
+
+Canonical JSON bắt buộc có `spec_version`, `execution_id`, `snapshot_id`, `runtime_profile_id`, `topology_profile_id`, `mapping_profile_id`, `source_refs`, `content_fingerprint`, `generated_at`, `runtime_tick`, `identity`, `dynamic_state`, `vector_khi`, `uncertainty`, `gate_results`, `error_codes`, `output_a`, `output_b`. Sort keys alphabetically, serialize UTF-8, rồi SHA-256. `output_a` là structural/runtime; `output_b` là observation/projection/semantic read-only.
+
+## 13. Test vectors
+
+| ID | Case | Expected |
 |---|---|---|
-| `CORE` | Enum, type contract, firewall, gate, failure behavior, determinism contract và invariant có căn cứ | Công thức chưa có nguồn, threshold chưa calibration, mapping profile tự bịa |
-| `COMPATIBILITY` | Decoder dữ liệu cũ có source/version/hash và không sửa Kernel | Đưa nhãn legacy vào canonical JSON hoặc ép legacy thành mã mới |
-| `RESEARCH` | Mô hình SL-DIF/BEC, matrix/delay, mapping rules, calibration, decay với test plan | Chạy mặc định hoặc trình bày như chân lý đã khóa |
-| `PLACEHOLDER` | Điểm còn thiếu phụ lục, phương trình hoặc quyết định | Tự điền bằng suy đoán mà không gắn unresolved |
+| TV-01 | sáu mã canonical | Schema pass |
+| TV-02 | legacy label trong Kernel | reject |
+| TV-03 | Unicode `DƯỠNG`/`DUONG` | serialize/hash ổn định |
+| TV-04 | thiếu S07 profile | `MAPPING_UNRESOLVED` |
+| TV-05 | profile hash sai | `PROFILE_HASH_MISMATCH` |
+| TV-06 | profile ngoài domain | `MAPPING_UNRESOLVED` |
+| TV-07 | `N_edges=0` | `NO_EDGES`, dừng S05 |
+| TV-08 | `A_max≤ε` | quarantine `DIVISION_BY_ZERO_RISK` |
+| TV-09 | `v_final=15` | `DPKE_DOMAIN_ERROR` |
+| TV-10 | `v_raw<0` | clamp 0.1, ghi audit |
+| TV-11 | `F_norm=0` | sigma dùng ε, không NaN/Inf |
+| TV-12 | BEC biên | chỉ evaluate khi threshold profile active |
+| TV-13 | tick 60 | `SYNC_RESONANCE`, không action |
+| TV-14 | `f_net_out` | không làm confidence |
+| TV-15 | 60 tick replay | hash history giống nhau |
+| TV-16 | decoder write-back | `SEMANTIC_LEAKAGE`, HALT |
 
-Các quyết định đã được giữ ở CORE sau hai vòng review là: sáu mã S07; firewall L3–L4; `MAPPING_UNRESOLVED` khi thiếu profile; cấu trúc năm gate; và determinism `S_(t+1) = K(S_t, I_t)`. Các đề xuất profile threshold cụ thể, công thức BEC suy đoán, epsilon cố định `1e-7` như invariant và status CORE cho matrix/delay runtime đều bị loại hoặc hạ tầng.
+## 14. Classification cuối
 
-## 8. Test vectors tối thiểu
-
-| ID | Trường hợp | Kỳ vọng |
-|---|---|---|
-| `TV-01` | Sáu mã `SAT`, `TA`, `NHIEU`, `HY`, `DUONG`, `AN` | Pass enum |
-| `TV-02` | Nhãn legacy `TỤ` hoặc `ÂN` ở Kernel | Reject `SCHEMA_INVALID` |
-| `TV-03` | `DƯỠNG` ↔ `DUONG` | Pass Unicode/serialize pair |
-| `TV-04` | Vectơ Khí 5D không có profile | `MAPPING_UNRESOLVED` |
-| `TV-05` | Profile sai SHA-256 | `MAPPING_UNRESOLVED` |
-| `TV-06` | Profile ngoài domain | `MAPPING_UNRESOLVED` |
-| `TV-07` | `w_resist = 0` trong DPKE | epsilon đã đăng ký hoặc controlled error; không crash, không coi epsilon là vật lý |
-| `TV-08` | `w_resist` rất nhỏ | kiểm tra overflow/underflow và provenance |
-| `TV-09` | `f_net_out` tại hai biên | không thay đổi quy tắc confidence |
-| `TV-10` | BEC tại `R = 0.30` và `R = 0.10` | đánh giá theo phương trình gốc khi được cung cấp; hiện giữ unresolved |
-| `TV-11` | Replay 60 ticks | hai lần chạy cùng input/config cho cùng hash Snapshot |
-| `TV-12` | L3 output chứa `HY` hoặc `primary_label` | fail firewall |
-
-Các test `TV-04`, `TV-05`, `TV-06` phải kiểm tra behavior unresolved, không được dùng threshold đoán. Các test BEC chỉ được pass canonical sau khi phụ lục v2.8 bổ sung phương trình và miền biên; trước thời điểm đó, gate phải ghi `RUNTIME_UNVERIFIED` hoặc `PLACEHOLDER_THEORY` tùy điểm thiếu.
-
-## 9. Ma trận giữ, sửa, loại
-
-| Nguồn/điểm | Quyết định | Phân loại | Lý do |
-|---|---|---|---|
-| Snapshot/TickEngine deterministic/replay | Giữ contract | `CORE` ở mức invariant | Có implementation và baseline tests |
-| Vectơ Khí 5D `S,D,I,F,T` | Giữ như raw measurement implementation | `RESEARCH` cho ý nghĩa canonical | Có trong code, chưa đủ phụ lục model |
-| Threshold legacy trong `semantic_thresholds.json` | Không dùng làm canonical profile | `COMPATIBILITY/RESEARCH` | Nhãn và provenance không đạt canonical |
-| `eval()` trong semantic evaluator | Loại khỏi thiết kế v3.1 | Security/architecture fix | Không phù hợp evaluator khai báo an toàn |
-| SDE/Bellman/12 phase operators | Giữ tên lớp, chưa khóa công thức | `PLACEHOLDER` | Không tìm thấy phụ lục v2.5 |
-| SL-DIF/BEC | Giữ vị trí lớp, chưa khóa phương trình | `RESEARCH` | Không tìm thấy phụ lục v2.8 |
-| Matrix/delay v2.9.2 | Giữ boundary runtime, chưa khóa toán tử | `RESEARCH` | Không tìm thấy phụ lục v2.9.2 |
-| S07 profile threshold | Không tự tạo | `RESEARCH` | Thiếu calibration, hash, test vectors |
-| UI/Operations | Giữ boundary theo L5 | `CORE` | Không được chứa logic tính toán |
-
-## 10. Provenance và nhật ký review
-
-Bản hợp nhất phải đi kèm `source_inventory.md`, `gemini_round1.json`, `gemini_round2.json`, `decision_log.md`, commit hash của repository và hash của các profile/schema. Gemini được ghi nhận là reviewer đề xuất/phản biện, không phải người quyết định canonical. Mọi bổ sung về sau phải tạo decision record mới, không sửa xóa provenance cũ.
-
-## 11. Các điểm mở cần bổ sung
-
-Để nâng v3.1 từ trạng thái hợp đồng kiến trúc lên runtime đầy đủ, cần bổ sung sáu phụ lục nguyên văn hoặc artifact có hash. Cụ thể là công thức và miền biến của Ψ/SDE/Bellman/12 phase operators; phương trình SL-DIF và BEC; toán tử matrix/delay và boundary; profile ánh xạ 5D → S07; calibration dataset/parameters; và API/UI contract đang được Operations phê duyệt. Khi một điểm được bổ sung, phải chạy lại gate liên quan, test vectors và vòng review hai bước.
+`CORE`: Frozen Core, forward-only, firewall, structural operators, deterministic contract, six enum, gates, error behavior, canonical JSON và M_POL/M_SIE/M_FLUX khi được pin bằng profile hash. `RESEARCH`: chu kỳ đồng pha 60 ticks, H1 Drain/Reserve và các causal/phase interpretations. `COMPATIBILITY`: legacy labels, legacy delay và old output. `CALIBRATION_REQUIRED`: S07 activation, threshold profile, BEC lambda/gamma, RGS normalization. `RESEARCH`: H1 Drain/Reserve, phase-shift interpretation và causal claims. Không còn placeholder không có behavior.
 
 ## References
 
-[1]: https://github.com/ntnguyen983-sketch/dd_engine1 "Repository dd_engine1 — runtime, mapping và UI hiện hữu"
-[2]: https://github.com/ntnguyen983-sketch/dd_engine "Repository dd_engine — nguồn tối giản"
-[3]: https://github.com/ntnguyen983-sketch/duyen-dich-engine "Repository duyen-dich-engine — repository trung tâm cho đặc tả v3.1"
-[4]: ./canonical_vocabulary.json "Duyên Dịch v3.1 canonical vocabulary"
-[5]: ./s07_mapping_profile_v31.json "S07 mapping profile registry — unresolved"
-[6]: ./schemas/canonical_response.schema.json "Duyên Dịch v3.1 canonical response schema"
-[7]: ./compatibility/legacy_decoder.json "Legacy compatibility decoder"
-[8]: ./../../SOURCE_INVENTORY.md "Inventory nguồn và giới hạn bằng chứng"
-[9]: ./../../gemini_round1.json "Gemini review round 1"
-[10]: ./../../gemini_round2.json "Gemini review round 2"
+[1]: https://docs.google.com/document/d/1T_VN8r5g2uKzT7vgL3Us4Fp-w2V_NNYRMTfA6PTHKsQ/edit "v2.5.3 Engine Specification"
+[2]: https://docs.google.com/document/d/15TXjkKCeZx3hqLj1_vm_uzp6pc-jk95mFWUlbDSqacA/edit "v2.5.6 Master B"
+[3]: https://docs.google.com/document/d/1LgvaWOndVxnBpi7p-6OPARZqJZ47TgmhB-Ii-b1losc/edit "v2.8.6 Master"
+[4]: https://docs.google.com/document/d/112YN7bwAHHebKLa5Amd_fFtVkQ5079Z-AZQk3XzVHBM/edit "BEC Unified Logic v2.8.7"
+[5]: https://docs.google.com/document/d/1JuxJGg6MQLsn5Jfz3wT4x2BQArtqjsCOzN_by2hNWLo/edit "v2.9 Architecture Overview"
+[6]: https://docs.google.com/document/d/1nGmMp7Gg5PVc9QeYpmTr7HKIVpGXcBNqDQ52vrO3LX8/edit "Py v2.9.3 Full Runtime"
+[7]: https://docs.google.com/document/d/180a8LwwV1OH3H2claoO89xih8h55lUY9tdbNgp0vTY0/edit "v2.9.1 NEW2"
+[8]: https://docs.google.com/document/d/1OaIykatXspd9HlDds6WeBHtQC0P7DAv3DEc93wKi_Dg/edit "Duyên Dịch v3.0.0 Canonical"
+
+
+### 12.1. Confidence audit bắt buộc
+
+G7 phải quét toàn bộ cây `uncertainty.confidence.inputs`, `output_a`, `output_b` và các trường dẫn xuất. Output chỉ pass khi `f_net_out_excluded=true`, `f_net_out_found=false`, `audit_status=PASSED` và `scanned_paths` không rỗng. Phát hiện chuỗi `f_net_out` trong danh sách input confidence là `SEMANTIC_LEAKAGE` và chặn publication.
