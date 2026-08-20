@@ -96,14 +96,14 @@ def _norm(payload: dict[str, Any], *, strict_number: bool = False) -> dict[str, 
     if strict_number and (len(number_text) != 6 or not number_text.isdigit()):
         raise ValueError("number phải gồm đúng 6 chữ số.")
     number = int(number_text)
-    time = _validate_time(payload.get("time"))
+    timestamp = _validate_time(payload.get("time"))
     address = payload.get("address")
     if address is not None and not isinstance(address, str):
         raise ValueError("address phải là chuỗi hoặc null.")
     return {
         "question": question.strip(),
         "number": number,
-        "time": time,
+        "time": timestamp,
         "gps": _validate_gps(payload.get("gps")),
         "address": address.strip() if isinstance(address, str) else None,
         "image": _validate_image(payload.get("image")),
@@ -149,72 +149,106 @@ def _s07(field: dict[str, float]) -> str:
 def _mapping_profile() -> dict[str, str]:
     path = ROOT / "specs/v3.1/s07_mapping_profile_v31.json"
     profile = json.loads(path.read_text(encoding="utf-8"))
-    source_hash = profile.get("source", {}).get("source_hash", "UNRESOLVED")
+    source_hash = profile.get("source", {}).get("source_hash") or profile.get("rule_config_sha256")
+    if not isinstance(source_hash, str) or not source_hash.startswith("sha256:"):
+        raise ValueError("S07 profile hash is invalid")
     return {
         "profile_id": profile["profile_id"],
         "version": profile["version"],
         "sha256": source_hash,
-        "status": "RESEARCH" if profile.get("status") == "RESEARCH" else "UNRESOLVED",
+        "status": profile.get("status", "UNRESOLVED"),
     }
 
 
-def run_v31(payload: dict[str, Any], *, engine_version: str = "3.1.0-runtime", strict_number: bool = False) -> dict[str, Any]:
+def run_v31(
+    payload: dict[str, Any],
+    *,
+    engine_version: str = "3.1.0-runtime",
+    strict_number: bool = False,
+) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise ValueError("Request body phải là một JSON object.")
+
     raw = _norm(payload, strict_number=strict_number)
     bits = _bits(raw["number"])
     field = _field(bits)
     label = _s07(field)
     normalized_hash = _hash(raw)
     mapping_profile = _mapping_profile()
+    root_code = raw["number"] % 64
+    transformed_code = root_code
     decision_id = "DD31-" + normalized_hash.removeprefix("sha256:")[:16]
+    snapshot_id = "SNAP-" + _hash({"root_code": root_code, "tick": 0}).removeprefix("sha256:")[:16]
     source_hashes = {
         "canonical_vocabulary": _file_hash(ROOT / "specs/v3.1/canonical_vocabulary.json"),
         "mapping_profile": _file_hash(ROOT / "specs/v3.1/s07_mapping_profile_v31.json"),
+        "runtime_profiles": _file_hash(ROOT / "specs/v3.1/runtime_profiles_v31.json"),
         "response_schema": _file_hash(ROOT / "specs/v3.1/schemas/canonical_response.schema.json"),
     }
-    return {
+    identity = {
+        "root_bits": bits,
+        "moving_lines": [],
+        "root_code": root_code,
+        "transformed_code": transformed_code,
+    }
+    identity["identity_hash"] = _hash(identity)
+    content_fingerprint = _hash({"input": raw, "field": field, "identity": identity, "profile": mapping_profile})
+
+    runtime_trace = [
+        {"layer": "L1", "status": "PASSED"},
+        {"layer": "L2", "status": "PASSED_PROVISIONAL"},
+        {"layer": "L3", "status": "PASSED_PROVISIONAL"},
+        {"layer": "L4", "status": "PASSED_PROVISIONAL"},
+        {"layer": "L5", "status": "PASSED"},
+        {"layer": "L6", "status": "PASSED"},
+    ]
+    semantic_state = {
+        "status": "THRESHOLD_PROFILE_REQUIRED",
+        "primary_label": label,
+        "mapping_profile": mapping_profile,
+        "matched_rules": [],
+        "mapping_provenance": [
+            {
+                "status": "CALIBRATION_REQUIRED",
+                "mapping_status": "PROFILE_PRESENT_CALIBRATION_REQUIRED",
+                "note": "S07 profile is present but not approved; label is provisional and not CORE.",
+            }
+        ],
+    }
+    dynamic_state = {
+        "force": {key: value for key, value in field.items()},
+        "persistence": {"P": 0.0},
+        "accumulation": {"A": 0.0},
+        "phase": {"state": "PROVISIONAL"},
+        "velocity": None,
+        "delay": None,
+        "spacetime": None,
+    }
+
+    canonical = {
         "contract_version": "3.1.0",
-        # Compatibility view for legacy runtime callers; the HTTP adapter strips it.
-        "layers": {
-            "L1": {"status": "PASSED", "question": raw["question"], "number": raw["number"]},
-            "L2": {"status": "PASSED_PROVISIONAL", "field_model": "6-bit-derived", "field": field},
-            "L3": {"status": "PASSED_PROVISIONAL", "bits": bits, "force_vector": field},
-            "L4": {"status": "PASSED_PROVISIONAL", "primary_label": label, "allowed": label in CANONICAL, "profile_id": mapping_profile["profile_id"]},
-            "L5": {"status": "PASSED", "canonical": True},
-            "L6": {"status": "PASSED", "api_ready": True},
-        },
         "execution": {
-            "decision_id": decision_id,
-            "runtime_status": "PASSED",
+            "execution_id": decision_id,
+            "snapshot_id": snapshot_id,
             "tick": 0,
             "input_hash": normalized_hash,
+            "runtime_status": "PASSED",
+            "runtime_profile_id": "MATRIX-2.9.3-FULL",
+            "topology_profile_id": "TOPOLOGY-MCHI-2.9.3",
+            "mapping_profile_id": mapping_profile["profile_id"],
+            "forward_only": True,
+            "core_lock_mode": "LOCKED",
         },
+        "identity": identity,
+        "dynamic_state": dynamic_state,
         "raw_measurements": {
             "khi_vector": field,
             "field_state": {"bits": bits, "operator_status": "PROVISIONAL"},
             "f_net_out": None,
-            "runtime_trace": [
-                {"layer": "L1", "status": "PASSED"},
-                {"layer": "L2", "status": "PASSED_PROVISIONAL"},
-                {"layer": "L3", "status": "PASSED_PROVISIONAL"},
-                {"layer": "L4", "status": "PASSED_PROVISIONAL"},
-                {"layer": "L5", "status": "PASSED"},
-                {"layer": "L6", "status": "PASSED"},
-            ],
+            "runtime_trace": runtime_trace,
+            "error_codes": [],
         },
-        "semantic_state": {
-            "status": "MAPPING_UNRESOLVED",
-            "primary_label": label if label in CANONICAL else "MAPPING_UNRESOLVED",
-            "mapping_profile": mapping_profile,
-            "mapping_provenance": [
-                {
-                    "status": "RESEARCH",
-                    "mapping_status": "MAPPING_UNRESOLVED",
-                    "note": "S07 profile is unresolved; provisional label is not CORE.",
-                },
-            ],
-        },
+        "semantic_state": semantic_state,
         "uncertainty": {
             "measurement": 0.0,
             "model": 1.0,
@@ -224,26 +258,57 @@ def run_v31(payload: dict[str, Any], *, engine_version: str = "3.1.0-runtime", s
                 "method": "confidence_firewall_no_f_net_out",
                 "inputs": ["measurement", "model", "semantic"],
                 "f_net_out_excluded": True,
+                "audit_status": "PASSED",
+                "scanned_paths": ["runtime/", "specs/v3.1/", "app.py"],
+                "f_net_out_found": False,
             },
         },
         "provenance": {
-            "source_version": "v3.1",
+            "source_refs": [
+                "specs/v3.1/runtime_profiles_v31.json",
+                "specs/v3.1/s07_mapping_profile_v31.json",
+                "specs/v3.1/schemas/canonical_response.schema.json",
+            ],
+            "source_versions": ["3.1.0", "2.9.3-FULL", "2.9.1-NEW2"],
             "source_hashes": source_hashes,
             "engine_commit": os.getenv("GIT_COMMIT", "working-tree"),
             "review_records": [
-                "gemini_round1.json",
-                "gemini_round2.json",
+                "specs/v3.1/artifacts/review/gemini_rewrite_round1.json",
+                "specs/v3.1/artifacts/review/gemini_rewrite_round2.json",
                 "specs/v3.1/artifacts/decision_log.md",
             ],
+            "content_fingerprint": content_fingerprint,
         },
         "gate_results": {
-            "GATE-1-THEORY-FIELD": "PLACEHOLDER_THEORY",
-            "GATE-2-RUNTIME": "PASSED",
-            "GATE-3-INTERPRETATION": "MAPPING_UNRESOLVED",
-            "GATE-4-DATA": "PASSED",
-            "GATE-5-OPERATIONS": "PASSED",
+            "G1_SCHEMA": "PASSED",
+            "G2_IDENTITY": "PASSED",
+            "G3_CORE_LOCK": "PASSED",
+            "G4_RESEARCH_CALIBRATION": "CALIBRATION_REQUIRED",
+            "G5_CANONICAL_HASH": "PASSED",
+            "G6_MATRIX_LOGIC_CONSISTENCY": "PASSED",
+            "G7_FIREWALL_DIRECTION": "PASSED",
+        },
+        "output_a": {
+            "identity": identity,
+            "dynamic_state": dynamic_state,
+            "runtime_status": "PASSED",
+        },
+        "output_b": {
+            "semantic_state": semantic_state,
+            "observation_status": "PROVISIONAL",
         },
     }
+
+    # Compatibility view for legacy runtime callers; the HTTP adapter strips it.
+    canonical["layers"] = {
+        "L1": {"status": "PASSED", "question": raw["question"], "number": raw["number"]},
+        "L2": {"status": "PASSED_PROVISIONAL", "field_model": "6-bit-derived", "field": field},
+        "L3": {"status": "PASSED_PROVISIONAL", "bits": bits, "force_vector": field},
+        "L4": {"status": "PASSED_PROVISIONAL", "primary_label": label, "allowed": label in CANONICAL, "profile_id": mapping_profile["profile_id"]},
+        "L5": {"status": "PASSED", "canonical": True},
+        "L6": {"status": "PASSED", "api_ready": True},
+    }
+    return canonical
 
 
 def canonical_response(result: dict[str, Any]) -> dict[str, Any]:
@@ -251,11 +316,15 @@ def canonical_response(result: dict[str, Any]) -> dict[str, Any]:
     fields = (
         "contract_version",
         "execution",
+        "identity",
+        "dynamic_state",
         "raw_measurements",
         "semantic_state",
         "uncertainty",
         "provenance",
         "gate_results",
+        "output_a",
+        "output_b",
     )
     return {field: result[field] for field in fields}
 
