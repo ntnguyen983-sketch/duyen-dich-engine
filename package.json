@@ -2,6 +2,7 @@
   "name": "duyen-dich-v31-web-test",
   "private": true,
   "scripts": {
+    "test:adapter": "node --test ui_test/dd3a_per_line_adapter.test.js",
     "test:e2e": "playwright test"
   },
   "devDependencies": {

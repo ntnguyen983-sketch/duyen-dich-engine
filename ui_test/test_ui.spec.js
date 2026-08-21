@@ -71,8 +71,13 @@ test('hexagram data_1/data_2 payload runs through production UI', async ({ page 
   await expect(page.locator('#core-result')).toContainText('Root code');
   await expect(page.locator('#microscope')).toContainText('Hào 1');
   await expect(page.locator('#microscope')).toContainText('Hào 6');
-  await expect(page.locator('#microscope')).toContainText('MOVING');
+  await expect(page.locator('[data-line="3"] .badge')).toHaveText('MOVING');
   await expect(page.locator('[data-line="3"]')).toHaveAttribute('data-moving', 'true');
+  for (const line of [1, 2, 4, 5, 6]) {
+    await expect(page.locator(`[data-line="${line}"] .badge`)).toHaveText('NOT MOVING');
+    await expect(page.locator(`[data-line="${line}"]`)).toHaveAttribute('data-moving', 'false');
+  }
+  await expect(page.locator('#microscope')).toContainText('UNSUPPORTED');
   await expect(page.locator('#matrix')).toContainText('Source Evidence');
   await expect(page.locator('#cross-line')).toContainText('Cross relation');
   await expect(page.locator('#timing')).toContainText('Expected window');
