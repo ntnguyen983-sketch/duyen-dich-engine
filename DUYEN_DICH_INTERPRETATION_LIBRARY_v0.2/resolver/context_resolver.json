@@ -1,0 +1,35 @@
+{
+  "library_version": "0.2.0",
+  "contract_version": "3.1.0",
+  "status": "PROVISIONAL_APPLICATION_LAYER",
+  "classification": "PROVISIONAL",
+  "source_note": "Seven context slots are Operations/Interpretation Library constructs. They are not CORE enums in specs/v3.1/canonical_vocabulary.json or runtime/v31/engine.py. Natural language must not write back into force/S07 (DUYEN_DICH_v3.1.md §4.3).",
+  "banned": ["Thể", "Dụng", "the_dung", "THE_DUNG"],
+  "pipeline": ["STRUCTURAL_MEANING", "CONTEXT_MAPPING", "APPLIED_IMAGE"],
+  "contexts": [
+    {"context_id": "RELATIONSHIP", "structural_meaning": "Uses identity.moving_lines, per_line bits, msie nodes only.", "context_mapping": "Frame structural nodes as participants/relations when evidence names them.", "applied_image_policy": "EVIDENCE_REQUIRED", "default_applied_image": null, "forbidden_defaults": ["auto_assign_person_roles_to_N1_N6"]},
+    {"context_id": "WORK", "structural_meaning": "Uses identity and dynamic_state slots without inventing job titles.", "context_mapping": "Frame nodes as roles/tasks only when evidence supplies role labels.", "applied_image_policy": "EVIDENCE_REQUIRED", "default_applied_image": null, "forbidden_defaults": ["auto_assign_job_titles"]},
+    {"context_id": "MONEY", "structural_meaning": "Numeric field values remain measurements; not currency amounts.", "context_mapping": "Map to resource language only with evidence of asset/transaction type.", "applied_image_policy": "EVIDENCE_REQUIRED", "default_applied_image": null, "forbidden_defaults": ["treat_khi_vector_as_money_amount"]},
+    {"context_id": "MOVEMENT", "structural_meaning": "velocity/delay/spacetime are null in current engine; do not invent motion.", "context_mapping": "Movement images require temporal/spatial evidence.", "applied_image_policy": "EVIDENCE_REQUIRED", "default_applied_image": null, "forbidden_defaults": ["invent_travel_from_null_velocity"]},
+    {"context_id": "DECISION", "structural_meaning": "moving_lines mark structural change candidates; not the decision itself.", "context_mapping": "Decision language requires an explicit decision question + options in evidence.", "applied_image_policy": "EVIDENCE_REQUIRED", "default_applied_image": null, "forbidden_defaults": ["equate_moving_line_with_chosen_option"]},
+    {"context_id": "INTENT", "structural_meaning": "question text is input observation; not kernel force.", "context_mapping": "Intent statements stay in provenance/observation, never alter identity.", "applied_image_policy": "EVIDENCE_REQUIRED", "default_applied_image": null, "forbidden_defaults": ["infer_hidden_motive_from_bits"]},
+    {"context_id": "FORECAST", "structural_meaning": "Engine is single-tick; no prediction head in CORE.", "context_mapping": "Forecast language is Operations-only and must carry uncertainty + CALIBRATION_REQUIRED when S07/profile unapproved.", "applied_image_policy": "EVIDENCE_REQUIRED", "default_applied_image": null, "forbidden_defaults": ["emit_certain_future_event", "treat_primary_label_as_prediction"]}
+  ],
+  "resolver_algorithm": {
+    "steps": [
+      "Load canonical_response (contract_version 3.1.0).",
+      "Extract CORE FACT: identity.*, moving_lines, per_line if present.",
+      "Select context_id from operations request (not from CORE).",
+      "Run evidence_gates.json; if fail → stop with gate code.",
+      "Produce structural_meaning block only from confirmed fields.",
+      "Produce applied_image only if evidence_refs non-empty and gates pass; else UNSUPPORTED."
+    ],
+    "write_back_to_core": false,
+    "forward_only": true
+  },
+  "core_enum_check": {
+    "status": "PROVISIONAL",
+    "in_canonical_vocabulary": false,
+    "evidence": "specs/v3.1/canonical_vocabulary.json has s07_states and non_semantic_states only; no RELATIONSHIP/WORK/MONEY/MOVEMENT/DECISION/INTENT/FORECAST"
+  }
+}
