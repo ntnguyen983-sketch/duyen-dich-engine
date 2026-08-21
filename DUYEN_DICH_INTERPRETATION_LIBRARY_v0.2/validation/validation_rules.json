@@ -1,0 +1,20 @@
+{
+  "library_version": "0.2.0",
+  "contract_version": "3.1.0",
+  "rules": [
+    {"id": "VR-JSON", "check": "all library JSON files parse"},
+    {"id": "VR-64", "check": "structural_dataset.hexagrams length == 64"},
+    {"id": "VR-384", "check": "structural_dataset.line_records length == 384"},
+    {"id": "VR-LINES", "check": "each hexagram_id has line_index 1..6 exactly once"},
+    {"id": "VR-MSIE", "check": "msie_node_root == N{line_index} and pair == N{line_index+6}"},
+    {"id": "VR-ID-UNIQUE", "check": "record_id unique across line_records"},
+    {"id": "VR-NO-PLACEHOLDER", "check": "no string values equal to TODO, placeholder, etc, similar, remaining records"},
+    {"id": "VR-NO-THE-DUNG", "check": "no banned body-function dualism tokens in library interpretation content (meta banned lists allowed)"},
+    {"id": "VR-NO-FABRICATED-NAMES", "check": "hexagram_name is null; name_status MISSING_SOURCE"},
+    {"id": "VR-CONTEXTS", "check": "context_resolver has exactly 7 context_id values"},
+    {"id": "VR-GATES", "check": "evidence_gates.gates non-empty and includes EG-NO-FABRICATE, EG-NO-THE-DUNG"},
+    {"id": "VR-GOLDEN", "check": "golden_cases.cases non-empty; each has case_id, INPUT, EXPECTED_INTERPRETATION, VALIDATION_RULE"},
+    {"id": "VR-TRACE", "check": "line_records include structural_trace.source paths"},
+    {"id": "VR-S07-CODES", "check": "semantic_rules.s07_codes match canonical vocabulary codes"}
+  ]
+}

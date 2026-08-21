@@ -1,0 +1,62 @@
+{
+  "library_version": "0.2.0",
+  "contract_version": "3.1.0",
+  "status": "PROVISIONAL_SAFE_TEMPLATES",
+  "classification": "DERIVED_FROM_SOURCE",
+  "source_refs": [
+    "specs/v3.1/DUYEN_DICH_v3.1.md scope declaration (no certainty claims, no good/bad assignment)",
+    "runtime/v31/engine.py interpretation empties and semantic_state status strings",
+    "ui_test/dd3a_per_line_adapter.js UNSUPPORTED markers"
+  ],
+  "banned_phrases": [
+    "Thể",
+    "Dụng",
+    "chắc chắn sẽ",
+    "định mệnh",
+    "quẻ bảo rằng bạn phải",
+    "ground truth đã xác nhận",
+    "f_net_out cho thấy"
+  ],
+  "patterns": {
+    "structural_report": {
+      "template": "Identity: root_code={root_code}, transformed_code={transformed_code}, moving_lines={moving_lines}. Line {line_index} bit={bit}, msie={msie_node}, zone={line_zone}.",
+      "requires": ["root_code", "line_index", "bit"],
+      "classification": "DERIVED_FROM_SOURCE"
+    },
+    "provisional_s07": {
+      "template": "Semantic label {code} is provisional (status={status}, profile={profile_id}). Calibration required; not ground truth.",
+      "requires": ["code", "status"],
+      "classification": "DERIVED_FROM_SOURCE"
+    },
+    "unsupported_field": {
+      "template": "Field {field_name} is UNSUPPORTED or null in canonical output; no applied image emitted.",
+      "requires": ["field_name"],
+      "classification": "DERIVED_FROM_SOURCE"
+    },
+    "context_without_evidence": {
+      "template": "Context {context_id} selected, but evidence_refs empty. Structural meaning only; applied image withheld.",
+      "requires": ["context_id"],
+      "classification": "PROVISIONAL"
+    },
+    "quantitative_block": {
+      "template": "khi_vector S={S} D={D} I={I} F={F} T={T} (operator_status={operator_status}). force mirrors field in current engine. velocity={velocity} delay={delay} spacetime={spacetime}.",
+      "requires": ["S", "D", "I", "F", "T"],
+      "classification": "DERIVED_FROM_SOURCE"
+    },
+    "qualitative_block": {
+      "template": "Qualitative narration is limited to structural facts and declared statuses. No outcome prediction is authorized by CORE.",
+      "requires": [],
+      "classification": "DERIVED_FROM_SOURCE"
+    },
+    "safety_refusal": {
+      "template": "Interpretation halted: {gate_id} ({reason}).",
+      "requires": ["gate_id", "reason"],
+      "classification": "DERIVED_FROM_SOURCE"
+    }
+  },
+  "output_channels": {
+    "quantitative": ["identity", "khi_vector", "moving_lines", "gate_results", "uncertainty"],
+    "qualitative": ["language_patterns templates only"],
+    "contextual_image": ["requires evidence_refs + passed EG-EVIDENCE-FOR-IMAGE"]
+  }
+}
