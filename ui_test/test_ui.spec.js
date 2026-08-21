@@ -38,10 +38,12 @@ test('full v3.1 browser flow renders canonical output', async ({ page }) => {
   await fillValidForm(page);
   await page.locator('#run').click();
   await expect(page.locator('#status')).toContainText('PASS', { timeout: 15000 });
-  await expect(page.locator('#run-caption')).toContainText('UI chỉ đọc JSON response');
+  await expect(page.locator('#run-caption')).toContainText('Canonical response được giữ nguyên; vùng INFERRED có cảnh báo riêng.');
   await expect(page.locator('#run-caption')).not.toContainText('canonical response đã được phân lớp để luận giải');
   await expect(page.locator('#out')).toContainText('3.1.0');
   await expect(page.locator('#out')).toContainText('f_net_out_excluded');
+  await expect(page.locator('#out')).not.toContainText('INFERRED');
+  await expect(page.locator('#out')).not.toContainText('Đây chỉ là suy diễn');
   await expect(page.locator('#layers')).toContainText('L1');
   await expect(page.locator('#layers')).toContainText('L6');
   await expect(page.locator('#checks')).toContainText('canonical vocabulary');
@@ -63,6 +65,9 @@ test('full v3.1 browser flow renders canonical output', async ({ page }) => {
   await expect(page.locator('#ground-truth')).toContainText('null');
   await expect(page.locator('#comparison')).toContainText('comparison');
   await expect(page.locator('#summary')).toContainText('Interpretation coverage');
+  await expect(page.locator('#inferred')).toContainText('INFERRED');
+  await expect(page.locator('#inferred')).toContainText('Đây chỉ là suy diễn, không phải dữ liệu API trả về.');
+  await expect(page.locator('#inferred')).toContainText('API không đánh dấu hào động');
 });
 
 test('hexagram data_1/data_2 payload runs through production UI', async ({ page }) => {
@@ -71,7 +76,7 @@ test('hexagram data_1/data_2 payload runs through production UI', async ({ page 
   await page.locator('#hexagram-payload').fill(hexagramPayload);
   await page.locator('#run').click();
   await expect(page.locator('#status')).toContainText('PASS', { timeout: 15000 });
-  await expect(page.locator('#run-caption')).toContainText('UI chỉ đọc JSON response');
+  await expect(page.locator('#run-caption')).toContainText('Canonical response được giữ nguyên; vùng INFERRED có cảnh báo riêng.');
   await expect(page.locator('#run-caption')).not.toContainText('canonical response đã được phân lớp để luận giải');
   await expect(page.locator('#out')).toContainText('3.1.0');
   await expect(page.locator('#out')).toContainText('CALIBRATION_REQUIRED');
@@ -97,6 +102,11 @@ test('hexagram data_1/data_2 payload runs through production UI', async ({ page 
   await expect(page.locator('#timing')).toContainText('interpretation.expected_time_windows');
   await expect(page.locator('#timing')).toContainText('[]');
   await expect(page.locator('#summary')).toContainText('CALIBRATION_REQUIRED');
+  await expect(page.locator('#inferred')).toContainText('Phong Lôi Ích');
+  await expect(page.locator('#inferred')).toContainText('Phong Hỏa Gia Nhân');
+  await expect(page.locator('#inferred')).toContainText('H3');
+  await expect(page.locator('#inferred')).toContainText('raw_measurements.khi_vector');
+  await expect(page.locator('#inferred')).toContainText('Đây chỉ là suy diễn, không phải dữ liệu API trả về.');
 });
 
 test('mobile interpretation layout has no horizontal overflow or console errors', async ({ page }) => {

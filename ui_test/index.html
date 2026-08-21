@@ -50,6 +50,8 @@
     .zone-provisional { border-top: 5px solid var(--amber); }
     .zone-truth { border-top: 5px solid var(--green); }
     .zone-summary { border-top: 5px solid var(--navy); }
+    .zone-inferred { border-top: 5px solid #b04a7c; }
+    .kicker-inferred { color: #a13e70; }
     .kicker-core { color: var(--blue); }
     .kicker-micro { color: var(--violet); }
     .kicker-provisional { color: var(--amber); }
@@ -91,6 +93,18 @@
     .badge-truth { color: var(--green); background: var(--green-soft); }
     .badge-unsupported { color: #6b7280; background: #eef1f4; }
     .badge-pass { color: var(--green); background: var(--green-soft); }
+    .badge-inferred { color: #8e2d5e; background: #fdebf4; }
+    .inferred-warning { color: #7a244f; background: #fff0f7; border: 1px solid #f0b9d2; }
+    .inferred-card { min-width: 0; padding: 12px; border: 1px solid #f0c6da; border-radius: 13px; background: linear-gradient(180deg, #fffafe, #fff5fa); }
+    .inferred-card h3 { color: #8e2d5e; }
+    .inferred-source { margin-top: 8px; color: #7a6070; font-size: .78rem; }
+    .infer-bars { display: grid; gap: 9px; margin-top: 9px; }
+    .infer-row { display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; align-items: center; gap: 8px; font-size: .82rem; }
+    .infer-label, .infer-value { font-weight: 800; }
+    .infer-value { text-align: right; }
+    .infer-track { height: 10px; overflow: hidden; border-radius: 999px; background: #f3dce8; }
+    .infer-fill { height: 100%; border-radius: inherit; background: #b04a7c; }
+    .infer-fill.positive { background: #2f956f; }
     .result-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 12px; }
     .line-list { display: grid; gap: 10px; }
     .line-card { padding: 14px; border: 1px solid #dfd8ff; border-radius: 14px; background: linear-gradient(180deg, #fcfbff, #f8f6ff); }
@@ -152,8 +166,8 @@
   <header class="hero">
     <div class="eyebrow">Duyên Dịch v3.1 · API response contract</div>
     <h1>Kiểm tra response có truy vết</h1>
-    <p>INPUT → CORE RESPONSE → RUNTIME TRACE → INTERPRETATION FIELDS → SEMANTIC STATE → RAW JSON</p>
-    <div class="hero-meta"><span class="pill">CORE/API không sửa</span><span class="pill">Canonical-only</span><span class="pill">Không dữ liệu giả</span><span class="pill">Production contract</span></div>
+    <p>INPUT → CORE RESPONSE → RUNTIME TRACE → CANONICAL FIELDS → INFERRED VIEW → RAW JSON</p>
+    <div class="hero-meta"><span class="pill">CORE/API không sửa</span><span class="pill">Canonical + Inferred có cảnh báo</span><span class="pill">Không dữ liệu giả</span><span class="pill">Production contract</span></div>
   </header>
 
   <section id="input-section">
@@ -185,7 +199,7 @@
     "quy_tac_luan": "QT LỰC 1"
   }
 }</textarea>
-        <p class="muted">Request được gửi nguyên dạng tới <code>POST /api/v31</code>. Mọi vùng kết quả bên dưới chỉ đọc JSON response thực tế; không tích hợp thêm thư viện diễn giải và không tạo dữ liệu thiếu.</p>
+        <p class="muted">Request được gửi nguyên dạng tới <code>POST /api/v31</code>. Các vùng API OUTPUT chỉ đọc JSON response; vùng INFERRED bên dưới là lớp suy diễn tách biệt và luôn có cảnh báo.</p>
       </div>
       <div id="flat-input">
         <label for="question">Câu hỏi *</label><textarea id="question" required>tình cảm</textarea>
@@ -228,13 +242,13 @@
   </section>
 
   <section id="timing" class="zone-provisional">
-    <div class="section-head"><div><div class="section-kicker kicker-provisional">INTERPRETATION.EXPECTED_TIME_WINDOWS</div><h2>Expected time windows</h2><p>Hiển thị đúng mảng API trả về; mảng rỗng không được chuyển thành timeline hoặc dự báo.</p></div><span class="badge badge-provisional">EXACT ARRAY</span></div>
+    <div class="section-head"><div><div class="section-kicker kicker-provisional">INTERPRETATION.EXPECTED_TIME_WINDOWS</div><h2>Expected time windows</h2><p>Hiển thị đúng mảng API trả về; mảng rỗng được giữ nguyên trong vùng canonical, không tự điền dữ liệu.</p></div><span class="badge badge-provisional">EXACT ARRAY</span></div>
     <div id="timeline" class="timeline"></div>
     <div id="timing-note" class="warning" style="margin-top:14px">Chưa có response.</div>
   </section>
 
   <section id="ground-truth" class="zone-truth">
-    <div class="section-head"><div><div class="section-kicker kicker-truth">INTERPRETATION.GROUND_TRUTH</div><h2>Ground truth</h2><p>Hiển thị nguyên trạng object hoặc <code>null</code>; UI không nhập, suy đoán hay kết nối observables.</p></div><span class="badge badge-truth">EXACT VALUE</span></div>
+    <div class="section-head"><div><div class="section-kicker kicker-truth">INTERPRETATION.GROUND_TRUTH</div><h2>Ground truth</h2><p>Hiển thị nguyên trạng object hoặc <code>null</code>. Suy diễn, nếu có, chỉ nằm ở vùng INFERRED riêng.</p></div><span class="badge badge-truth">EXACT VALUE</span></div>
     <div id="truth-content" class="grid"></div>
   </section>
 
@@ -246,6 +260,12 @@
   <section id="summary" class="zone-summary">
     <div class="section-head"><div><div class="section-kicker">RESPONSE COVERAGE</div><h2>Phạm vi dữ liệu response</h2><p>Bảng này chỉ mô tả các field API đã trả về và trạng thái rỗng/null của chúng.</p></div><span class="badge badge-core">TRACEABLE</span></div>
     <div id="summary-content" class="grid"></div>
+  </section>
+
+  <section id="inferred" class="zone-inferred">
+    <div class="section-head"><div><div class="section-kicker kicker-inferred">INFERRED VIEW</div><h2>Lớp suy diễn có kiểm soát</h2><p>Vùng này không phải API output. Nội dung được tính riêng từ source input và các JSON path canonical, không ghi ngược vào raw response.</p></div><span class="badge badge-inferred">INFERRED</span></div>
+    <div class="warning inferred-warning"><strong>Đây chỉ là suy diễn, không phải dữ liệu API trả về.</strong> Mọi nhận định dưới đây cần được kiểm chứng độc lập và không phải kết luận CORE.</div>
+    <div id="inferred-content" class="grid" style="margin-top:12px"><div class="note">Chưa có response.</div></div>
   </section>
 
   <section id="canonical-debug">
@@ -279,9 +299,11 @@ function renderTiming(result={}){const interp=result.interpretation||{},present=
 function renderTruth(result={}){const interp=result.interpretation||{},present=Object.prototype.hasOwnProperty.call(interp,'ground_truth'),truth=interp.ground_truth,value=!present?'field absent':truth===null?'null':display(truth);$('truth-content').innerHTML=[field('JSON path','interpretation.ground_truth'),field('Value',escapeHtml(value),true),field('Field present',escapeHtml(display(present)),true)].join('')}
 function renderComparison(){$('comparison-content').innerHTML=`<div class="note"><strong>comparison</strong> không có trong response contract hiện tại. UI không tạo dự báo, trạng thái chờ quan sát hoặc kết quả đối chiếu thay thế.</div>`}
 function renderSummary(result){const semantic=result.semantic_state||{},mapping=semantic.mapping_profile||{},confidence=result.uncertainty?.confidence||{},interp=result.interpretation||{};const coverage=(key)=>{if(!Object.prototype.hasOwnProperty.call(interp,key))return 'absent';const value=interp[key];return Array.isArray(value)?`${value.length} record(s)`:display(value)};const truth=Object.prototype.hasOwnProperty.call(interp,'ground_truth')?(interp.ground_truth===null?'null':display(interp.ground_truth)):'absent';$('summary-content').innerHTML=[card('Contract version',escapeHtml(display(result.contract_version)),'<span class="badge badge-core">API</span>'),card('Runtime status',escapeHtml(display(result.execution?.runtime_status)),'<span class="badge badge-pass">API</span>'),card('Semantic state',escapeHtml(`${display(semantic.primary_label)} · ${display(semantic.status)}`),`<span class="badge badge-provisional">${escapeHtml(display(mapping.status))}</span>`),card('Interpretation coverage',escapeHtml(`per_line=${coverage('per_line')}; source_interaction=${coverage('source_interaction')}; cross_line=${coverage('cross_line')}; expected_time_windows=${coverage('expected_time_windows')}; ground_truth=${truth}`)),`<div class="safe-note" style="grid-column:1/-1">Confidence firewall: ${escapeHtml(display(confidence.method))}; f_net_out_excluded = ${escapeHtml(display(confidence.f_net_out_excluded))}; f_net_out_found = ${escapeHtml(display(confidence.f_net_out_found))}. UI chỉ hiển thị giá trị API trả về.</div>`].join('')}
-	function renderInterpretation(result){renderCore(result);renderMicroscope(result);renderMatrix(result);renderCross(result);renderTiming(result);renderTruth(result);renderComparison();renderSummary(result);$('out').textContent=JSON.stringify(result,null,2)}
-$('form').addEventListener('submit',async(event)=>{event.preventDefault();$('run').disabled=true;$('status').textContent='Đang chạy…';$('status').className='status';$('status-badge').textContent='RUNNING';$('status-badge').className='badge badge-core';$('run-caption').textContent='Đang gọi POST /api/v31 và chờ JSON response.';$('checks').replaceChildren();const validation=validateInput();validation.checks.forEach(([name,ok,detail])=>addCheck(name,ok,detail));if(!validation.ok){$('status').textContent='FAIL — input không hợp lệ';$('status').className='status fail';$('status-badge').textContent='INPUT ERROR';$('status-badge').className='badge badge-unsupported';$('run').disabled=false;return}try{const first=await callApi(validation.payload);const second=await callApi(validation.payload);const trace=Object.fromEntries((first.raw_measurements?.runtime_trace||[]).map(x=>[x.layer,x.status]));addCheck('API reachable',true);addCheck('L1',trace.L1==='PASSED');addCheck('L2 PASS/PROVISIONAL',String(trace.L2||'').startsWith('PASSED'));addCheck('L3 PASS/PROVISIONAL',String(trace.L3||'').startsWith('PASSED'));addCheck('L4 canonical vocabulary',CANONICAL.includes(first.semantic_state?.primary_label));addCheck('L5 canonical=true',first.execution?.runtime_status==='PASSED'&&first.gate_results?.G1_SCHEMA==='PASSED');addCheck('L6 API ready',trace.L6==='PASSED');addCheck('contract_version = 3.1.0',first.contract_version==='3.1.0');addCheck('f_net_out_excluded = true',first.uncertainty?.confidence?.f_net_out_excluded===true);addCheck('provenance tồn tại',!!first.provenance&&Object.keys(first.provenance).length>0);addCheck('input hash tồn tại',/^sha256:[0-9a-f]{64}$/.test(first.execution?.input_hash||''));addCheck('deterministic request',JSON.stringify(first)===JSON.stringify(second));renderInterpretation(first);$('status').textContent='PASS — response contract đã hiển thị nguyên trạng';$('status').className='status pass';$('status-badge').textContent='PASS';$('status-badge').className='badge badge-pass';$('run-caption').textContent='UI chỉ đọc JSON response; không sửa CORE/API và không tạo dữ liệu thiếu.'}catch(error){$('status').textContent='FAIL — '+error.message;$('status').className='status fail';$('status-badge').textContent='ERROR';$('status-badge').className='badge badge-unsupported';addCheck('API reachable',false,error.message)}finally{$('run').disabled=false}});
-renderMatrix();renderCross();renderMicroscope({});renderTiming({});renderTruth();renderComparison();
+function inferredCard(title,body,source){return `<article class="inferred-card"><h3>${escapeHtml(title)}</h3><div>${body}</div><div class="inferred-source"><strong>Nguồn:</strong> ${escapeHtml(source)}<br><strong>Trạng thái:</strong> INFERRED — đây chỉ là suy diễn, không phải dữ liệu API trả về.</div></article>`}
+function renderInferred(result={},sourcePayload={}){const semantic=result.semantic_state||{},mapping=semantic.mapping_profile||{},gate=result.gate_results||{},interp=result.interpretation||{},lines=Array.isArray(interp.per_line)?interp.per_line:[],moving=lines.filter(line=>line&&line.moving===true).map(line=>line.line),d2=sourcePayload?.data_2||{},force=result.raw_measurements?.khi_vector||{},forceEntries=Object.entries(force).filter(([,value])=>Number.isFinite(Number(value))),inputForce=d2.truong||{},inputForceEntries=Object.entries(inputForce).filter(([,value])=>Number.isFinite(Number(value))),maxAbs=Math.max(1,...forceEntries.map(([,value])=>Math.abs(Number(value)))),inputMaxAbs=Math.max(1,...inputForceEntries.map(([,value])=>Math.abs(Number(value)))),barRows=(entries,max)=>entries.map(([key,value])=>{const numeric=Number(value),width=Math.round(Math.abs(numeric)/max*100);return `<div class="infer-row"><span class="infer-label">${escapeHtml(key)}</span><span class="infer-track"><span class="infer-fill ${numeric>=0?'positive':''}" style="width:${width}%"></span></span><span class="infer-value">${escapeHtml(display(numeric))}</span></div>`}).join(''),calibration=[mapping.status,semantic.status,gate.G4_RESEARCH_CALIBRATION].find(value=>value==='CALIBRATION_REQUIRED')||null;const calibrationBody=calibration?`Mapping profile hiện diện nhưng chưa được hiệu chuẩn/phê duyệt (${escapeHtml(calibration)}). Semantic label ${escapeHtml(display(semantic.primary_label))} không phải kết luận CORE.`:'Response không báo CALIBRATION_REQUIRED ở các field đã kiểm tra.';const movingBody=moving.length?`API đánh dấu ${moving.length} hào động: ${moving.map(line=>`H${escapeHtml(display(line))}`).join(', ')}.`:'API không đánh dấu hào động trong interpretation.per_line.';const sourceBody=(d2.que_goc_s||d2.que_bien_s)?`Input chứa quẻ gốc ${escapeHtml(display(d2.que_goc_s))} và quẻ biến ${escapeHtml(display(d2.que_bien_s))}. Đây là tóm tắt từ payload, không phải field response.`:'Payload hiện tại không có que_goc_s/que_bien_s để suy diễn.';const forceBody=forceEntries.length?`Biểu diễn lực từ raw_measurements.khi_vector: <div class="infer-bars">${barRows(forceEntries,maxAbs)}</div>`:'Response chưa có raw_measurements.khi_vector.';const inputForceBody=inputForceEntries.length?`Biểu diễn trường lực từ source input data_2.truong: <div class="infer-bars">${barRows(inputForceEntries,inputMaxAbs)}</div>`:'Payload hiện tại không có data_2.truong.';const timingBody=Array.isArray(interp.expected_time_windows)&&interp.expected_time_windows.length?'API đã có expected_time_windows; không tạo thêm mốc.':'API trả expected_time_windows = []; không suy diễn mốc thời gian thay thế.';$('inferred-content').innerHTML=[inferredCard('Calibration interpretation',calibrationBody,'semantic_state.mapping_profile.status / semantic_state.status / gate_results.G4_RESEARCH_CALIBRATION'),inferredCard('Moving-line summary',movingBody,'interpretation.per_line[*].moving'),inferredCard('Input hexagram context',sourceBody,'source input: data_2.que_goc_s, data_2.que_bien_s'),inferredCard('Input force context',inputForceBody,'source input: data_2.truong'),inferredCard('Force representation',forceBody,'raw_measurements.khi_vector'),inferredCard('Time-window guard',timingBody,'interpretation.expected_time_windows')].join('')}
+	function renderInterpretation(result,sourcePayload={}){renderCore(result);renderMicroscope(result);renderMatrix(result);renderCross(result);renderTiming(result);renderTruth(result);renderComparison();renderSummary(result);renderInferred(result,sourcePayload);$('out').textContent=JSON.stringify(result,null,2)}
+$('form').addEventListener('submit',async(event)=>{event.preventDefault();$('run').disabled=true;$('status').textContent='Đang chạy…';$('status').className='status';$('status-badge').textContent='RUNNING';$('status-badge').className='badge badge-core';$('run-caption').textContent='Đang gọi POST /api/v31 và chờ JSON response.';$('checks').replaceChildren();const validation=validateInput();validation.checks.forEach(([name,ok,detail])=>addCheck(name,ok,detail));if(!validation.ok){$('status').textContent='FAIL — input không hợp lệ';$('status').className='status fail';$('status-badge').textContent='INPUT ERROR';$('status-badge').className='badge badge-unsupported';$('run').disabled=false;return}try{const first=await callApi(validation.payload);const second=await callApi(validation.payload);const trace=Object.fromEntries((first.raw_measurements?.runtime_trace||[]).map(x=>[x.layer,x.status]));addCheck('API reachable',true);addCheck('L1',trace.L1==='PASSED');addCheck('L2 PASS/PROVISIONAL',String(trace.L2||'').startsWith('PASSED'));addCheck('L3 PASS/PROVISIONAL',String(trace.L3||'').startsWith('PASSED'));addCheck('L4 canonical vocabulary',CANONICAL.includes(first.semantic_state?.primary_label));addCheck('L5 canonical=true',first.execution?.runtime_status==='PASSED'&&first.gate_results?.G1_SCHEMA==='PASSED');addCheck('L6 API ready',trace.L6==='PASSED');addCheck('contract_version = 3.1.0',first.contract_version==='3.1.0');addCheck('f_net_out_excluded = true',first.uncertainty?.confidence?.f_net_out_excluded===true);addCheck('provenance tồn tại',!!first.provenance&&Object.keys(first.provenance).length>0);addCheck('input hash tồn tại',/^sha256:[0-9a-f]{64}$/.test(first.execution?.input_hash||''));addCheck('deterministic request',JSON.stringify(first)===JSON.stringify(second));renderInterpretation(first,validation.payload);$('status').textContent='PASS — response contract đã hiển thị nguyên trạng';$('status').className='status pass';$('status-badge').textContent='PASS';$('status-badge').className='badge badge-pass';$('run-caption').textContent='Canonical response được giữ nguyên; vùng INFERRED có cảnh báo riêng.'}catch(error){$('status').textContent='FAIL — '+error.message;$('status').className='status fail';$('status-badge').textContent='ERROR';$('status-badge').className='badge badge-unsupported';addCheck('API reachable',false,error.message)}finally{$('run').disabled=false}});
+renderMatrix();renderCross();renderMicroscope({});renderTiming({});renderTruth();renderComparison();renderInferred({},{});
 </script>
 </body>
 </html>
