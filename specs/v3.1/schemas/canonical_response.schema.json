@@ -98,45 +98,27 @@
           "prefixItems": [
             {
               "type": "integer",
-              "enum": [
-                0,
-                1
-              ]
+              "enum": [0, 1]
             },
             {
               "type": "integer",
-              "enum": [
-                0,
-                1
-              ]
+              "enum": [0, 1]
             },
             {
               "type": "integer",
-              "enum": [
-                0,
-                1
-              ]
+              "enum": [0, 1]
             },
             {
               "type": "integer",
-              "enum": [
-                0,
-                1
-              ]
+              "enum": [0, 1]
             },
             {
               "type": "integer",
-              "enum": [
-                0,
-                1
-              ]
+              "enum": [0, 1]
             },
             {
               "type": "integer",
-              "enum": [
-                0,
-                1
-              ]
+              "enum": [0, 1]
             }
           ],
           "items": false
@@ -563,6 +545,62 @@
     },
     "output_b": {
       "type": "object"
+    },
+    "interpretation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "per_line": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["line", "bit", "moving", "status"],
+            "properties": {
+              "line": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 6
+              },
+              "bit": {
+                "type": "integer",
+                "enum": [0, 1]
+              },
+              "moving": {
+                "type": "boolean"
+              },
+              "status": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "cross_line": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "source_interaction": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "expected_time_windows": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "ground_truth": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      }
     }
   }
 }
