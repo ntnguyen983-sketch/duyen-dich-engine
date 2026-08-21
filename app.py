@@ -21,17 +21,14 @@ def _is_hexagram_payload(payload: dict[str, Any]) -> bool:
 
 
 def normalize_run_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], str]:
-    """Map the supplied hexagram envelope to the unchanged core runtime payload."""
     if not _is_hexagram_payload(payload):
         return payload, "flat"
-
     data_1 = payload["data_1"]
     data_2 = payload["data_2"]
     time = data_1.get("time")
     number = data_1.get("number")
     question = data_2.get("question")
     gps = data_1.get("gps_show")
-
     if not isinstance(question, str) or not question.strip():
         raise ValueError("data_2.question is required")
     if not isinstance(time, str) or not time.strip():
@@ -40,31 +37,19 @@ def normalize_run_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], str]
         raise ValueError("data_1.number phải là số nguyên không âm.")
     if not isinstance(gps, dict) or "lat" not in gps or "lng" not in gps:
         raise ValueError("data_1.gps_show phải có lat và lng.")
-
-    number_text = str(number).strip()
     core_payload = {
-        "question": question.strip(),
-        "number": int(number_text),
-        "time": time.strip(),
-        "gps": {"lat": gps["lat"], "lng": gps["lng"]},
-        "address": payload.get("address"),
-        "image": payload.get("image"),
+        "question": question.strip(), "number": int(str(number).strip()), "time": time.strip(),
+        "gps": {"lat": gps["lat"], "lng": gps["lng"]}, "address": payload.get("address"),
+        "image": payload.get("image"), "dong": data_1.get("dong"),
     }
     return core_payload, "hexagram"
 
 
 @app.get("/")
 def index():
-    # Flask's send_from_directory response uses direct_passthrough=True, so reading
-    # it via get_data() causes a RuntimeError in Vercel's serverless runtime.
-    # Read the canonical HTML directly and return it as a normal response instead.
     index_path = ROOT / "ui_test" / "index.html"
     html = index_path.read_text(encoding="utf-8")
-    html = html.replace(
-        "</body>",
-        '<script src="/ui_test/v31_runtime_fix.js?v=f0754c72"></script></body>',
-        1,
-    )
+    html = html.replace("</body>", '<script src="/ui_test/v31_runtime_fix.js?v=584401ff"></script></body>', 1)
     return app.response_class(html, status=200, mimetype="text/html")
 
 
@@ -92,11 +77,7 @@ def v31_endpoint():
         result = canonical_response(run_v31(core_payload, strict_number=(source == "flat")))
     except (TypeError, ValueError, OverflowError) as exc:
         return _error(str(exc))
-    return app.response_class(
-        json.dumps(result, ensure_ascii=False, sort_keys=True),
-        status=200,
-        mimetype="application/json",
-    )
+    return app.response_class(json.dumps(result, ensure_ascii=False, sort_keys=True), status=200, mimetype="application/json")
 
 
 if __name__ == "__main__":
