@@ -1,0 +1,40 @@
+{
+  "dataset_id": "EXT-LINE-TEXTS-POINTERS",
+  "classification": "REFERENCE",
+  "not_core_canonical": true,
+  "status": "MISSING_FULL_CORPUS_IN_LIBRARY",
+  "retrieved_at": "2026-08-21T10:00:00+07:00",
+  "sources": [
+    {
+      "source_name": "Wikibooks I Ching Explanations (partial)",
+      "source_url": "https://en.wikibooks.org/wiki/I_Ching/Explanation_Of_I_Ching_Hexagrams_And_Lines",
+      "source_type": "open_educational",
+      "license": "CC BY-SA 3.0",
+      "retrieved_at": "2026-08-21T10:00:00+07:00",
+      "confidence": 0.6,
+      "mapping_status": "REFERENCE",
+      "notes": "Not a complete verified 384-line classical Chinese corpus dump."
+    },
+    {
+      "source_name": "Wilhelm/Baynes translation (claimed PD 2020 by third parties)",
+      "source_url": "https://github.com/adamblvck/iching-wilhelm-dataset",
+      "source_type": "dataset_mirror",
+      "license": "Claimed public domain (verify jurisdiction before redistribution of full text)",
+      "retrieved_at": "2026-08-21T10:00:00+07:00",
+      "confidence": 0.4,
+      "mapping_status": "UNVERIFIED",
+      "notes": "Library does NOT embed full Wilhelm text here to avoid license/jurisdiction risk and to avoid treating translation as Zhouyi autograph."
+    }
+  ],
+  "policy": "Do not paraphrase classical line statements. classical_text fields remain empty until a verified licensed corpus is ingested with edition metadata.",
+  "line_record_template": {
+    "king_wen_number": null,
+    "line_index": null,
+    "classical_text": null,
+    "translation": null,
+    "source_edition": null,
+    "confidence": null,
+    "status": "MISSING_SOURCE"
+  },
+  "records_embedded": 0
+}

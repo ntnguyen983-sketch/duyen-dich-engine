@@ -1,0 +1,29 @@
+{
+  "dataset_id": "EXT-POSITION-ZHENG-WEI-SECONDARY",
+  "classification": "REFERENCE",
+  "not_core_canonical": true,
+  "retrieved_at": "2026-08-21T10:00:00+07:00",
+  "sources": [
+    {
+      "source_name": "ChinaSage Yi Jing notes on ideal structure",
+      "source_url": "https://www.chinasage.info/yi-jing/i-ching.htm",
+      "source_type": "secondary_web",
+      "license": "unknown",
+      "retrieved_at": "2026-08-21T10:00:00+07:00",
+      "confidence": 0.5,
+      "mapping_status": "REFERENCE",
+      "notes": "States ideal: yin at lines 2 and 4, yang at 3 and 5 (bottom=1). Secondary popular summary, not a primary Zhouyi appendix."
+    }
+  ],
+  "profiles": [
+    {
+      "profile_id": "ZHENG-WEI-ODD-YANG-EVEN-YIN",
+      "rule": "Line positions 1,3,5 prefer YANG (solid); positions 2,4,6 prefer YIN (broken). A line matching preference is often called correct/central in later commentary tradition.",
+      "line_preference": {"1": "YANG", "2": "YIN", "3": "YANG", "4": "YIN", "5": "YANG", "6": "YIN"},
+      "classification": "REFERENCE",
+      "confidence": 0.5,
+      "conflicts_with": []
+    }
+  ],
+  "note": "Multiple commentary schools exist; only one secondary rule captured. Do not treat as CORE."
+}

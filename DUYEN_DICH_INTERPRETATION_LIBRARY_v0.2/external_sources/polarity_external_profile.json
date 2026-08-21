@@ -1,0 +1,35 @@
+{
+  "dataset_id": "EXT-POLARITY-YIN-YANG",
+  "classification": "REFERENCE",
+  "not_core_canonical": true,
+  "core_binding": "NONE — Duyên Dịch CORE exposes bit 0|1 only; this profile must not auto-label CORE bits",
+  "retrieved_at": "2026-08-21T10:00:00+07:00",
+  "sources": [
+    {
+      "source_name": "Wikipedia I Ching",
+      "source_url": "https://en.wikipedia.org/wiki/I_Ching",
+      "source_type": "encyclopedia",
+      "license": "CC BY-SA 4.0",
+      "retrieved_at": "2026-08-21T10:00:00+07:00",
+      "confidence": 0.95,
+      "mapping_status": "REFERENCE",
+      "notes": "yin = broken line; yang = solid line in traditional diagrams"
+    },
+    {
+      "source_name": "Wikibooks binary note",
+      "source_url": "https://en.wikibooks.org/wiki/I_Ching/The_64_Hexagrams",
+      "source_type": "open_educational",
+      "license": "CC BY-SA 3.0",
+      "retrieved_at": "2026-08-21T10:00:00+07:00",
+      "confidence": 0.85,
+      "mapping_status": "REFERENCE",
+      "notes": "0 = YIN broken; 1 = YANG unbroken in their binary table"
+    }
+  ],
+  "profile": {
+    "traditional_diagram": {"broken_line": "YIN", "solid_line": "YANG"},
+    "wikibooks_binary_encoding": {"0": "YIN", "1": "YANG"},
+    "duyen_dich_core": {"bit_values": [0, 1], "semantic_yin_yang": "NOT_DEFINED_IN_CORE"}
+  },
+  "mapping_status": "REFERENCE"
+}
