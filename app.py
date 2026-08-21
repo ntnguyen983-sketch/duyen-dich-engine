@@ -21,12 +21,7 @@ def _is_hexagram_payload(payload: dict[str, Any]) -> bool:
 
 
 def normalize_run_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], str]:
-    """Map the supplied hexagram envelope to the unchanged core runtime payload.
-
-    The adapter accepts the canonical UI payload as well as the production test
-    envelope. Hexagram metadata is validated at the boundary but is not injected
-    into the core L1-L6 calculation or used for interpretation.
-    """
+    """Map the supplied hexagram envelope to the unchanged core runtime payload."""
     if not _is_hexagram_payload(payload):
         return payload, "flat"
 
@@ -46,9 +41,6 @@ def normalize_run_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], str]
     if not isinstance(gps, dict) or "lat" not in gps or "lng" not in gps:
         raise ValueError("data_1.gps_show phải có lat và lng.")
 
-    # The supplied number is a quẻ/session identifier and is preserved in the
-    # core run. The legacy flat UI contract remains strict six digits; the
-    # hexagram envelope uses the runtime's non-negative integer mode.
     number_text = str(number).strip()
     core_payload = {
         "question": question.strip(),
@@ -63,7 +55,18 @@ def normalize_run_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], str]
 
 @app.get("/")
 def index():
-    return send_from_directory(ROOT / "ui_test", "index.html")
+    # Keep the canonical HTML unchanged and load the runtime UI hotfix separately.
+    # This avoids duplicating the presentation layer while replacing only the broken
+    # form-submit behavior after the original inline script has initialized.
+    response = send_from_directory(ROOT / "ui_test", "index.html")
+    html = response.get_data(as_text=True)
+    html = html.replace(
+        "</body>",
+        '<script src="/ui_test/v31_runtime_fix.js?v=f0754c72"></script></body>',
+        1,
+    )
+    response.set_data(html)
+    return response
 
 
 @app.get("/ui_test/<path:filename>")
