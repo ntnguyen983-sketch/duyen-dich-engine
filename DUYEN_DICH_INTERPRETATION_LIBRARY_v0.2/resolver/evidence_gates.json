@@ -1,0 +1,33 @@
+{
+  "library_version": "0.2.0",
+  "contract_version": "3.1.0",
+  "status": "DERIVED_FROM_SOURCE",
+  "source_refs": [
+    "specs/v3.1/DUYEN_DICH_v3.1.md §4 firewalls, §5 gates",
+    "runtime/v31/engine.py gate_results, uncertainty.confidence",
+    "specs/v3.1/schemas/canonical_response.schema.json"
+  ],
+  "banned": ["Thể", "Dụng"],
+  "gates": [
+    {"gate_id": "EG-G1-SCHEMA", "maps_to": "G1_SCHEMA", "rule": "canonical_response must validate against canonical_response.schema.json", "on_fail": "HALT_INTERPRETATION", "classification": "SOURCE_CONFIRMED"},
+    {"gate_id": "EG-G2-IDENTITY", "maps_to": "G2_IDENTITY", "rule": "identity.root_bits, moving_lines, root_code, transformed_code, identity_hash present and consistent with bit indexing convention", "on_fail": "HALT_INTERPRETATION", "classification": "SOURCE_CONFIRMED"},
+    {"gate_id": "EG-G3-CORE-LOCK", "maps_to": "G3_CORE_LOCK", "rule": "execution.core_lock_mode == LOCKED; no write-back of interpretation into identity", "on_fail": "HALT_INTERPRETATION", "classification": "SOURCE_CONFIRMED"},
+    {"gate_id": "EG-G4-CALIBRATION", "maps_to": "G4_RESEARCH_CALIBRATION", "rule": "If mapping_profile.status is CALIBRATION_REQUIRED, interpretation may describe structural facts but must not claim calibrated S07 semantics as ground truth", "on_fail": "DOWNGRADE_TO_PROVISIONAL", "classification": "SOURCE_CONFIRMED"},
+    {"gate_id": "EG-G5-HASH", "maps_to": "G5_CANONICAL_HASH", "rule": "content_fingerprint / input_hash present for traceability", "on_fail": "WARN_TRACEABILITY", "classification": "SOURCE_CONFIRMED"},
+    {"gate_id": "EG-G7-FIREWALL", "maps_to": "G7_FIREWALL_DIRECTION", "rule": "confidence must not use f_net_out; f_net_out_excluded must be true when confidence present", "on_fail": "HALT_INTERPRETATION", "classification": "SOURCE_CONFIRMED"},
+    {"gate_id": "EG-NO-FABRICATE", "maps_to": null, "rule": "Do not invent source, interaction, trigger, expected_time_window, or ground_truth when arrays are empty or fields are null/UNSUPPORTED", "on_fail": "EMIT_UNSUPPORTED", "classification": "DERIVED_FROM_SOURCE"},
+    {"gate_id": "EG-NO-THE-DUNG", "maps_to": null, "rule": "Reject any interpretation payload containing Thể/Dụng logic", "on_fail": "HALT_INTERPRETATION", "classification": "LIBRARY_CONSTRAINT"},
+    {"gate_id": "EG-EVIDENCE-FOR-IMAGE", "maps_to": null, "rule": "Applied image requires non-empty evidence_refs with provenance; else UNSUPPORTED", "on_fail": "EMIT_UNSUPPORTED", "classification": "DERIVED_FROM_SOURCE"},
+    {"gate_id": "EG-CIRCUIT-BREAKER-BEC", "maps_to": "BEC-H1-DRAIN-RESERVE", "rule": "Spec defines CircuitBreaker when R<=Threshold_stop; profile status RESEARCH; engine does not execute — do not claim active breaker from live runs", "on_fail": "MISSING_SOURCE", "classification": "SOURCE_CONFIRMED_PROFILE_NOT_EXECUTED"}
+  ],
+  "anti_hallucination": {
+    "rules": [
+      "Empty interpretation.source_interaction → do not narrate interactions",
+      "interpretation.ground_truth is null → do not claim verified outcome",
+      "dynamic_state.velocity/delay/spacetime null → do not narrate timing windows as computed",
+      "primary_label under THRESHOLD_PROFILE_REQUIRED → label as provisional, not calibrated fact",
+      "No external observation store → no post-event confirmation language"
+    ],
+    "classification": "DERIVED_FROM_SOURCE"
+  }
+}
