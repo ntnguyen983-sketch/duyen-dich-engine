@@ -1,68 +1,88 @@
 # SOURCE REGISTER — Nội dung đã xác định để đưa vào Origin
 
+Branch: `chinh-ly-origin-taxonomy`
+
+## Mục đích
+Đây là sổ nguồn của Origin. Tài liệu lịch sử được giữ nguyên vai trò truy vết; không tài liệu cũ nào tự động trở thành Core hiện hành.
+
 ## A. Nền tảng Đạo–Duyên–Dịch
 
-1. `Duyên Dịch v2.3.6.pdf`
-   - Đạo–Duyên–Dịch
-   - vô thường / vô ngã
-   - architecture freeze
-   - ontology, axioms, traceability
-   - Actor localization
-   - Ngũ hành/SIE/Khí
+### `Duyên Dịch v2.3.6.pdf`
+- Đạo–Duyên–Dịch.
+- Vô thường / vô ngã.
+- Architecture Freeze.
+- Ontology, axioms, traceability.
+- Actor localization.
+- Ngũ hành / SIE / Vectơ Khí.
 
-2. `Duyên Dịch mt v2.3.7_new.pdf`
-   - Universe / Layer 0
-   - A0–A12
-   - 7-layer pipeline
-   - Dynamic Engine / Evaluation / Interpretation
-   - response function và trajectory integrator
+### `Duyên Dịch mt v2.3.7_new.pdf`
+- Universe / Layer 0.
+- A0–A12 và UK rules.
+- 7-layer pipeline.
+- Dynamic Engine / Evaluation / Interpretation.
+- Dynamic impermanence, non-self, traceability.
 
-## B. Structural / Frozen Core
+## B. Structural / Frozen Core lineage
 
-3. `DUYÊN DỊCH MASTER SPECIFICATION v2.8.6-.pdf`
-   - S00/S01
-   - snapshot
-   - quẻ/hào
-   - dòng Duyên
-   - architecture freeze
-   - core/runtime separation
+### `DUYÊN DỊCH MASTER SPECIFICATION v2.8.6-6line.pdf`
+- Snapshot / dòng Duyên.
+- Quẻ / hào / 6-line structure.
+- Architecture freeze.
+- Core/runtime boundaries.
 
-4. `DUYÊN DỊCH MASTER SPECIFICATION v2.8.6-6line.pdf`
-   - 6-line structure
-   - dòng Duyên
-   - freeze policy
-   - runtime boundaries
+### `Duyên Dịch v2.3.6.pdf`
+- Node Element Matrix.
+- SIE topology.
+- Vectơ Khí mở rộng `[S,D,I,F,T]`.
+- Localization algorithm.
 
 ## C. Research / BEC / Runtime evolution
 
-5. `VERSION 2.8.7+ REV.A.pdf`
-   - Frozen Core v2.8.6
-   - Research Layer
-   - deterministic / forward-only
-   - calibration discipline
+### `VERSION 2.8.7+ REV.A.pdf`
+- Frozen Core v2.8.6.
+- Research Layer.
+- Deterministic / forward-only.
+- Calibration discipline.
 
-6. `DUYEN_DICH_UNIFIED_MASTER_SPEC_2.8.7_REV.B.pdf`
-   - unified v2.8.7 research architecture
-   - BEC / research separation
-   - observation continuity
+### `DUYEN_DICH_UNIFIED_MASTER_SPEC_2.8.7_REV.B.pdf/.docx`
+- Unified research/runtime architecture.
+- BEC / research separation.
+- Observation continuity.
+- One canonical core state, initialization snapshot, forward-only, calibration.
 
-7. `Đã dán markdown (1)(4).md`
-   - v2.9.0 BEC-DPKE protocol
-   - runtime prompt
-   - knowledge mapping
-   - mobile UI contract
+### `DUYEN_DICH_MASTER_v2.9.2_MERGED_FREEZE.docx`
+- S00–S08.
+- Deterministic Matrix Core.
+- DWL, DPKE, BEC density + observation.
+- Emergence, spacetime, ROM, warning, forecast, recommendation.
+- Canonical JSON / KIL / SHA-256.
+
+### `duyen_dich_engine_v293_full.py`
+- Concrete v2.9.2 implementation lineage.
+- BEC recurrence/rhythm, variable detection, threshold observation, emergence, spacetime/runtime components.
+
+### `Đã dán markdown (1)(2).md`
+- DWL / L2-RGS.
+- DPKE / phase kinematics.
+- Actor delay.
+- Spacetime contract.
+- Dynamic computational state.
 
 ## D. Current architectural anchor
 
-8. `DD-3A-v3.4-CANONICAL-ARCHITECTURAL-ANCHOR`
-   - N(n) ontology
-   - Entity / Observation / Interaction
-   - Space / Time / Dynamics
-   - spatial bottleneck B(V_k)
-   - event_count / cycle_count / K_rep
-   - rhythm
-   - Định danh | Định lượng | Định tính
+### `DD-3A-v3.4-CANONICAL-ARCHITECTURAL-ANCHOR`
+- N(n) ontology.
+- Entity / Observation / Interaction.
+- Space / Time / Dynamics.
+- Spatial bottleneck `B(V_k)`.
+- Separation of `event_count`, `cycle_count`, `K_rep`.
+- Event-level rhythm `sigma_rhythm`.
+- Final expression: **Định danh | Định lượng | Định tính**.
+- No fixed essence / no permanent labels; implementation remains flexible.
 
-## Ghi chú
-
-Danh sách trên là **register nội dung**, không phải tuyên bố rằng mọi tài liệu đều còn là Core. Bản lịch sử được giữ để truy vết; các mâu thuẫn giữa các thời kỳ phải được giải bằng provenance và trạng thái hiệu lực, không bằng cách âm thầm xóa lịch sử.
+## Quy tắc Origin
+1. Không xóa lịch sử chỉ vì công thức cũ đã bị thay thế.
+2. Không lấy code reference làm authority của lý luận.
+3. Không tự điền công thức thiếu bằng heuristic.
+4. Mọi thay đổi hiện hành phải chỉ rõ nguồn và trạng thái hiệu lực.
+5. v3.4 là architectural anchor; các implementation phía sau có thể thay đổi.
