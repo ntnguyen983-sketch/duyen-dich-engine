@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "research_only.nxnxspace/output.schema.json",
+  "title": "NxNxspace Research Output",
+  "description": "Research-only NxN cosine similarity output; not a canonical response.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "namespace",
+    "status",
+    "N",
+    "tick_id",
+    "timestamp",
+    "deterministic_input_hash",
+    "entity_vectors",
+    "cosine_similarity_matrix",
+    "space_state",
+    "time_axis"
+  ],
+  "properties": {
+    "namespace": {
+      "const": "research_only.nxnxspace"
+    },
+    "status": {
+      "const": "research_only"
+    },
+    "N": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "tick_id": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "deterministic_input_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "entity_vectors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entity_vector"
+      }
+    },
+    "cosine_similarity_matrix": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      }
+    },
+    "space_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "dimension",
+        "zero_vector_count",
+        "pairwise_mean",
+        "pairwise_min",
+        "pairwise_max"
+      ],
+      "properties": {
+        "kind": {
+          "const": "cosine_similarity_snapshot"
+        },
+        "dimension": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "zero_vector_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pairwise_mean": {
+          "type": ["number", "null"]
+        },
+        "pairwise_min": {
+          "type": ["number", "null"]
+        },
+        "pairwise_max": {
+          "type": ["number", "null"]
+        }
+      }
+    },
+    "time_axis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "tick_id", "unit"],
+      "properties": {
+        "kind": {
+          "const": "discrete_tick"
+        },
+        "tick_id": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unit": {
+          "const": "tick"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "entity_vector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "vector"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "vector": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

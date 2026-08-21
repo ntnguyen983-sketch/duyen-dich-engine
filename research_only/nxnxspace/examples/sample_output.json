@@ -1,0 +1,61 @@
+{
+  "N": 3,
+  "cosine_similarity_matrix": [
+    [
+      1.0,
+      0.739940073396,
+      0.348186529604
+    ],
+    [
+      0.739940073396,
+      1.0,
+      0.888217643156
+    ],
+    [
+      0.348186529604,
+      0.888217643156,
+      1.0
+    ]
+  ],
+  "deterministic_input_hash": "b3462066b3cec3d72f09af30b61c6bb3cf3803583abeffa283d8cf316f2ed384",
+  "entity_vectors": [
+    {
+      "id": "entity_A",
+      "vector": [
+        0.2,
+        0.8
+      ]
+    },
+    {
+      "id": "entity_B",
+      "vector": [
+        0.6,
+        0.4
+      ]
+    },
+    {
+      "id": "entity_C",
+      "vector": [
+        0.9,
+        0.1
+      ]
+    }
+  ],
+  "namespace": "research_only.nxnxspace",
+  "space_state": {
+    "dimension": 2,
+    "kind": "cosine_similarity_snapshot",
+    "pairwise_max": 0.888217643156,
+    "pairwise_mean": 0.658781415385,
+    "pairwise_min": 0.348186529604,
+    "zero_vector_count": 0
+  },
+  "status": "research_only",
+  "tick_id": 42,
+  "time_axis": {
+    "kind": "discrete_tick",
+    "tick_id": 42,
+    "unit": "tick"
+  },
+  "timestamp": "2026-08-21T00:00:00Z"
+}

@@ -1,0 +1,18 @@
+{
+  "tick_id": 42,
+  "entities": [
+    {
+      "id": "entity_A",
+      "vector": [0.2, 0.8]
+    },
+    {
+      "id": "entity_B",
+      "vector": [0.6, 0.4]
+    },
+    {
+      "id": "entity_C",
+      "vector": [0.9, 0.1]
+    }
+  ],
+  "timestamp": "2026-08-21T00:00:00Z"
+}
