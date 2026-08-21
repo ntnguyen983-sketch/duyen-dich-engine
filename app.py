@@ -49,7 +49,8 @@ def normalize_run_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], str]
 def index():
     index_path = ROOT / "ui_test" / "index.html"
     html = index_path.read_text(encoding="utf-8")
-    html = html.replace("</body>", '<script src="/ui_test/dd3a_per_line_adapter.js?v=2"></script><script src="/ui_test/v31_runtime_fix.js?v=canonical-response-1"></script></body>', 1)
+    # The UI contract renderer is self-contained in index.html. Do not inject
+    # legacy per-line adapters or runtime hotfixes that can overwrite its handler.
     return app.response_class(html, status=200, mimetype="text/html")
 
 
