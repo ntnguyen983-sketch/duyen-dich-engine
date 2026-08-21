@@ -55,18 +55,17 @@ def normalize_run_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], str]
 
 @app.get("/")
 def index():
-    # Keep the canonical HTML unchanged and load the runtime UI hotfix separately.
-    # This avoids duplicating the presentation layer while replacing only the broken
-    # form-submit behavior after the original inline script has initialized.
-    response = send_from_directory(ROOT / "ui_test", "index.html")
-    html = response.get_data(as_text=True)
+    # Flask's send_from_directory response uses direct_passthrough=True, so reading
+    # it via get_data() causes a RuntimeError in Vercel's serverless runtime.
+    # Read the canonical HTML directly and return it as a normal response instead.
+    index_path = ROOT / "ui_test" / "index.html"
+    html = index_path.read_text(encoding="utf-8")
     html = html.replace(
         "</body>",
         '<script src="/ui_test/v31_runtime_fix.js?v=f0754c72"></script></body>',
         1,
     )
-    response.set_data(html)
-    return response
+    return app.response_class(html, status=200, mimetype="text/html")
 
 
 @app.get("/ui_test/<path:filename>")
