@@ -144,11 +144,13 @@
       // One request is enough. A second request is used only for deterministic comparison.
       const first = await post(input.payload);
       const second = await post(input.payload);
-      const frontendResult = window.DD3A?.adaptCanonicalResponse(first);
-      if (!frontendResult) throw new Error('DD-3A adapter chưa được nạp.');
+      // Render the canonical API object unchanged. The UI may classify absent
+      // optional evidence as UNSUPPORTED, but it must not rewrite per_line.
+      const frontendResult = first;
       runtimeChecks(first);
-      addCheck('DD-3A six per-line records', frontendResult.interpretation.per_line.length === 6);
-      addCheck('DD-3A 1-based moving index', frontendResult.interpretation.per_line.every((line, index) => line.id === `H${index + 1}` && line.index === index + 1));
+      const perLine = frontendResult.interpretation?.per_line;
+      addCheck('canonical per-line records', Array.isArray(perLine) && perLine.length === 6);
+      addCheck('canonical line numbering', Array.isArray(perLine) && perLine.every((line, index) => line.line === index + 1));
       addCheck('deterministic request', JSON.stringify(first) === JSON.stringify(second));
 
       if (typeof window.renderInterpretation === 'function') {

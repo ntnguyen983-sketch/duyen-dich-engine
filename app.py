@@ -49,7 +49,7 @@ def normalize_run_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], str]
 def index():
     index_path = ROOT / "ui_test" / "index.html"
     html = index_path.read_text(encoding="utf-8")
-    html = html.replace("</body>", '<script src="/ui_test/dd3a_per_line_adapter.js?v=1"></script><script src="/ui_test/v31_runtime_fix.js?v=584401ff"></script></body>', 1)
+    html = html.replace("</body>", '<script src="/ui_test/dd3a_per_line_adapter.js?v=2"></script><script src="/ui_test/v31_runtime_fix.js?v=canonical-response-1"></script></body>', 1)
     return app.response_class(html, status=200, mimetype="text/html")
 
 

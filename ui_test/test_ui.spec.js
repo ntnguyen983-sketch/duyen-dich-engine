@@ -49,7 +49,9 @@ test('full v3.1 browser flow renders canonical output', async ({ page }) => {
   await expect(page.locator('#core-result')).toContainText('Input hash');
   await expect(page.locator('#microscope')).toContainText('H1');
   await expect(page.locator('#microscope')).toContainText('H6');
-  await expect(page.locator('#microscope')).toContainText('UNSUPPORTED');
+  await expect(page.locator('#microscope')).toContainText('CANONICAL_IDENTITY');
+  await expect(page.locator('#microscope')).toContainText('Bit');
+  await expect(page.locator('#matrix')).toContainText('UNSUPPORTED');
   await expect(page.locator('#timing')).toContainText('ỨNG KỲ');
   await expect(page.locator('#ground-truth')).toContainText('GROUND TRUTH');
   await expect(page.locator('#comparison')).toContainText('ĐỐI CHIẾU');
@@ -77,7 +79,8 @@ test('hexagram data_1/data_2 payload runs through production UI', async ({ page 
     await expect(page.locator(`[data-line="${line}"] .badge`)).toHaveText('NOT MOVING');
     await expect(page.locator(`[data-line="${line}"]`)).toHaveAttribute('data-moving', 'false');
   }
-  await expect(page.locator('#microscope')).toContainText('UNSUPPORTED');
+  await expect(page.locator('#microscope')).toContainText('CANONICAL_INPUT');
+  await expect(page.locator('#microscope')).not.toContainText('Source Evidence');
   await expect(page.locator('#matrix')).toContainText('Source Evidence');
   await expect(page.locator('#cross-line')).toContainText('Cross relation');
   await expect(page.locator('#timing')).toContainText('Expected window');
