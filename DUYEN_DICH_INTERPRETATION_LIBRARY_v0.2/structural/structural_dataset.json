@@ -1,1 +1,1 @@
-PLACEHOLDER
+{"$schema_note":"Duyên Dịch Interpretation Library v0.2 structural dataset","library_version":"0.2.0","contract_version":"3.1.0","status":"STRUCTURAL_ONLY","source_authority":["specs/v3.1/DUYEN_DICH_v3.1.md","runtime/v31/engine.py","specs/v3.1/runtime_profiles_v31.json"],"bit_indexing_convention":"engine root_bits[0]=MSB=line6; line_index 1=LSB maps msie N1","explicit_exclusions":["hexagram_name","trigram_traditional_name","trigram_element","proper_improper_position","yin_yang_label","the_dung"],"counts":{"hexagrams":64,"line_records":64},"line_records":[]}
