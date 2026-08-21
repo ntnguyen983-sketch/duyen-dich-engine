@@ -1,22 +1,45 @@
 # ORIGIN content completeness audit — 2026-08-21
 
-## Current finding
+## Current intake status
 
-The Origin branch now contains structured lineage records for the foundational v2.3.6 architecture, v2.8.7+ Rev.A research/frozen-core transition, and v2.9.2-MERGED runtime/matrix lineage, in addition to the existing Dao/Structural/3A/Research/Implementation/Validation/Historical folders.
+This branch is the **source-intake / taxonomy branch**. The current operation is intentionally RÓT, not reconciliation. Source material is classified and captured into the appropriate Origin compartments without rewriting contradictions.
 
-## Material content recovered from the source library
+## Substantive source coverage now captured
 
-1. v2.3.6: ontology, Đạo–Duyên–Dịch, constitutional principles, A1–A10, UK1–UK8, 7-layer pipeline, S06 firewall, SIE, Vector Khí [S,D,I,F,T], Actor Localization, field phases and historical S07 decoder.
-2. v2.8.7+ Rev.A: Frozen Core/Research Layer separation, A0–A12, S00–S08, DWL, L2-RGS, DPKE, Spacetime, BEC research, gates, canonical hash/precision, reconciliation and legacy invariants.
-3. v2.9.2-MERGED: deterministic matrix core, NodeSpace 12, W/Mpol/MSIE/MFlux/MChi/KTime/MTransform/Special operators, scalar/vector Force contract, DWL, DPKE, BEC Density/Observation, S07, PhiSystem, Spacetime, ROM, Emergence, Warning, Implication, Forecast, Recommendation and unresolved verification points.
+### Early / Dao–Duyên–Dịch
+- `Master D.D.pdf`: Duyên as conditions participating in a Dòng; Khí, Tương tác, Lực, Hướng, Thế, Dòng, Chuyển hóa; lifecycle of Duyên; early layered pipeline.
+- `Duyên Dịch v2.3.6.pdf`: ontology, constitution, A1–A10, UK1–UK8, SIE, Vector Khí, Actor Localization, 7-layer runtime, S06 firewall and S07.
 
-## Still unresolved as content, not file count
+### Structural expansion
+- `Duyên Dịch mt v2.3.7_new.pdf`: A0–A12, 7 Layers, phase coordinate, Node schema, interaction operators, response R, trajectory Φ, S07 and interpretation separation.
+- `Duyên Dịch_new_v2.5.1.pdf`: Space / Force / Field / Potential / Interaction / Evolution / Prediction / Strategy / Feedback architecture.
+- `ddnew1.PDF`: Duyên Dịch 3.0 / DCGF v4.6 / UKES / KIL unified structural architecture.
 
-- Earlier pre-v2.3 'Đạo Duyên Dịch' writings are not yet represented as complete primary-source transcriptions; only later lineage references are available in the current retrieved corpus.
-- Some intermediate versions/patches between v2.3.6 and v2.8.6 are referenced by later specifications but their complete primary documents have not yet been recovered in this pass.
-- The current DD-3A v3.4 Anchor is present, but its full mathematical/reference implementation lineage must remain separated from historical speculative formulas.
-- Any source whose content has not been directly recovered is marked unresolved rather than reconstructed from memory.
+### Frozen Core → Research / BEC
+- `DUYÊN DỊCH MASTER SPECIFICATION v2.8.6-6line.pdf`: Frozen Core, S00–S08, DWL, L2-RGS, DPKE, Spacetime, Firewalls, Canonical JSON and SHA-256.
+- `VERSION 2.8.7+ REV.A.pdf`: Frozen Core + Research Layer + Runtime Continuity, explicit calibration and no-reset rules.
+- `DUYÊN DỊCH FULL_SPEC.pdf`: complete v2.8.7 union architecture, BEC, Knowledge Mapping, conditional inference and output separation.
+- `DUYEN_DICH_UNIFIED_MASTER_SPEC_2.8.7_REV.B.pdf`: unified runtime authority and explicit Research/Knowledge/Observation boundaries.
 
-## Rule for future intake
+### Reconciliation / merged runtime
+- `DUYEN_DICH_v2.9.0.pdf`: reconciliation release, S07 canonicalization, Delay reconciliation, M_pol reconciliation and G6 Matrix Consistency Check.
+- `V2.9.pdf`: SL-DIF paradigm shift to six-line Dynamic Coupled System over OCG.
+- `DUYÊN DỊCH MASTER v2.9.2-MERGED`: deterministic matrix core + DWL + DPKE + BEC + Spacetime + ROM + Warning + Forecast + Recommendation + canonical output.
 
-Never declare Origin complete merely because every folder has a README. Completeness means the substantive historical claims, formulas, architecture decisions, contradictions and unresolved points that can be recovered from the source corpus are represented and provenance-tagged. New evidence must be added without rewriting history.
+### Dynamic 3A
+- `DD-3A-v3.4-CANONICAL-ARCHITECTURAL-ANCHOR.md`: current architectural anchor with Entity/Observation/Interaction/Space/Time and the final separation of identification, quantity and quality.
+
+## What is now sufficient for the next phase
+
+The major conceptual and engineering epochs needed to reconstruct the Origin architecture are represented: early ontology → v2.3.x formalization → v2.5 field/potential expansion → v2.8.6 Frozen Core → 2.8.7 Research/BEC → v2.9 reconciliation/SL-DIF → v2.9.2 merged runtime → v3.0 structural unification → v3.4 dynamic architectural anchor.
+
+This is sufficient to begin a later **cross-source comparison** phase.
+
+## What is intentionally NOT being done yet
+
+- No contradictions are being reconciled in this intake pass.
+- No historical formula is being silently promoted to v3.4.
+- No missing primary source is being reconstructed from memory.
+- No implementation is being declared Production Ready from the presence of a historical specification.
+
+If additional primary files are recovered later, they are added as new source material first; reconciliation happens only after the intake stage is explicitly complete.
