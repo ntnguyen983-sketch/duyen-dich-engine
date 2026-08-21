@@ -47,15 +47,20 @@ test('full v3.1 browser flow renders canonical output', async ({ page }) => {
   await expect(l5Check).toHaveClass(/pass/);
   await expect(page.locator('#checks')).toContainText('deterministic request');
   await expect(page.locator('#core-result')).toContainText('Input hash');
-  await expect(page.locator('#microscope')).toContainText('H1');
-  await expect(page.locator('#microscope')).toContainText('H6');
+  await expect(page.locator('#microscope')).toContainText('Line 1');
+  await expect(page.locator('#microscope')).toContainText('Line 6');
   await expect(page.locator('#microscope')).toContainText('CANONICAL_IDENTITY');
-  await expect(page.locator('#microscope')).toContainText('Bit');
-  await expect(page.locator('#matrix')).toContainText('UNSUPPORTED');
-  await expect(page.locator('#timing')).toContainText('ỨNG KỲ');
-  await expect(page.locator('#ground-truth')).toContainText('GROUND TRUTH');
-  await expect(page.locator('#comparison')).toContainText('ĐỐI CHIẾU');
-  await expect(page.locator('#summary')).toContainText('Nhắc nhở kiểm chứng');
+  await expect(page.locator('#microscope')).toContainText('bit');
+  await expect(page.locator('#matrix')).toContainText('interpretation.source_interaction');
+  await expect(page.locator('#matrix')).toContainText('[]');
+  await expect(page.locator('#cross-line')).toContainText('interpretation.cross_line');
+  await expect(page.locator('#cross-line')).toContainText('[]');
+  await expect(page.locator('#timing')).toContainText('interpretation.expected_time_windows');
+  await expect(page.locator('#timing')).toContainText('[]');
+  await expect(page.locator('#ground-truth')).toContainText('interpretation.ground_truth');
+  await expect(page.locator('#ground-truth')).toContainText('null');
+  await expect(page.locator('#comparison')).toContainText('comparison');
+  await expect(page.locator('#summary')).toContainText('Interpretation coverage');
 });
 
 test('hexagram data_1/data_2 payload runs through production UI', async ({ page }) => {
@@ -71,8 +76,8 @@ test('hexagram data_1/data_2 payload runs through production UI', async ({ page 
   await expect(page.locator('#checks')).toContainText('deterministic request');
   await expect(page.locator('#checks .check', { hasText: 'L5 canonical=true' })).toHaveClass(/pass/);
   await expect(page.locator('#core-result')).toContainText('Root code');
-  await expect(page.locator('#microscope')).toContainText('Hào 1');
-  await expect(page.locator('#microscope')).toContainText('Hào 6');
+  await expect(page.locator('#microscope')).toContainText('Line 1');
+  await expect(page.locator('#microscope')).toContainText('Line 6');
   await expect(page.locator('[data-line="3"] .badge')).toHaveText('MOVING');
   await expect(page.locator('[data-line="3"]')).toHaveAttribute('data-moving', 'true');
   for (const line of [1, 2, 4, 5, 6]) {
@@ -81,10 +86,13 @@ test('hexagram data_1/data_2 payload runs through production UI', async ({ page 
   }
   await expect(page.locator('#microscope')).toContainText('CANONICAL_INPUT');
   await expect(page.locator('#microscope')).not.toContainText('Source Evidence');
-  await expect(page.locator('#matrix')).toContainText('Source Evidence');
-  await expect(page.locator('#cross-line')).toContainText('Cross relation');
-  await expect(page.locator('#timing')).toContainText('Expected window');
-  await expect(page.locator('#summary')).toContainText('PROVISIONAL');
+  await expect(page.locator('#matrix')).toContainText('interpretation.source_interaction');
+  await expect(page.locator('#matrix')).toContainText('[]');
+  await expect(page.locator('#cross-line')).toContainText('interpretation.cross_line');
+  await expect(page.locator('#cross-line')).toContainText('[]');
+  await expect(page.locator('#timing')).toContainText('interpretation.expected_time_windows');
+  await expect(page.locator('#timing')).toContainText('[]');
+  await expect(page.locator('#summary')).toContainText('CALIBRATION_REQUIRED');
 });
 
 test('mobile interpretation layout has no horizontal overflow or console errors', async ({ page }) => {
@@ -100,8 +108,9 @@ test('mobile interpretation layout has no horizontal overflow or console errors'
   const layout = await page.evaluate(() => ({ width: window.innerWidth, scrollWidth: document.documentElement.scrollWidth }));
   expect(layout.scrollWidth).toBeLessThanOrEqual(layout.width + 1);
   expect(consoleErrors).toEqual([]);
-  await expect(page.locator('#timing')).toContainText('ỨNG KỲ');
-  await expect(page.locator('#ground-truth')).toContainText('OBSERVATION REQUIRED');
+  await expect(page.locator('#timing')).toContainText('Expected time windows');
+  await expect(page.locator('#ground-truth')).toContainText('EXACT VALUE');
+  await expect(page.locator('#ground-truth')).toContainText('null');
 });
 
 test('missing question is blocked before API call', async ({ page }) => {
