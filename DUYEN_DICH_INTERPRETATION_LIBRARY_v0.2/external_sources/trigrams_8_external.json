@@ -1,0 +1,39 @@
+{
+  "dataset_id": "EXT-TRIGRAM-8",
+  "classification": "CANONICAL_EXTERNAL",
+  "not_core_canonical": true,
+  "retrieved_at": "2026-08-21T10:00:00+07:00",
+  "sources": [
+    {
+      "source_name": "Wikipedia I Ching (trigram names)",
+      "source_url": "https://en.wikipedia.org/wiki/I_Ching",
+      "source_type": "encyclopedia",
+      "license": "CC BY-SA 4.0",
+      "retrieved_at": "2026-08-21T10:00:00+07:00",
+      "confidence": 0.95,
+      "mapping_status": "CANONICAL_EXTERNAL"
+    },
+    {
+      "source_name": "Master Sean Chan / secondary bagua element table",
+      "source_url": "https://www.masterseanchan.com/iching-8-trigrams/",
+      "source_type": "practitioner_reference",
+      "license": "unknown_proprietary_page",
+      "retrieved_at": "2026-08-21T10:00:00+07:00",
+      "confidence": 0.55,
+      "mapping_status": "REFERENCE",
+      "notes": "Wuxing mapping is correlative tradition; not Duyên Dịch CORE."
+    }
+  ],
+  "binary_convention": "binary_bottom_to_top: leftmost char = bottom line (line of lower trigram base)",
+  "records": [
+    {"id": "QIAN", "zh": "乾", "pinyin": "qián", "en": "Heaven", "symbol": "☰", "binary_bottom_to_top": "111", "wuxing_zh": "金", "wuxing_en": "Metal", "wuxing_status": "REFERENCE_SECONDARY"},
+    {"id": "KUN", "zh": "坤", "pinyin": "kūn", "en": "Earth", "symbol": "☷", "binary_bottom_to_top": "000", "wuxing_zh": "土", "wuxing_en": "Earth", "wuxing_status": "REFERENCE_SECONDARY"},
+    {"id": "ZHEN", "zh": "震", "pinyin": "zhèn", "en": "Thunder", "symbol": "☳", "binary_bottom_to_top": "001", "wuxing_zh": "木", "wuxing_en": "Wood", "wuxing_status": "REFERENCE_SECONDARY"},
+    {"id": "XUN", "zh": "巽", "pinyin": "xùn", "en": "Wind", "symbol": "☴", "binary_bottom_to_top": "110", "wuxing_zh": "木", "wuxing_en": "Wood", "wuxing_status": "REFERENCE_SECONDARY"},
+    {"id": "KAN", "zh": "坎", "pinyin": "kǎn", "en": "Water", "symbol": "☵", "binary_bottom_to_top": "010", "wuxing_zh": "水", "wuxing_en": "Water", "wuxing_status": "REFERENCE_SECONDARY"},
+    {"id": "LI", "zh": "離", "pinyin": "lí", "en": "Fire", "symbol": "☲", "binary_bottom_to_top": "101", "wuxing_zh": "火", "wuxing_en": "Fire", "wuxing_status": "REFERENCE_SECONDARY"},
+    {"id": "GEN", "zh": "艮", "pinyin": "gèn", "en": "Mountain", "symbol": "☶", "binary_bottom_to_top": "100", "wuxing_zh": "土", "wuxing_en": "Earth", "wuxing_status": "REFERENCE_SECONDARY"},
+    {"id": "DUI", "zh": "兌", "pinyin": "duì", "en": "Lake", "symbol": "☱", "binary_bottom_to_top": "011", "wuxing_zh": "金", "wuxing_en": "Metal", "wuxing_status": "REFERENCE_SECONDARY"}
+  ],
+  "count": 8
+}
