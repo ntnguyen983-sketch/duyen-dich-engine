@@ -30,12 +30,12 @@ jobs:
         id: gemini_review
         uses: google-github-actions/run-gemini-cli@387c8ddb7a72078825da941758b811b9153c71e8 # main, pinned
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_ACTOR }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_ACTOR }}
           GITHUB_TOKEN: ${{ github.token }}
           GEMINI_CLI_TRUST_WORKSPACE: 'true'
         with:
-          gemini_api_key: ${{ secrets.GEMINI_ACTOR }}
-          gemini_model: 'gemini-2.5-flash'
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_ACTOR }}
+          gemini_model: 'gemini-2.5-flash-lite'
           github_pr_number: ${{ github.event.pull_request.number }}
           workflow_name: 'gemini-pr-review'
           settings: |-
