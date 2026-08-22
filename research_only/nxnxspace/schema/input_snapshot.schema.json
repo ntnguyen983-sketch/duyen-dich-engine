@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "research_only.nxnxspace/input_snapshot.schema.json",
+  "title": "NxNxspace Research Snapshot Input",
+  "description": "Snapshot/mock data contract for the research-only NxNxspace prototype.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["tick_id", "entities"],
+  "properties": {
+    "tick_id": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entity"
+      }
+    }
+  },
+  "$defs": {
+    "entity": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "vector"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "vector": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

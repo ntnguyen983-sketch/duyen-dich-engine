@@ -1,0 +1,317 @@
+﻿Dưới đây là cây registry DD LEGACY FORCE & INTERACTION REGISTRY đã được bổ sung đầy đủ các Toán tử KERNEL/DPKE (Layer 1-2) và các Toán tử Định lượng Research (Chapter 13) từ tài liệu Duyên Dịch.
+DD LEGACY FORCE & INTERACTION REGISTRY
+│
+├── 0. REGISTRY METADATA
+│   ├── Scope
+│   │   └── Legacy lineage ≤ DD-3.0[span_4](start_span)[span_4](end_span)[span_5](start_span)[span_5](end_span)[span_6](start_span)[span_6](end_span)
+│   ├── Status
+│   │   └── RESEARCH / LINEAGE / NOT MERGED[span_7](start_span)[span_7](end_span)[span_8](start_span)[span_8](end_span)[span_9](start_span)[span_9](end_span)
+│   ├── Canonical Rule
+│   │   ├── Không sửa legacy source[span_10](start_span)[span_10](end_span)
+│   │   ├── Không suy ngược proposal mới thành legacy[span_11](start_span)[span_11](end_span)
+│   │   └── Không tự chuẩn hóa numeric rules[span_12](start_span)[span_12](end_span)
+│   └── Evidence Level
+│       ├── VERIFIED[span_13](start_span)[span_13](end_span)
+│       ├── PARTIALLY VERIFIED[span_14](start_span)[span_14](end_span)
+│       └── UNVERIFIED[span_15](start_span)[span_15](end_span)
+│
+├── 1. STRUCTURAL PRIMITIVES
+│   ├── H
+│   │   └── Hướng (Direction)[span_16](start_span)[span_16](end_span)[span_17](start_span)[span_17](end_span)
+│   ├── L
+│   │   └── Lực (Force)[span_18](start_span)[span_18](end_span)[span_19](start_span)[span_19](end_span)
+│   ├── K
+│   │   └── Khí (State / Energy)[span_20](start_span)[span_20](end_span)[span_21](start_span)[span_21](end_span)
+│   ├── T
+│   │   └── Thế (Context)[span_22](start_span)[span_22](end_span)[span_23](start_span)[span_23](end_span)
+│   ├── M
+│   │   └── Momentum / Động năng [M ∈ [0.0, 1.0]][span_24](start_span)[span_24](end_span)
+│   ├── E
+│   │   └── Existence / Mức độ hiện hữu [E ∈ [0.0, 1.0]][span_25](start_span)[span_25](end_span)
+│   ├── Topology (T)[span_26](start_span)[span_26](end_span)
+│   ├── Time (T)[span_27](start_span)[span_27](end_span)
+│   ├── Observer (O)[span_28](start_span)[span_28](end_span)
+│   ├── Evidence (E)[span_29](start_span)[span_29](end_span)
+│   └── Uncertainty σ[span_30](start_span)[span_30](end_span)
+│
+├── 2. NODE / POSITION LAYER
+│   ├── Six-line structure (Hào 1–6)[span_31](start_span)[span_31](end_span)
+│   ├── Active line (Hào động z)[span_32](start_span)[span_32](end_span)
+│   ├── Core Operators (Toán tử Dịch biến Lõi)
+│   │   ├── Động Hào Operator: D̂_i(χ_i) = 1 - χ_i[span_33](start_span)[span_33](end_span)
+│   │   ├── Biến Quẻ Operator: Ĉ(χ) = (1-χ_1, ..., 1-χ_6)^T[span_34](start_span)[span_34](end_span)
+│   │   ├── Tông Quẻ Operator: P̂(χ) = (χ_6, χ_5, χ_4, χ_3, χ_2, χ_1)^T[span_35](start_span)[span_35](end_span)
+│   │   └── Hổ Quẻ Operator: Ĥ(χ) = (χ_2, χ_3, χ_4, χ_3, χ_4, χ_5)^T[span_36](start_span)[span_36](end_span)
+│   ├── Spatial Index S
+│   │   ├── Hào 1–2 (Địa / Nội quái)
+│   │   │   └── S = 0.0[span_37](start_span)[span_37](end_span)
+│   │   ├── Hào 3–4 (Nhân / Trung ranh giới)
+│   │   │   └── S = 0.5[span_38](start_span)[span_38](end_span)
+│   │   └── Hào 5–6 (Thiên / Ngoại quái)
+│   │       └── S = 1.0[span_39](start_span)[span_39](end_span)
+│   └── Spatial semantic
+│       ├── Địa
+│       ├── Nhân
+│       └── Thiên
+│
+├── 3. RELATIONAL LAYER
+│   │
+│   ├── 3.1 Ngũ Hành Relations
+│   │   ├── Tỷ hòa
+│   │   │   └── weight = +0.5[span_40](start_span)[span_40](end_span)
+│   │   ├── Tương sinh
+│   │   │   └── weight = +0.8[span_41](start_span)[span_41](end_span)
+│   │   ├── Tương khắc
+│   │   │   └── weight = -0.8[span_42](start_span)[span_42](end_span)
+│   │   └── Trung tính
+│   │       └── weight = 0[span_43](start_span)[span_43](end_span)
+│   │
+│   ├── 3.2 Graph Relations
+│   │   ├── Edge
+│   │   │   ├── source
+│   │   │   ├── target
+│   │   │   ├── weight
+│   │   │   └── relation_type
+│   │   ├── ung
+│   │   ├── ty
+│   │   ├── hinh
+│   │   ├── xung
+│   │   ├── khac
+│   │   └── hop
+│   │
+│   └── 3.3 Dynamic Five-Element Differential Operator (Toán tử Vi phân Ngũ Hành)
+│       └── dX/dt = Ω_5H · X(t) + f_ext(t)[span_44](start_span)[span_44](end_span)[span_45](start_span)[span_45](end_span)[span_46](start_span)[span_46](end_span)
+│
+├── 4. FORCE / FIELD LAYER
+│   │
+│   ├── 4.1 Vector Khí (5-Dimensional Energy Vector)
+│   │   └── V_Khí = [S, D, I, F, T][span_47](start_span)[span_47](end_span)[span_48](start_span)[span_48](end_span)
+│   │       ├── S = Spatial Index ∈ {0.0, 0.5, 1.0}[span_49](start_span)[span_49](end_span)
+│   │       ├── D = Directional Derivative = ΔH · ψ ∈ [-1.0, +1.0][span_50](start_span)[span_50](end_span)
+│   │       ├── I = Interaction Density ∈ [0.0, 1.0][span_51](start_span)[span_51](end_span)
+│   │       ├── F = Force / Momentum Scalar = F_norm ∈ [0.0, 1.0][span_52](start_span)[span_52](end_span)[span_53](start_span)[span_53](end_span)
+│   │       └── T = Temporal Phase ∈ ℤ_12[span_54](start_span)[span_54](end_span)
+│   │
+│   ├── 4.2 DWL-0.1 Weight & Energy Layer (Toán tử DWL Tức thời & Tích lũy)
+│   │   ├── Instantaneous Weight: W_ij(τ) = B_ij · K_context(τ) · K_interaction(τ) · K_time(τ) ∈ [0, 4.0][span_55](start_span)[span_55](end_span)[span_56](start_span)[span_56](end_span)
+│   │   ├── Persistence Index: P_ij = N_active / N_observed ∈ [0.0, 1.0][span_57](start_span)[span_57](end_span)[span_58](start_span)[span_58](end_span)
+│   │   └── Accumulated Weight: A_ij(t) = ∑ W_ij(τ) ≥ 0[span_59](start_span)[span_59](end_span)[span_60](start_span)[span_60](end_span)
+│   │
+│   ├── 4.3 Force Solver Normalization (Chuẩn hóa Lực trường)
+│   │   ├── Raw Field Force: F_field_raw = ∑ W_ij · D_ij[span_61](start_span)[span_61](end_span)[span_62](start_span)[span_62](end_span)
+│   │   ├── Theoretical Maximum: F_max = 4.0 · N_edges[span_63](start_span)[span_63](end_span)[span_64](start_span)[span_64](end_span)
+│   │   └── Normalized Strength: F_norm = ||F_field_raw|| / F_max ∈ [0.0, 1.0][span_65](start_span)[span_65](end_span)[span_66](start_span)[span_66](end_span)
+│   │
+│   ├── 4.4 Interaction Density
+│   │   ├── substantive_edges
+│   │   ├── maximum_possible_edges
+│   │   └── I = substantive_edges / maximum_possible_edges[span_67](start_span)[span_67](end_span)
+│   │
+│   ├── 4.5 Direction & Phase Kinematics (DPKE - Local Phase Velocity)
+│   │   ├── D = Directional Derivative[span_68](start_span)[span_68](end_span)
+│   │   └── Phase Velocity: v_i(τ) = Clamp(v_base + α·F_net,i(τ) - β·W_resist,i(τ), v_min, v_max)[span_69](start_span)[span_69](end_span)
+│   │
+│   ├── 4.6 Temporal Phase
+│   │   ├── active line
+│   │   ├── giờ Địa Chi
+│   │   └── T ∈ [0,1][span_70](start_span)[span_70](end_span)
+│   │
+│   ├── 4.7 Momentum & Dynamic Sufficiency Constraint (Nguyên lý Đủ lực SL-DIF)
+│   │   ├── Self-Maintain Force: F_self-maintain,i = θ_exist · (1 + α · ||F_suppression→i||)[span_71](start_span)[span_71](end_span)
+│   │   ├── Available Outgoing Force: F_out,i = max(0, F_available,i - F_self-maintain,i)[span_72](start_span)[span_72](end_span)
+│   │   ├── Decay khi không có input mới
+│   │   └── Interaction Kernel: I_ij(τ) = F_out,i(τ) · F_response,j(τ) · K_ij · P_ij · C_ij[span_73](start_span)[span_73](end_span)
+│   │
+│   └── 4.8 Rigid Geometry Solver (L2-RGS)
+│       ├── Rigid Fit Error: E_rigid = (1/n) ∑ ||R(p_i) - q_i||^2[span_74](start_span)[span_74](end_span)[span_75](start_span)[span_75](end_span)
+│       └── Rigid Fit Score: F_rigid = 1 - normalize(E_rigid) ∈ [0.0, 1.0][span_76](start_span)[span_76](end_span)[span_77](start_span)[span_77](end_span)
+│
+├── 5. SEMANTIC STATE LAYER
+│   │
+│   ├── 5.1 Density × Direction (6 Trạng thái Khí)
+│   │   ├── TỤ : I ≥ 0.75 ∧ D > 0[span_78](start_span)[span_78](end_span)[span_79](start_span)[span_79](end_span)
+│   │   ├── HỢP : I ≥ 0.75 ∧ D ≤ 0[span_80](start_span)[span_80](end_span)[span_81](start_span)[span_81](end_span)
+│   │   ├── TÁN : I < 0.30 ∧ D > 0[span_82](start_span)[span_82](end_span)[span_83](start_span)[span_83](end_span)
+│   │   └── LY : I < 0.30 ∧ D ≤ 0[span_84](start_span)[span_84](end_span)[span_85](start_span)[span_85](end_span)
+│   │
+│   ├── 5.2 Spatial × Force
+│   │   ├── HIỆN : S ≥ 0.70 ∧ F > 0.5[span_86](start_span)[span_86](end_span)[span_87](start_span)[span_87](end_span)
+│   │   └── ẨN : S < 0.30 (hoặc I · S < 0.30)[span_88](start_span)[span_88](end_span)[span_89](start_span)[span_89](end_span)
+│   │
+│   └── 5.3 Emergence Matrix (S07 Threshold Registry)
+│       ├── NO_EMERGENCE : I < θ_I ∧ F < θ_F[span_90](start_span)[span_90](end_span)[span_91](start_span)[span_91](end_span)
+│       ├── TRANSIENT_FORCE : I < θ_I ∧ F ≥ θ_F[span_92](start_span)[span_92](end_span)[span_93](start_span)[span_93](end_span)
+│       ├── LATENT_ACCUMULATION : I ≥ θ_I ∧ F < θ_F ∧ P ≥ θ_P ∧ A ≥ θ_A[span_94](start_span)[span_94](end_span)[span_95](start_span)[span_95](end_span)
+│       └── STABLE_EMERGENCE : I ≥ θ_I ∧ F ≥ θ_F ∧ P ≥ θ_P ∧ A ≥ θ_A[span_96](start_span)[span_96](end_span)[span_97](start_span)[span_97](end_span)
+│
+├── 6. INTERACTION / PROPAGATION
+│   │
+│   ├── Graph interaction (M11 Interaction Tensor)[span_98](start_span)[span_98](end_span)[span_99](start_span)[span_99](end_span)
+│   ├── Edge propagation[span_100](start_span)[span_100](end_span)
+│   ├── Interaction Density response[span_101](start_span)[span_101](end_span)
+│   ├── Force response[span_102](start_span)[span_102](end_span)
+│   ├── Spatial response[span_103](start_span)[span_103](end_span)
+│   └── Temporal response[span_104](start_span)[span_104](end_span)
+│
+├── 7. SIE OVERRIDE / PRECEDENCE (Cây Ưu Tiên Tuyệt Đối - Override Cascade)
+│   │
+│   ├── Step 1: Tam Hợp / Lục Hợp ──> E = +1.5 [STOP][span_105](start_span)[span_105](end_span)[span_106](start_span)[span_106](end_span)
+│   ├── Step 2: Khắc Nhập (K_IN) ───> E = -2.0 [STOP][span_107](start_span)[span_107](end_span)[span_108](start_span)[span_108](end_span)
+│   ├── Step 3: Khắc Xuất (K_OUT) ──> E = -1.5 [STOP][span_109](start_span)[span_109](end_span)[span_110](start_span)[span_110](end_span)
+│   ├── Step 4: Sinh Nhập (S_IN) ───> E = +1.2 [STOP][span_111](start_span)[span_111](end_span)[span_112](start_span)[span_112](end_span)
+│   ├── Step 5: Sinh Xuất (S_OUT) ──> E = -1.0 [STOP][span_113](start_span)[span_113](end_span)[span_114](start_span)[span_114](end_span)
+│   ├── Step 6: Tỷ Hòa (EQU) ──────> E = +1.0 [STOP][span_115](start_span)[span_115](end_span)[span_116](start_span)[span_116](end_span)
+│   ├── Conflict detection & Override Rule
+│   │   └── S00 = S01 > S06 (SIE/Khí) > S07 > S08 ... (SIE áp đảo S07 khi xung đột)[span_117](start_span)[span_117](end_span)[span_118](start_span)[span_118](end_span)
+│   └── Result
+│       └── TÁN/LY → tái đánh giá[span_119](start_span)[span_119](end_span)
+│
+├── 8. LEGACY NUMERIC REGISTRY
+│   │
+│   ├── Relation Weights
+│   │   ├── Tỷ hòa = +0.5[span_120](start_span)[span_120](end_span)
+│   │   ├── Sinh = +0.8[span_121](start_span)[span_121](end_span)
+│   │   ├── Khắc = -0.8[span_122](start_span)[span_122](end_span)
+│   │   └── Trung tính = 0[span_123](start_span)[span_123](end_span)
+│   │
+│   ├── Spatial
+│   │   ├── 0.0[span_124](start_span)[span_124](end_span)
+│   │   ├── 0.5[span_125](start_span)[span_125](end_span)
+│   │   └── 1.0[span_126](start_span)[span_126](end_span)
+│   │
+│   ├── Force
+│   │   ├── fallback = 0.5[span_127](start_span)[span_127](end_span)
+│   │   ├── khắc increment = 0.05[span_128](start_span)[span_128](end_span)
+│   │   ├── increment ceiling = 0.3[span_129](start_span)[span_129](end_span)
+│   │   └── F range = [0,1][span_130](start_span)[span_130](end_span)
+│   │
+│   └── Semantic Thresholds
+│       ├── I = 0.75[span_131](start_span)[span_131](end_span)
+│       ├── I = 0.30[span_132](start_span)[span_132](end_span)
+│       ├── S = 0.70[span_133](start_span)[span_133](end_span)
+│       └── S = 0.30[span_134](start_span)[span_134](end_span)
+│
+├── 9. EXPERIMENTAL / QUANTITATIVE RESEARCH OPERATORS (Chapter 13 - Research Module)
+│   │
+│   ├── 9.1 Final Field Force Operator (Toán tử Lực Final Dụng Thần)
+│   │   ├── Anchor Mapping:
+│   │   │   ├── Chi phí / Tiền bạc (P) ──> Lực Final Hào Thê Tài (F_Tài)[span_135](start_span)[span_135](end_span)[span_136](start_span)[span_136](end_span)
+│   │   │   ├── Biến cố / Rủi ro (Q) ────> Lực Final Hào Quan Quỷ (F_Quỷ)[span_137](start_span)[span_137](end_span)[span_138](start_span)[span_138](end_span)
+│   │   │   └── Thời gian / Môi trường (M) ─> Lực Final Hào Phụ Mẫu (F_Phụ)[span_139](start_span)[span_139](end_span)[span_140](start_span)[span_140](end_span)
+│   │   └── Master Formula:
+│   │       └── V_output = V_0 · (1 + F_DụngThần / SL_Dương) · |F_BiếnCố| · THẾ · (SL_Âm / SL_Dương)^α[span_141](start_span)[span_141](end_span)[span_142](start_span)[span_142](end_span)
+│   │
+│   └── 9.2 Observation & Calibration Protocol
+│       └── Delta Error: ΔV = |V_actual - V_output| (Tự động hiệu chỉnh hằng số base V_0)[span_143](start_span)[span_143](end_span)
+│
+└── 10. UNVERIFIED / NON-LEGACY CANDIDATES
+   │
+   ├── Numeric Graph Proposal
+   │   ├── Sinh = +1[span_144](start_span)[span_144](end_span)
+   │   ├── Khắc = -1[span_145](start_span)[span_145](end_span)
+   │   ├── Xung = -2[span_146](start_span)[span_146](end_span)
+   │   └── Hợp = +2[span_147](start_span)[span_147](end_span)
+   │
+   ├── BaseStrength
+   │   ├── Động = +2[span_148](start_span)[span_148](end_span)
+   │   └── Tĩnh = +1[span_149](start_span)[span_149](end_span)
+   │
+   ├── SeasonalWeight
+   │   ├── Vượng = +2[span_150](start_span)[span_150](end_span)
+   │   ├── Tướng = +1[span_151](start_span)[span_151](end_span)
+   │   ├── Hưu = 0[span_152](start_span)[span_152](end_span)
+   │   ├── Tù = -1[span_153](start_span)[span_153](end_span)
+   │   └── Tử = -2[span_154](start_span)[span_154](end_span)
+   │
+   ├── Graph Wavefront
+   │   ├── t = 1[span_155](start_span)[span_155](end_span)
+   │   └── t = 2[span_156](start_span)[span_156](end_span)
+   │
+   ├── Static Hexagram
+   │   └── Thế = fallback Origin[span_157](start_span)[span_157](end_span)
+   │
+   ├── 6×6 weighted adjacency semantics[span_158](start_span)[span_158](end_span)
+   │
+   ├── 12-node topology[span_159](start_span)[span_159](end_span)
+   │
+   └── Other relations pending lineage audit
+       ├── Lục Hợp[span_160](start_span)[span_160](end_span)
+       ├── Lục Xung[span_161](start_span)[span_161](end_span)
+       ├── Tam Hợp[span_162](start_span)[span_162](end_span)
+       ├── Tam Hội[span_163](start_span)[span_163](end_span)
+       ├── Tương Hại[span_164](start_span)[span_164](end_span)
+       ├── Tương Phá[span_165](start_span)[span_165](end_span)
+       ├── Tương Hình[span_166](start_span)[span_166](end_span)
+       ├── Root–Transform Pair[span_167](start_span)[span_167](end_span)
+       └── Adjacent[span_168](start_span)[span_168](end_span)
+
+Để xuất cấu trúc registry này thành file PDF tên legacy magic.pdf, bạn hãy mở Terminal/Command Prompt trên máy tính có sẵn Python và thư viện ReportLab/WeasyPrint, sau đó chạy script dưới đây:
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.platypus import Preformatted, SimpleDocTemplate
+
+# Định nghĩa nội dung Registry
+registry_text = """DD LEGACY FORCE & INTERACTION REGISTRY
+│
+├── 0. REGISTRY METADATA
+│   ├── Scope: Legacy lineage ≤ DD-3.0
+│   ├── Status: RESEARCH / LINEAGE / NOT MERGED
+│   ├── Canonical Rule: Không sửa legacy source | Không suy ngược proposal | Không tự chuẩn hóa
+│   └── Evidence Level: VERIFIED | PARTIALLY VERIFIED | UNVERIFIED
+│
+├── 1. STRUCTURAL PRIMITIVES
+│   ├── H (Hướng) | L (Lực) | K (Khí) | T (Thế)
+│   ├── M (Momentum ∈ [0.0, 1.0]) | E (Existence ∈ [0.0, 1.0])
+│   └── Topology (T) | Time (T) | Observer (O) | Evidence (E) | Uncertainty σ
+│
+├── 2. NODE / POSITION LAYER
+│   ├── Six-line structure (Hào 1–6) & Active line (Hào động z)
+│   ├── Core Operators: D̂_i(χ_i)=1-χ_i | Ĉ(χ)=1-χ | P̂(χ)=Đảo vị | Ĥ(χ)=Hổ quẻ
+│   └── Spatial Index S: Hào 1–2 (0.0 - Địa) | Hào 3–4 (0.5 - Nhân) | Hào 5–6 (1.0 - Thiên)
+│
+├── 3. RELATIONAL LAYER
+│   ├── 3.1 Ngũ Hành Weights: Tỷ hòa (+0.5) | Sinh (+0.8) | Khắc (-0.8) | Trung tính (0)
+│   ├── 3.2 Graph Relations: Edge(source, target, weight, relation_type), ung, ty, hinh, xung, khac, hop
+│   └── 3.3 Differential Operator: dX/dt = Ω_5H · X(t) + f_ext(t)
+│
+├── 4. FORCE / FIELD LAYER
+│   ├── 4.1 Vector Khí: V_Khí = [S, D, I, F, T]
+│   ├── 4.2 DWL-0.1: W_ij(τ) = B_ij · K_ctx · K_inter · K_time | P_ij = N_act/N_obs | A_ij(t) = ∑ W_ij
+│   ├── 4.3 Normalization: F_field_raw = ∑ W_ij · D_ij | F_norm = ||F_raw|| / F_max ∈ [0, 1]
+│   ├── 4.4 Interaction Density: I = substantive_edges / maximum_possible_edges
+│   ├── 4.5 Phase Kinematics: v_i(τ) = Clamp(v_base + α·F_net - β·W_resist, v_min, v_max)
+│   ├── 4.6 Dynamic Sufficiency: F_out = max(0, F_avail - F_self_maintain)
+│   └── 4.7 Rigid Geometry Solver (L2-RGS): E_rigid & F_rigid ∈ [0, 1]
+│
+├── 5. SEMANTIC STATE LAYER
+│   ├── 5.1 6 Trạng thái Khí: TỤ (I≥0.75, D>0) | HỢP (I≥0.75, D≤0) | TÁN (I<0.30, D>0) | LY (I<0.30, D≤0)
+│   ├── 5.2 Spatial x Force: HIỆN (S≥0.70, F>0.5) | ẨN (S<0.30)
+│   └── 5.3 Emergence Matrix: NO_EMERGENCE | TRANSIENT_FORCE | LATENT_ACCUMULATION | STABLE_EMERGENCE
+│
+├── 6. INTERACTION / PROPAGATION (M11 Interaction Tensor & Propagation Engine)
+│
+├── 7. SIE OVERRIDE / PRECEDENCE (Override Cascade)
+│   └── Step 1: Tam/Lục Hợp (+1.5) ➔ Step 2: Khắc Nhập (-2.0) ➔ Step 3: Khắc Xuất (-1.5)
+│       ➔ Step 4: Sinh Nhập (+1.2) ➔ Step 5: Sinh Xuất (-1.0) ➔ Step 6: Tỷ Hòa (+1.0)
+│
+├── 8. LEGACY NUMERIC REGISTRY
+│   └── Relation Weights | Spatial (0.0, 0.5, 1.0) | Force Ceiling | Thresholds (0.75, 0.30)
+│
+├── 9. EXPERIMENTAL OPERATORS (Chapter 13 - Research Module)
+│   ├── Final Field Force Operator: V_output = V_0 · (1 + F_DụngThần / SL_Dương) · |F_BiếnCố| · THẾ · (SL_Âm/SL_Dương)^α
+│   └── Observation Protocol: ΔV = |V_actual - V_output|
+│
+└── 10. UNVERIFIED / NON-LEGACY CANDIDATES
+   └── Numeric Graph Proposals, BaseStrength, SeasonalWeight, Graph Wavefront, 6x6 Adjacency
+"""
+
+# Tạo file PDF
+doc = SimpleDocTemplate(
+   "legacy magic.pdf", pagesize=letter, rightMargin=36, leftMargin=36, topMargin=36, bottomMargin=36
+)
+styles = getSampleStyleSheet()
+code_style = ParagraphStyle("CodeStyle", fontName="Courier", fontSize=8, leading=10)
+
+element = Preformatted(registry_text, code_style)
+doc.build([element])
+print("Thành công! File PDF 'legacy magic.pdf' đã được khởi tạo.")
