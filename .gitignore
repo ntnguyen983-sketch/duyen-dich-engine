@@ -8,3 +8,16 @@ gha-creds-*.json
 playwright-report/
 test-results/
 .vercel
+
+# Local research artifacts and provider responses; keep source code/tests only in Git.
+drive-*.txt
+drive-*.md
+duyen-dich-master-spec-v3-0-dd.pdf
+duyen-dich-master-spec-v3-0-dd.txt
+gemini-*.json
+gemini-*.md
+image-error-findings.md
+v30dd-source-inventory.md
+web-preview-findings.md
+architecture-ai-decision.md
+ai-interpretation-design.md

@@ -7,6 +7,7 @@ from typing import Any
 from flask import Flask, jsonify, request, send_from_directory
 
 from runtime.v31.engine import canonical_response, run_v31
+from services.ai_inference import GeminiConfigurationError, GeminiProviderError, generate_ai_interpretation
 
 ROOT = Path(__file__).resolve().parent
 app = Flask(__name__, static_folder=None)
@@ -14,6 +15,21 @@ app = Flask(__name__, static_folder=None)
 
 def _error(message: str, status: int = 400):
     return jsonify({"error": message, "code": "INVALID_INPUT"}), status
+
+
+def _attach_engine_trace(ai_result: dict[str, Any], engine_result: dict[str, Any]) -> dict[str, Any]:
+    """Make engine provenance authoritative over any model-generated trace fields."""
+    result = dict(ai_result)
+    trace = dict(result.get("trace") or {})
+    execution = engine_result.get("execution") or {}
+    provenance = engine_result.get("provenance") or {}
+    trace.update({
+        "engine_execution_id": execution.get("execution_id", "unknown"),
+        "engine_input_hash": execution.get("input_hash", "unknown"),
+        "engine_content_fingerprint": provenance.get("content_fingerprint", "unknown"),
+    })
+    result["trace"] = trace
+    return result
 
 
 def _is_hexagram_payload(payload: dict[str, Any]) -> bool:
@@ -61,7 +77,12 @@ def ui_asset(filename: str):
 
 @app.get("/api/health")
 def health():
-    return jsonify({"status": "ok", "contract_version": "3.1.0", "runtime": "v31"})
+    return jsonify({
+        "status": "ok",
+        "contract_version": "3.1.0",
+        "runtime": "v31",
+        "ai_interpretation": "configured" if __import__("os").getenv("GEMINI_API_KEY") else "not_configured",
+    })
 
 
 @app.route("/api/v31", methods=["GET", "POST"])
@@ -79,6 +100,60 @@ def v31_endpoint():
     except (TypeError, ValueError, OverflowError) as exc:
         return _error(str(exc))
     return app.response_class(json.dumps(result, ensure_ascii=False, sort_keys=True), status=200, mimetype="application/json")
+
+
+@app.post("/api/v31/analyze")
+def v31_analyze_endpoint():
+    """Run the immutable engine, then generate a separate AI interpretation."""
+    if not request.is_json:
+        return _error("Content-Type phải là application/json.")
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return _error("Request body phải là một JSON object.")
+    try:
+        core_payload, source = normalize_run_payload(payload)
+        engine_result = canonical_response(run_v31(core_payload, strict_number=(source == "flat")))
+    except (TypeError, ValueError, OverflowError) as exc:
+        return _error(str(exc))
+
+    try:
+        ai_result = generate_ai_interpretation(
+            engine_result,
+            core_payload["question"],
+            source_payload=payload,
+        )
+        ai_result = _attach_engine_trace(ai_result, engine_result)
+    except GeminiConfigurationError:
+        return jsonify({
+            "error": "AI luận giải chưa được cấu hình ở môi trường server.",
+            "code": "GEMINI_NOT_CONFIGURED",
+            "engine_output": engine_result,
+        }), 503
+    except GeminiProviderError:
+        app.logger.exception("Gemini interpretation provider failure")
+        return jsonify({
+            "error": "Không thể tạo luận giải AI lúc này.",
+            "code": "AI_INTERPRETATION_FAILED",
+            "engine_output": engine_result,
+        }), 502
+    except Exception:
+        app.logger.exception("Unexpected AI interpretation failure")
+        return jsonify({
+            "error": "Không thể tạo luận giải AI lúc này.",
+            "code": "AI_INTERPRETATION_FAILED",
+            "engine_output": engine_result,
+        }), 502
+
+    response_payload = {
+        "engine_output": engine_result,
+        "ai_interpretation": ai_result,
+        "ai_trace": ai_result["trace"],
+    }
+    return app.response_class(
+        json.dumps(response_payload, ensure_ascii=False, sort_keys=True),
+        status=200,
+        mimetype="application/json",
+    )
 
 
 if __name__ == "__main__":

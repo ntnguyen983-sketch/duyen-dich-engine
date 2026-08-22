@@ -11,6 +11,40 @@ const hexagramPayload = JSON.stringify({
   }
 }, null, 2);
 
+async function mockAi(page) {
+  await page.route('**/api/v31/analyze', async route => {
+    const engineResponse = await page.request.post('/api/v31', { data: JSON.parse(route.request().postData() || '{}') });
+    const engine = await engineResponse.json();
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        engine_output: engine,
+        ai_interpretation: {
+          status: 'provisional',
+          headline: 'Có lực để tiến, nhưng cần giữ nhịp',
+          answer: 'Nếu giữ điều kiện hiện tại, xu hướng là có thể tiến từng bước; tránh quyết định vội.',
+          reading: 'Đây là luận giải AI dựa trên output của Engine.',
+          signals: [{ name: 'Vector Khí', direction: 'mixed', evidence_paths: ['raw_measurements.khi_vector'], meaning: 'Tín hiệu hỗn hợp nên cần quan sát thêm.' }],
+          forecast: { near_term: 'Tiến triển từng bước.', condition: 'Nếu giữ cách làm hiện tại.', turning_point: 'Khi điều kiện thực địa thay đổi.' },
+          actions: ['Kiểm tra điều kiện thực tế trước khi chốt.'],
+          uncertainty: { score: 0.7, note: 'Mapping còn provisional.' },
+          limitations: ['Luận giải AI không phải kết luận CORE.'],
+          trace: {
+            model: 'test-model',
+            engine_execution_id: engine.execution.execution_id,
+            engine_input_hash: engine.execution.input_hash,
+            engine_content_fingerprint: engine.provenance.content_fingerprint,
+            source_version: 'v3.0dd-architecture + v3.1-runtime',
+            inference_layer: 'AI_INTERPRETATION',
+            generated_at: '2026-08-22T00:00:00+00:00'
+          }
+        }
+      })
+    });
+  });
+}
+
 async function fillValidForm(page) {
   await page.locator('#question').fill('tình cảm');
   await page.locator('#number').fill(payloadNumber);
@@ -31,15 +65,19 @@ test.afterEach(async ({ page }, testInfo) => {
   }
 });
 
-test('full v3.1 browser flow renders canonical output', async ({ page }) => {
+test('full v3.1 browser flow renders canonical output and AI interpretation', async ({ page }) => {
+  await mockAi(page);
   await page.goto('/');
   await expect(page.locator('#question')).toHaveValue('tình cảm');
   await expect(page.locator('#run')).toHaveText('CHẠY DUYÊN DỊCH v3.1');
   await fillValidForm(page);
   await page.locator('#run').click();
   await expect(page.locator('#status')).toContainText('PASS', { timeout: 15000 });
-  await expect(page.locator('#run-caption')).toContainText('Canonical response được giữ nguyên; vùng INFERRED có cảnh báo riêng.');
-  await expect(page.locator('#run-caption')).not.toContainText('canonical response đã được phân lớp để luận giải');
+  await expect(page.locator('#run-caption')).toContainText('Engine CORE giữ nguyên; lớp AI đã suy diễn có điều kiện từ output.');
+  await expect(page.locator('#ai-interpretation')).toContainText('LUẬN GIẢI AI');
+  await expect(page.locator('#ai-interpretation')).toContainText('Nếu giữ điều kiện hiện tại');
+  await expect(page.locator('#ai-interpretation')).toContainText('raw_measurements.khi_vector');
+  await expect(page.locator('#ai-interpretation')).toContainText('Luận giải AI không phải kết luận CORE');
   await expect(page.locator('#out')).toContainText('3.1.0');
   await expect(page.locator('#out')).toContainText('f_net_out_excluded');
   await expect(page.locator('#out')).not.toContainText('INFERRED');
@@ -71,13 +109,15 @@ test('full v3.1 browser flow renders canonical output', async ({ page }) => {
 });
 
 test('hexagram data_1/data_2 payload runs through production UI', async ({ page }) => {
+  await mockAi(page);
   await page.goto('/');
   await page.locator('#use-hexagram').check();
   await page.locator('#hexagram-payload').fill(hexagramPayload);
   await page.locator('#run').click();
   await expect(page.locator('#status')).toContainText('PASS', { timeout: 15000 });
-  await expect(page.locator('#run-caption')).toContainText('Canonical response được giữ nguyên; vùng INFERRED có cảnh báo riêng.');
-  await expect(page.locator('#run-caption')).not.toContainText('canonical response đã được phân lớp để luận giải');
+  await expect(page.locator('#run-caption')).toContainText('Engine CORE giữ nguyên; lớp AI đã suy diễn có điều kiện từ output.');
+  await expect(page.locator('#ai-interpretation')).toContainText('LUẬN GIẢI AI');
+  await expect(page.locator('#ai-interpretation')).toContainText('Đã tạo luận giải AI ở trạng thái provisional');
   await expect(page.locator('#out')).toContainText('3.1.0');
   await expect(page.locator('#out')).toContainText('CALIBRATION_REQUIRED');
   await expect(page.locator('#layers')).toContainText('L1');
@@ -110,6 +150,7 @@ test('hexagram data_1/data_2 payload runs through production UI', async ({ page 
 });
 
 test('mobile interpretation layout has no horizontal overflow or console errors', async ({ page }) => {
+  await mockAi(page);
   await page.setViewportSize({ width: 390, height: 844 });
   const consoleErrors = [];
   page.on('console', message => { if (message.type() === 'error') consoleErrors.push(message.text()); });

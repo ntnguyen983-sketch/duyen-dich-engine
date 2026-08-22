@@ -32,6 +32,8 @@ Runtime v3.1 chạy L1→L6 end-to-end. Các toán tử field và S07 mapping tr
 
 Ứng dụng Flask tại `app.py` là adapter duy nhất nối HTTP với `runtime.v31`; không có engine thứ hai trong API. Vercel nạp `api/index.py`, route `/` phục vụ `ui_test/index.html`, còn `POST /api/v31` trả strict canonical JSON theo schema v3.1. UI dùng cùng-origin request, không hard-code localhost.
 
+Lớp `POST /api/v31/analyze` chạy engine trước, sau đó gửi câu hỏi, source input và canonical engine output cho Gemini server-side. Gemini được phép suy diễn ở tầng `Pattern → Inference → Action` để tạo `headline`, `answer`, `reading`, `forecast` và `actions`; nó không được tính lại hoặc sửa CORE. Response AI có trace gồm model, execution ID, input hash, content fingerprint, source version và limitation. `GEMINI_API_KEY` chỉ được đọc từ server-side environment variable; không đặt trong JavaScript hoặc response công khai. `CALIBRATION_REQUIRED` không chặn luận giải nhưng làm trạng thái AI thành `provisional` và được đưa vào limitations.
+
 Chạy local:
 
 ```bash
@@ -39,7 +41,7 @@ pip install -r requirements.txt
 python3 app.py
 ```
 
-Mở `http://127.0.0.1:8000/`. Health check là `GET /api/health`; readiness check là `GET /api/v31`.
+Mở `http://127.0.0.1:8000/`. Health check là `GET /api/health`; readiness check là `GET /api/v31`. Để bật luận giải AI trên deployment, cấu hình `GEMINI_API_KEY` trong environment Variables của Vercel cho Preview/Production tương ứng; secret GitHub Actions không tự động trở thành biến runtime của Vercel.
 
 ## Kiểm định đặc tả
 
