@@ -11,6 +11,7 @@ from services.ai_interpretation import (
     GeminiProviderError,
     generate_interpretation,
 )
+from services.postcore_verification import run_postcore_verification
 
 ROOT = Path(__file__).resolve().parent
 app = Flask(__name__, static_folder=None)
@@ -56,7 +57,18 @@ def normalize_run_payload(payload: dict[str, Any]) -> tuple[dict[str, Any], str]
 def _run_engine(payload: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any], str]:
     core_payload, source = normalize_run_payload(payload)
     result = canonical_response(run_v31(core_payload, strict_number=(source == "flat")))
-    return result, core_payload, source
+    # Mirror runtime.v31._norm so the audit hashes exactly the engine input,
+    # including explicit nulls for optional fields omitted by a flat request.
+    normalized_for_audit = {
+        "question": str(core_payload["question"]).strip(),
+        "number": int(str(core_payload["number"]).strip()),
+        "time": str(core_payload["time"]).strip(),
+        "gps": core_payload.get("gps"),
+        "address": core_payload.get("address").strip() if isinstance(core_payload.get("address"), str) else None,
+        "image": core_payload.get("image"),
+        "dong": core_payload.get("dong"),
+    }
+    return result, normalized_for_audit, source
 
 
 def _attach_engine_trace(ai_result: dict[str, Any], engine_output: dict[str, Any]) -> dict[str, Any]:
@@ -121,11 +133,20 @@ def v31_interpret_endpoint():
         engine_output, core_payload, _ = _run_engine(payload)
     except (TypeError, ValueError, OverflowError) as exc:
         return _error(str(exc))
+    postcore_verification = run_postcore_verification(core_payload, engine_output)
+    if postcore_verification["status"] != "PASSED":
+        return jsonify({
+            "code": "POSTCORE_VERIFICATION_FAILED",
+            "error": "Không tạo luận giải: đối chất sau CORE không đạt.",
+            "engine_output": engine_output,
+            "postcore_verification": postcore_verification,
+        }), 422
     try:
         ai_result = generate_interpretation(
             engine_output,
             core_payload["question"],
             source_input=payload,
+            postcore_verification=postcore_verification,
         )
         ai_result = _attach_engine_trace(ai_result, engine_output)
     except GeminiConfigurationError:
@@ -133,6 +154,7 @@ def v31_interpret_endpoint():
             "code": "GEMINI_NOT_CONFIGURED",
             "error": "AI luận giải chưa được cấu hình ở môi trường server.",
             "engine_output": engine_output,
+            "postcore_verification": postcore_verification,
         }), 503
     except GeminiProviderError:
         app.logger.exception("Gemini interpretation provider failure")
@@ -140,6 +162,7 @@ def v31_interpret_endpoint():
             "code": "AI_INTERPRETATION_FAILED",
             "error": "Không thể tạo luận giải AI lúc này.",
             "engine_output": engine_output,
+            "postcore_verification": postcore_verification,
         }), 502
     except Exception:
         app.logger.exception("Unexpected AI interpretation failure")
@@ -147,10 +170,12 @@ def v31_interpret_endpoint():
             "code": "AI_INTERPRETATION_FAILED",
             "error": "Không thể tạo luận giải AI lúc này.",
             "engine_output": engine_output,
+            "postcore_verification": postcore_verification,
         }), 502
 
     response_payload = {
         "engine_output": engine_output,
+        "postcore_verification": postcore_verification,
         "ai_interpretation": ai_result,
         "ai_trace": ai_result["trace"],
     }

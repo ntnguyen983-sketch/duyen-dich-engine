@@ -183,7 +183,7 @@ def _normalize(raw: dict[str, Any], engine_output: dict[str, Any], model: str) -
     }
 
 
-def _prompt(question: str, source_input: dict[str, Any], engine_output: dict[str, Any]) -> str:
+def _prompt(question: str, source_input: dict[str, Any], engine_output: dict[str, Any], postcore_verification: dict[str, Any]) -> str:
     schema = {
         "status": "ready|provisional",
         "headline": "string",
@@ -201,6 +201,7 @@ def _prompt(question: str, source_input: dict[str, Any], engine_output: dict[str
         f"QUESTION={question}",
         f"SOURCE_INPUT={json.dumps(source_input, ensure_ascii=False, sort_keys=True, default=str)}",
         f"ENGINE_OUTPUT={json.dumps(engine_output, ensure_ascii=False, sort_keys=True, default=str)}",
+        f"POSTCORE_VERIFICATION={json.dumps(postcore_verification, ensure_ascii=False, sort_keys=True, default=str)}",
     ])
 
 
@@ -233,11 +234,12 @@ def generate_interpretation(
     question: str,
     *,
     source_input: dict[str, Any] | None = None,
+    postcore_verification: dict[str, Any] | None = None,
     model: str | None = None,
 ) -> dict[str, Any]:
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise GeminiConfigurationError("GEMINI_API_KEY is not configured")
     selected_model = _model_name(model)
-    raw = _extract_json(_call_gemini(api_key, selected_model, _prompt(question, source_input or {"question": question}, engine_output)))
+    raw = _extract_json(_call_gemini(api_key, selected_model, _prompt(question, source_input or {"question": question}, engine_output, postcore_verification or {})))
     return _normalize(raw, engine_output, selected_model)

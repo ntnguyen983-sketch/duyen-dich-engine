@@ -27,6 +27,14 @@ async function mockInterpretation(page) {
       contentType: 'application/json',
       body: JSON.stringify({
         engine_output: engine,
+        postcore_verification: {
+          status: 'PASSED',
+          breakpoint: 'DD-3.0/3.1 CORE_LOCKED → NxNxspace → AI_INTERPRETATION',
+          core_lock: true,
+          core_audit: { status: 'PASSED', mismatch_count: 0 },
+          nxnxspace: { status: 'PASSED', namespace: 'research_only.nxnxspace', N: 6 },
+          no_writeback: true,
+        },
         ai_interpretation: {
           status: 'provisional',
           headline: 'Có lực để tiến, nhưng cần giữ nhịp',
@@ -85,6 +93,9 @@ test('user-facing flow renders AI interpretation before technical trace', async 
   await expect(page.locator('#interpretation')).toContainText('raw_measurements.khi_vector');
   await expect(page.locator('#engine-json')).toContainText('3.1.0');
   await expect(page.locator('#trace-json')).toContainText('AI_INTERPRETATION');
+  await expect(page.locator('#postcore-json')).toContainText('CORE_LOCKED');
+  await expect(page.locator('#postcore-json')).toContainText('research_only.nxnxspace');
+  await expect(page.locator('#status')).toContainText('NxNxspace');
 });
 
 test('hexagram payload preserves user context and shows provisional interpretation', async ({ page }) => {
@@ -97,6 +108,7 @@ test('hexagram payload preserves user context and shows provisional interpretati
   await expect(page.locator('#ai-pill')).toHaveText('AI PROVISIONAL');
   await expect(page.locator('#interpretation')).toContainText('Đã tạo luận giải ở trạng thái provisional');
   await expect(page.locator('#engine-json')).toContainText('CALIBRATION_REQUIRED');
+  await expect(page.locator('#postcore-json')).toContainText('PASSED');
 });
 
 test('mobile interpretation layout has no horizontal overflow or console errors', async ({ page }) => {

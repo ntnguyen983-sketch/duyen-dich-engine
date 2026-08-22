@@ -110,6 +110,7 @@
       <div class="section-head"><div><div class="eyebrow">Data / Signal / Trace</div><h2 id="trace-title">Bằng chứng và truy vết</h2><p>Vùng này dành cho kiểm định: CORE engine output không bị AI thay đổi.</p></div></div>
       <details><summary>Mở engine output canonical</summary><pre id="engine-json">Chưa có dữ liệu.</pre></details>
       <details><summary>Mở AI trace</summary><pre id="trace-json">Chưa có dữ liệu.</pre></details>
+      <details><summary>Mở kết quả NxNxspace và đối chất sau CORE</summary><pre id="postcore-json">Chưa có dữ liệu.</pre></details>
     </section>
 
     <footer class="foot">Nguồn kiến trúc: <a href="https://drive.google.com/file/d/19fwYtUWCz6djk46vibzAR5YN1VZ309bc/view?usp=drivesdk" target="_blank" rel="noreferrer">DD-SPEC-UNIFIED-v3.0_dd</a>. AI là lớp suy diễn sau engine; trạng thái CORE, gate và provenance được giữ nguyên.</footer>
@@ -162,7 +163,7 @@
       try{
         const payload=payloadFromForm(); const response=await fetch('/api/v31/interpret',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)}); const body=await response.json();
         if(!response.ok){ if(body.engine_output){ $('engine-json').textContent=JSON.stringify(body.engine_output,null,2); } throw new Error(body.error||`HTTP ${response.status}`); }
-        renderAi(body.ai_interpretation); $('engine-json').textContent=JSON.stringify(body.engine_output,null,2); $('trace-json').textContent=JSON.stringify(body.ai_trace||body.ai_interpretation?.trace||{},null,2); $('status').textContent='PASS — đã có luận giải dựa trên Engine'; $('status').className='status good';
+        renderAi(body.ai_interpretation); $('engine-json').textContent=JSON.stringify(body.engine_output,null,2); $('trace-json').textContent=JSON.stringify(body.ai_trace||body.ai_interpretation?.trace||{},null,2); $('postcore-json').textContent=JSON.stringify(body.postcore_verification||{},null,2); $('status').textContent='PASS — đã có luận giải dựa trên Engine + NxNxspace'; $('status').className='status good';
       }catch(error){ $('status').textContent=`FAIL — ${error.message}`; $('status').className='status bad'; $('ai-status').textContent='Không tạo được luận giải AI.'; $('ai-status').className='status bad'; $('ai-pill').textContent='AI ERROR'; $('ai-pill').className='pill warn'; }
       finally{ $('run').disabled=false; }
     });
