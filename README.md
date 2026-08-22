@@ -30,7 +30,9 @@ Runtime v3.1 chạy L1→L6 end-to-end. Các toán tử field và S07 mapping tr
 
 ## Web test end-to-end
 
-Ứng dụng Flask tại `app.py` là adapter duy nhất nối HTTP với `runtime.v31`; không có engine thứ hai trong API. Vercel nạp `api/index.py`, route `/` phục vụ `ui_test/index.html`, còn `POST /api/v31` trả strict canonical JSON theo schema v3.1. UI dùng cùng-origin request, không hard-code localhost.
+Ứng dụng Flask tại `app.py` là adapter duy nhất nối HTTP với `runtime.v31`; không có engine thứ hai trong API. Vercel nạp `api/index.py`, route `/` phục vụ `ui_test/index.html`, `POST /api/v31` trả strict canonical JSON theo schema v3.1, còn `POST /api/v31/interpret` chạy engine trước rồi gọi lớp AI luận giải server-side. UI dùng cùng-origin request, không hard-code localhost.
+
+Architecture canonical v3.0_dd và registry toán tử được lưu tại `docs/canonical/v3.0dd/`; nguồn Drive, hash và phạm vi áp dụng được ghi trong README của thư mục đó. AI được phép suy diễn ở tầng `Data → Signal → Pattern → Inference → Action`, nhưng không được tính lại hoặc ghi đè CORE. Mỗi luận giải phải có dự báo có điều kiện, hành động, uncertainty, limitation và trace về execution ID, input hash, content fingerprint và source version.
 
 Chạy local:
 
@@ -39,7 +41,7 @@ pip install -r requirements.txt
 python3 app.py
 ```
 
-Mở `http://127.0.0.1:8000/`. Health check là `GET /api/health`; readiness check là `GET /api/v31`.
+Mở `http://127.0.0.1:8000/`. Health check là `GET /api/health`; readiness check là `GET /api/v31`; bản luận giải đầy đủ là `POST /api/v31/interpret`. Cấu hình `GEMINI_API_KEY` chỉ ở server-side environment; không đặt khóa trong JavaScript.
 
 ## Kiểm định đặc tả
 
