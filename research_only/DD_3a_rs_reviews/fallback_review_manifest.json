@@ -1,0 +1,14 @@
+[
+  {
+    "name": "grok_direct",
+    "status": "error",
+    "error": "<_InactiveRpcError of RPC that terminated with:\n\tstatus = StatusCode.INVALID_ARGUMENT\n\tdetails = \"Incorrect API key provided. You can obtain an API key from https://console.x.ai.\"\n\tdebug_error_string = \"INVALID_ARGUMENT:Incorrect API key provided. You can obtain an API key from https://console.x.ai.\"\n>"
+  },
+  {
+    "name": "openai_direct_retry",
+    "status": "ok",
+    "model": "gpt-5.5",
+    "path": "/home/ubuntu/dd3a_review_outputs/openai_direct_retry.md",
+    "chars": 17632
+  }
+]

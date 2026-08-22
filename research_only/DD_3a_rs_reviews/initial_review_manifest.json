@@ -1,0 +1,51 @@
+[
+  {
+    "name": "gemini",
+    "model": "gemini-3.1-pro-preview",
+    "status": "ok",
+    "path": "/home/ubuntu/dd3a_review_outputs/gemini.md",
+    "chars": 6653
+  },
+  {
+    "name": "grok",
+    "model": "x-ai/grok-4.6",
+    "status": "error",
+    "path": "/home/ubuntu/dd3a_review_outputs/grok_ERROR.txt",
+    "error": "HTTPError('401 Client Error: Unauthorized for url: https://openrouter.ai/api/v1/chat/completions')"
+  },
+  {
+    "name": "deepseek",
+    "model": "deepseek-v4-pro",
+    "status": "error",
+    "path": "/home/ubuntu/dd3a_review_outputs/deepseek_ERROR.txt",
+    "error": "HTTPError('402 Client Error: Payment Required for url: https://api.deepseek.com/chat/completions')"
+  },
+  {
+    "name": "openai",
+    "model": "gpt-5.5",
+    "status": "error",
+    "path": "/home/ubuntu/dd3a_review_outputs/openai_ERROR.txt",
+    "error": "HTTPError('400 Client Error: Bad Request for url: https://api.manus.im/api/llm-proxy/v1/chat/completions')"
+  },
+  {
+    "name": "anthropic",
+    "model": "claude-opus-4-7",
+    "status": "ok",
+    "path": "/home/ubuntu/dd3a_review_outputs/anthropic.md",
+    "chars": 25173
+  },
+  {
+    "name": "cohere",
+    "model": "cohere/north-mini-code:free",
+    "status": "error",
+    "path": "/home/ubuntu/dd3a_review_outputs/cohere_ERROR.txt",
+    "error": "HTTPError('401 Client Error: Unauthorized for url: https://openrouter.ai/api/v1/chat/completions')"
+  },
+  {
+    "name": "perplexity",
+    "model": "perplexity/sonar-pro-search",
+    "status": "error",
+    "path": "/home/ubuntu/dd3a_review_outputs/perplexity_ERROR.txt",
+    "error": "HTTPError('401 Client Error: Unauthorized for url: https://openrouter.ai/api/v1/chat/completions')"
+  }
+]
